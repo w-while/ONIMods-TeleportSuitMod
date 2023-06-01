@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Application: Oxygen Not IncludedPOT Version: 2.0\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.1\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ko\n"
+
+#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
+msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
+msgid "存放传送服并为其补充氧气和电量，清空传送服中的污染物"
+msgstr "1111111"
+
+#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT
+msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT"
+msgid ""
+"存放<link=\"TELEPORTSUIT\">传送服</link>并为其补充氧气和电量\n"
+"清空传送服中的污染物\n"
+"不需要检查点，复制人会在工作时间穿上传送服并在休息时间脱下（可在模组设置中"
+"取消）"
+msgstr "111111111111111"
+
+#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME
+msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME"
+msgid "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
+msgstr "1111111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME"
+msgid "传送服电量"
+msgstr "11111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC"
+msgid "和通勤说拜拜"
+msgstr "1111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT"
+msgid ""
+"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">Lead Suit</link>相当的防"
+"护能力\n"
+"每次传送将消耗电量"
+msgstr "11111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME"
+msgid "传送服"
+msgstr "1111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
+msgid "<link=\"TELEPORTSUIT\">传送服</link>"
+msgstr "111111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC"
+msgid ""
+"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">Lead Suit</link>相当的防"
+"护能力"
+msgstr "111111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES"
+msgid "传送服电量为空"
+msgstr "1111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC"
+msgid ""
+"一件破损的 <link=\"TELEPORTSUIT\">传送服</link>。\n"
+"\n"
+"可以在 <link=\"SUITFABRICATOR\">Exosuit Forge</link>中修复。"
+msgstr "111111111111"
+
+#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
+msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
+msgid "<link=\"TELEPORTSUIT\">破损的传送服</link>"
+msgstr "111111111111"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE"
+msgid "复制人是否该在休息时间脱下传送服"
+msgstr "111111111111"
+
+#. STRINGS.UI.UISIDESCREENS.THRESHOLD_SWITCH_SIDESCREEN.DISEASE_UNITS
+msgctxt "STRINGS.UI.UISIDESCREENS.THRESHOLD_SWITCH_SIDESCREEN.DISEASE_UNITS"
+msgid "个"
+msgstr "111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER."
+"DESC"
+msgid "存放传送服并为其补充氧气和电量，清空传送服中的污染物"
+msgstr "1111111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER."
+"EFFECT"
+msgid ""
+"存放<link=\"TELEPORTSUIT\">传送服</link>并为其补充氧气和电量\n"
+"清空传送服中的污染物\n"
+"不需要检查点，复制人会在工作时间穿上传送服并在休息时间脱下（可在模组设置中"
+"取消）"
+msgstr "11111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER."
+"NAME"
+msgid "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
+msgstr "111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"BATTERY_EFFECT_NAME"
+msgid "传送服电量"
+msgstr "111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC"
+msgid "和通勤说拜拜"
+msgstr "111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT"
+msgid ""
+"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">Lead Suit</link>相当的防"
+"护能力\n"
+"每次传送将消耗电量"
+msgstr "11111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"GENERICNAME"
+msgid "传送服"
+msgstr "111111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
+msgid "<link=\"TELEPORTSUIT\">传送服</link>"
+msgstr "11111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"RECIPE_DESC"
+msgid ""
+"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">Lead Suit</link>相当的防"
+"护能力"
+msgstr "1111111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"SUIT_OUT_OF_BATTERIES"
+msgid "传送服电量为空"
+msgstr "11111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"WORN_DESC"
+msgid ""
+"一件破损的 <link=\"TELEPORTSUIT\">传送服</link>。\n"
+"\n"
+"可以在 <link=\"SUITFABRICATOR\">Exosuit Forge</link>中修复。"
+msgstr "111111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+"WORN_NAME"
+msgid "<link=\"TELEPORTSUIT\">破损的传送服</link>"
+msgstr "111111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY
+msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY"
+msgid "传送服电量 ({0})"
+msgstr "11111111111111"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT."
+"SHOULD_DROP_DURING_BREAK_TITLE"
+msgid "复制人是否该在休息时间脱下传送服"
+msgstr "111111111111111"
