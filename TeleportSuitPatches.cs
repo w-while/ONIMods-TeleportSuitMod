@@ -20,6 +20,7 @@ using PeterHan.PLib.Options;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using static PathFinder;
+using YamlDotNet.Core.Tokens;
 
 namespace TeleportSuitMod
 {
@@ -153,7 +154,8 @@ namespace TeleportSuitMod
                                 ___navigator.transform.SetPosition(Grid.CellToPosCBC(num, Grid.SceneLayer.Move));
 
                                 FallMonitor.Instance sMI = ___navigator.GetSMI<FallMonitor.Instance>();
-                                sMI.UpdateFalling();
+                                //sMI.UpdateFalling();
+                                sMI.sm.isFalling.Set(false, sMI);
                                 sMI.GoTo(sMI.sm.standing);
                                 return false;
                             }
