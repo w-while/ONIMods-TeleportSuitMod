@@ -15,7 +15,7 @@ namespace TeleportSuitMod
         public static PBuilding CreateBuilding()
         {
             string techString = "";
-            if (DlcManager.IsExpansion1Id("EXPANSION1_ID"))
+            if (DlcManager.IsContentActive("EXPANSION1_ID"))
             {
                 techString = techStringDlc;
             }

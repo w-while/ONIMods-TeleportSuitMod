@@ -65,7 +65,7 @@ namespace TeleportSuitMod
                     description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC,
                     nameDisplay = ComplexRecipe.RecipeNameDisplay.ResultWithIngredient,
                     fabricators = new List<Tag> { "SuitFabricator" },
-                    requiredTech = DlcManager.IsExpansion1Id("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
+                    requiredTech = DlcManager.IsContentActive("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
                     sortOrder = 1
                 };
                 ComplexRecipe.RecipeElement[] array17 = new ComplexRecipe.RecipeElement[2]
