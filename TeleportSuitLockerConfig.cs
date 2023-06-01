@@ -26,7 +26,7 @@ namespace TeleportSuitMod
             return TeleportSuitLockerTemplate = new PBuilding(ID, TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME)
             {
                 //AddAfter = PressureDoorConfig.ID,
-                Animation = "changingarea_radiation_kanim",
+                Animation = "teleport_suit_locker_kanim",
                 Category = "Equipment",
                 ConstructionTime = 30.0f,
                 Decor = BUILDINGS.DECOR.BONUS.TIER1,

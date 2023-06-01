@@ -106,7 +106,7 @@ namespace TeleportSuitMod
             //技能减免
             expertAthleticsModifier = new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, -ATHLETICS, Db.Get().Skills.Suits1.Name);
 
-            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef("Teleport_Suit", TUNING.EQUIPMENT.SUITS.SLOT, SimHashes.Dirt, TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS, "suit_leadsuit_kanim", "", "body_leadsuit_kanim", 6, list, null, IsBody: true, EntityTemplates.CollisionShape.CIRCLE, 0.325f, 0.325f, new Tag[2]
+            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef("Teleport_Suit", TUNING.EQUIPMENT.SUITS.SLOT, SimHashes.Dirt, TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS, "teleport_suit_kanim", "", "teleport_suit_body_kanim", 6, list, null, IsBody: true, EntityTemplates.CollisionShape.CIRCLE, 0.325f, 0.325f, new Tag[2]
             {
                 GameTags.Suit,
                 GameTags.Clothes

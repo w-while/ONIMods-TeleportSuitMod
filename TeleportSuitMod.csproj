@@ -84,9 +84,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="anim\assets\teleport_suit\teleport_suit_anim.bytes" />
+    <None Include="anim\assets\teleport_suit\teleport_suit_build.bytes" />
+    <None Include="anim\assets\teleport_suit_body\teleport_suit_body_build.bytes" />
+    <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_anim.bytes" />
+    <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_build.bytes" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="translations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
+    <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
+    <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
