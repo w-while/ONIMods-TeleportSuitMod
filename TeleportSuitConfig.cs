@@ -13,8 +13,6 @@ namespace TeleportSuitMod
     {
         public const string ID = "Teleport_Suit";
         public static ComplexRecipe recipe;
-        //TODO: 可能错误
-
         public static PathFinder.PotentialPath.Flags TeleportSuitFlags = (PathFinder.PotentialPath.Flags)32;//必须是2的幂且大于8
 
         public static int TELEPORTCOUNT = 80;

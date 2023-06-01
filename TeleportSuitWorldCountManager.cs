@@ -11,6 +11,9 @@ namespace TeleportSuitMod
     public class TeleportSuitWorldCountManager : KMonoBehaviour, ISim1000ms
     {
         public static TeleportSuitWorldCountManager Instance;
+
+        //一个很让我困惑的点在于在引用时(Instance==null)为真，但是直接使用不会触发为空报错
+
         public Dictionary<int, int> WorldCount = new Dictionary<int, int>();
         private int[] innerTempList = new int[50];
         private int len;

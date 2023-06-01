@@ -68,7 +68,6 @@ namespace TeleportSuitMod
                     requiredTech = DlcManager.IsExpansion1Id("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
                     sortOrder = 1
                 };
-                //TODO:
                 ComplexRecipe.RecipeElement[] array17 = new ComplexRecipe.RecipeElement[2]
                 {
                     new ComplexRecipe.RecipeElement("Worn_Teleport_Suit".ToTag(), 1f),
