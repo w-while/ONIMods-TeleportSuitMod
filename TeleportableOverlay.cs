@@ -33,7 +33,8 @@ namespace TeleportSuitMod
         {
             return new List<LegendEntry>()
             {
-                new LegendEntry("可传送区域", "穿着传送服的复制人可以传送到该地点", Color.blue),
+                new LegendEntry(TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA,
+                TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA, Color.blue),
             };
         }
     }

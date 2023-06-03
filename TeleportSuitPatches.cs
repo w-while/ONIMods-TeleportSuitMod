@@ -323,13 +323,13 @@ namespace TeleportSuitMod
             {
                 Type type = typeof(OverlayMenu).GetNestedType("OverlayToggleInfo", BindingFlags.NonPublic|BindingFlags.Instance);
                 object[] parameters = new object[] {
-                    STRINGS.UI.OVERLAYS.OXYGEN.BUTTON.ToString(),
-                    "overlay_oxygen",
+                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON.ToString(),
+                    "overlay_suit",
                     TeleportableOverlay.ID,
                     DlcManager.IsContentActive("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
                     Action.NumActions,
-                    STRINGS.UI.TOOLTIPS.OXYGENOVERLAYSTRING.ToString(),
-                    STRINGS.UI.OVERLAYS.OXYGEN.BUTTON.ToString()
+                    TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING.ToString(),
+                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON.ToString()
                 };
                 object obj = Activator.CreateInstance(type, parameters);
                 ___overlayToggleInfos.Add((KIconToggleMenu.ToggleInfo)obj);
@@ -371,7 +371,7 @@ namespace TeleportSuitMod
             public static void Prefix(List<OverlayLegend.OverlayInfo> ___overlayInfoList)
             {
                 OverlayLegend.OverlayInfo info = new OverlayLegend.OverlayInfo();
-                info.name = ___overlayInfoList[1].name;
+                info.name = "STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME";
                 info.mode=TeleportableOverlay.ID;
                 info.infoUnits=new List<OverlayInfoUnit>();
                 info.isProgrammaticallyPopulated=true;

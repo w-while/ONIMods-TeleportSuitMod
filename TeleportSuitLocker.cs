@@ -1,5 +1,7 @@
-﻿using STRINGS;
+﻿using Database;
+using STRINGS;
 using System;
+using System.Reflection;
 using TUNING;
 using UnityEngine;
 using static TeleportSuitMod.TeleportSuitLocker;
@@ -18,7 +20,7 @@ namespace TeleportSuitMod
             public static readonly Chore.Precondition DoesDupeHasTeleportSuitAndNeedCharging = new Chore.Precondition
             {
                 id = "DoesDupeHasTeleportSuitAndNeedCharging",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_URGENT,
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_DUPE_HAS_TELEPORT_SUIT_AND_NEED_CHARGING,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     Equipment equipment2 = context.consumerState.equipment;
@@ -53,7 +55,7 @@ namespace TeleportSuitMod
             public static readonly Chore.Precondition DoesDupeHasTeleportSuit = new Chore.Precondition
             {
                 id = "DoesDupeHasTeleportSuit",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_IDLE,
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_DUPE_HAS_TELEPORTSUIT,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     Equipment equipment = context.consumerState.equipment;
@@ -82,7 +84,7 @@ namespace TeleportSuitMod
             public static readonly Chore.Precondition CanTeleportSuitLockerDropOffSuit = new Chore.Precondition
             {
                 id = "CanTeleportSuitLockerDropOffSuit",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_IDLE,
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.CAN_TELEPORT_SUIT_LOCKER_DROP_OFFSUIT,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     if (data!=null)
@@ -94,10 +96,13 @@ namespace TeleportSuitMod
             };
             private WorkChore<UnequipTeleportSuitWorkable> urgentUnequipChore;
 
-            private WorkChore<UnequipTeleportSuitWorkable> idleUnequipChore;
+            //todo:让小人在空闲的时候脱下传送服
+            //private WorkChore<UnequipTeleportSuitWorkable> idleUnequipChore;
 
             private WorkChore<UnequipTeleportSuitWorkable> breakTimeUnequipChore;
 
+            public static ChoreType urgentUnequipChoreType = null;
+            public static ChoreType breakTimeUnequipChoreType = null;
 
             protected override void OnPrefabInit()
             {
@@ -111,8 +116,34 @@ namespace TeleportSuitMod
             {
                 if (urgentUnequipChore == null)
                 {
+                    if (urgentUnequipChoreType==null)
+                    {
+                        urgentUnequipChoreType = (ChoreType)typeof(ChoreTypes).GetMethod("Add", BindingFlags.Instance|BindingFlags.NonPublic).
+                            Invoke(Db.Get().ChoreTypes, new object[] {
+                                "ReturnTeleportSuitUrgent", new string[0], "", new string[0],
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.NAME.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.STATUS.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.TOOLTIP.ToString(),
+                                false
+                            });
+                    }
+                    if (breakTimeUnequipChore==null)
+                    {
+                        breakTimeUnequipChoreType = (ChoreType)typeof(ChoreTypes).GetMethod("Add", BindingFlags.Instance|BindingFlags.NonPublic).
+                            Invoke(Db.Get().ChoreTypes, new object[] {
+                                "ReturnTeleportSuitBreakTime", new string[0], "", new string[0],
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.NAME.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.STATUS.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.TOOLTIP.ToString(),
+                                false
+                            });
+                    }
                     SuitLocker component = GetComponent<SuitLocker>();
-                    urgentUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitUrgent, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
+                    urgentUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(urgentUnequipChoreType,
+                        this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true,
+                        null, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false,
+                        allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5,
+                        ignore_building_assignment: false, add_to_daily_report: false);
                     urgentUnequipChore.AddPrecondition(DoesDupeHasTeleportSuitAndNeedCharging);
                     urgentUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
                     //idleUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitIdle, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.idle, 5, ignore_building_assignment: false, add_to_daily_report: false);
@@ -120,7 +151,11 @@ namespace TeleportSuitMod
                     //idleUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
                     if (TeleportSuitOptions.Instance.ShouldDropDuringBreak)
                     {
-                        breakTimeUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitUrgent, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, Db.Get().ScheduleBlockTypes.Hygiene, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
+                        breakTimeUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(breakTimeUnequipChoreType,
+                            this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true,
+                            Db.Get().ScheduleBlockTypes.Hygiene, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false,
+                            allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5,
+                            ignore_building_assignment: false, add_to_daily_report: false);
                         breakTimeUnequipChore.AddPrecondition(DoesDupeHasTeleportSuit);
                         breakTimeUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
                     }
@@ -134,11 +169,11 @@ namespace TeleportSuitMod
                     urgentUnequipChore.Cancel(nameof(UnequipTeleportSuitWorkable.CancelChore));
                     urgentUnequipChore = null;
                 }
-                if (idleUnequipChore != null)
-                {
-                    idleUnequipChore.Cancel(nameof(UnequipTeleportSuitWorkable.CancelChore));
-                    idleUnequipChore = null;
-                }
+                //if (idleUnequipChore != null)
+                //{
+                //    idleUnequipChore.Cancel(nameof(UnequipTeleportSuitWorkable.CancelChore));
+                //    idleUnequipChore = null;
+                //}
                 if (breakTimeUnequipChore!=null)
                 {
                     breakTimeUnequipChore.Cancel(nameof(UnequipTeleportSuitWorkable.CancelChore));
@@ -195,7 +230,7 @@ namespace TeleportSuitMod
             public static readonly Chore.Precondition DoesTeleportSuitLockerHasAvailableSuit = new Chore.Precondition
             {
                 id = "DoesTeleportSuitLockerHasAvailableSuit",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_URGENT,
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_TELEPORT_SUIT_LOCKER_HAS_AVAILABLE_SUIT,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     if (data==null)
@@ -208,7 +243,7 @@ namespace TeleportSuitMod
             public static readonly Chore.Precondition DoesDupeAtEquipTeleportSuitSchedule = new Chore.Precondition
             {
                 id = "DoesDupeAtEquipTeleportSuitSchedule",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_URGENT,
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_DUPE_AT_EQUIP_TELEPORT_SUIT_SCHEDULE,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     if (context.consumerState.scheduleBlock?.GroupId!="Worktime")
@@ -218,10 +253,10 @@ namespace TeleportSuitMod
                     return true;
                 }
             };
-            public static readonly Chore.Precondition DoesDupeHasNoSuit = new Chore.Precondition
+            public static readonly Chore.Precondition DoesDupeHasNoTeleportSuit = new Chore.Precondition
             {
-                id = "DoesDupeHasNoSuit",
-                description = DUPLICANTS.CHORES.PRECONDITIONS.DOES_SUIT_NEED_RECHARGING_IDLE,
+                id = "DoesDupeHasNoTeleportSuit",
+                description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_DUPE_HAS_NO_TELEPORT_SUIT,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
                     Equipment equipment = context.consumerState.equipment;
@@ -229,7 +264,8 @@ namespace TeleportSuitMod
                     {
                         return false;
                     }
-                    if (equipment.IsSlotOccupied(Db.Get().AssignableSlots.Suit))
+                    if (equipment.IsSlotOccupied(Db.Get().AssignableSlots.Suit)
+                    &&equipment.GetSlot(Db.Get().AssignableSlots.Suit).assignable.GetComponent<TeleportSuitTank>()!=null)
                     {
                         return false;
                     }
@@ -254,7 +290,7 @@ namespace TeleportSuitMod
                     equipChore = new WorkChore<EquipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitUrgent, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null, ignore_schedule_block: false, only_when_operational: true, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
                     equipChore.AddPrecondition(DoesDupeAtEquipTeleportSuitSchedule);
                     equipChore.AddPrecondition(DoesTeleportSuitLockerHasAvailableSuit, component);
-                    equipChore.AddPrecondition(DoesDupeHasNoSuit);
+                    equipChore.AddPrecondition(DoesDupeHasNoTeleportSuit);
                 }
             }
 
@@ -279,7 +315,6 @@ namespace TeleportSuitMod
 
             protected override void OnCompleteWork(Worker worker)
             {
-                Console.WriteLine("EquipTeleportSuitWorkable OnCompleteWork called");
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
                 if (equipment==null)
                 {
@@ -297,7 +332,7 @@ namespace TeleportSuitMod
             {
                 return new HashedString[1]
                 {
-                new HashedString("none")
+                    new HashedString("none")
                 };
             }
         }
