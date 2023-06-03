@@ -71,6 +71,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TeleportableOverlay.cs" />
     <Compile Include="TeleportSuitConfig.cs" />
     <Compile Include="TeleportSuitGameTags.cs" />
     <Compile Include="TeleportSuitLocker.cs" />

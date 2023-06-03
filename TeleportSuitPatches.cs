@@ -21,6 +21,9 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using static PathFinder;
 using YamlDotNet.Core.Tokens;
+using static OverlayLegend;
+using static STRINGS.UI.USERMENUACTIONS;
+using System.Linq;
 
 namespace TeleportSuitMod
 {
@@ -255,85 +258,24 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(NavPathDrawer), "OnPostRender")]
         public static class NavPathDrawer_OnPostRender_Patch
         {
-            private static readonly HashedString[] PreAnims = new HashedString[2] { "grid_pre", "grid_loop" };
-            public static Grid.SceneLayer sceneLayer = Grid.SceneLayer.FXFront;
-            private static readonly HashedString PostAnim = "grid_pst";
-            private static readonly string AnimName = "transferarmgrid_kanim";
-            private struct VisData
-            {
-                public int cell;
-
-                public KBatchedAnimController controller;
-            }
-            private static List<VisData> visualizers = new List<VisData>();
-            private static List<int> newCells = new List<int>();
-
-            private static void DestroyEffect(KBatchedAnimController controller)
-            {
-                controller.destroyOnAnimComplete = true;
-                controller.Play(PostAnim);
-            }
-            private static void ClearVisualizers()
-            {
-                for (int i = 0; i < visualizers.Count; i++)
-                {
-                    DestroyEffect(visualizers[i].controller);
-                }
-                visualizers.Clear();
-            }
-            private static KBatchedAnimController CreateEffect(int cell)
-            {
-                KBatchedAnimController kBatchedAnimController = FXHelpers.CreateEffect(AnimName, Grid.CellToPosCCC(cell, sceneLayer), null, update_looping_sounds_position: false, sceneLayer, set_inactive: true);
-                kBatchedAnimController.destroyOnAnimComplete = false;
-                kBatchedAnimController.visibilityType = KAnimControllerBase.VisibilityType.Always;
-                kBatchedAnimController.gameObject.SetActive(value: true);
-                kBatchedAnimController.Play(PreAnims, KAnim.PlayMode.Loop);
-                return kBatchedAnimController;
-            }
+            static bool preDraw = false;
             public static bool Prefix(NavPathDrawer __instance)
             {
                 Navigator nav = __instance.GetNavigator();
                 if (nav!=null&&(nav.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
                 {
-                    int num;
-                    WorldContainer w = nav.GetMyWorld();
-                    newCells.Clear();
-                    for (int i = (int)w.minimumBounds.y; (float)i <= w.maximumBounds.y; i++)
+                    if (OverlayScreen.Instance.mode != TeleportableOverlay.ID)
                     {
-                        for (int j = (int)w.minimumBounds.x; (float)j <= w.maximumBounds.x; j++)
-                        {
-                            num=Grid.XYToCell(j, i);
-                            if (TeleportSuitConfig.CanTeloportTo(num))
-                            {
-                                newCells.Add(num);
-                            }
-                        }
-
+                        OverlayScreen.Instance.ToggleOverlay(TeleportableOverlay.ID);
                     }
-                    for (int num4 = visualizers.Count - 1; num4 >= 0; num4--)
-                    {
-                        if (newCells.Contains(visualizers[num4].cell))
-                        {
-                            newCells.Remove(visualizers[num4].cell);
-                        }
-                        else
-                        {
-                            DestroyEffect(visualizers[num4].controller);
-                            visualizers.RemoveAt(num4);
-                        }
-                    }
-                    for (int k = 0; k < newCells.Count; k++)
-                    {
-                        KBatchedAnimController controller = CreateEffect(newCells[k]);
-                        visualizers.Add(new VisData
-                        {
-                            cell = newCells[k],
-                            controller = controller
-                        });
-                    }
+                    preDraw=true;
                     return false;
                 }
-                ClearVisualizers();
+                if (preDraw)
+                {
+                    preDraw=false;
+                    OverlayScreen.Instance.ToggleOverlay(OverlayModes.None.ID);
+                }
                 return true;
             }
         }
@@ -371,6 +313,69 @@ namespace TeleportSuitMod
                     return false;
                 }
                 return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(OverlayMenu), "InitializeToggles")]
+        public static class OverlayMenu_InitializeToggles_Patch
+        {
+            public static void Postfix(List<OverlayMenu.ToggleInfo> ___overlayToggleInfos)
+            {
+                Type type = typeof(OverlayMenu).GetNestedType("OverlayToggleInfo", BindingFlags.NonPublic|BindingFlags.Instance);
+                object[] parameters = new object[] {
+                    STRINGS.UI.OVERLAYS.OXYGEN.BUTTON.ToString(),
+                    "overlay_oxygen",
+                    TeleportableOverlay.ID,
+                    DlcManager.IsContentActive("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
+                    Action.NumActions,
+                    STRINGS.UI.TOOLTIPS.OXYGENOVERLAYSTRING.ToString(),
+                    STRINGS.UI.OVERLAYS.OXYGEN.BUTTON.ToString()
+                };
+                object obj = Activator.CreateInstance(type, parameters);
+                ___overlayToggleInfos.Add((KIconToggleMenu.ToggleInfo)obj);
+            }
+        }
+
+        [HarmonyPatch(typeof(SimDebugView), "OnPrefabInit")]
+        public static class SimDebugView_OnPrefabInit_Patch
+        {
+            public static void Postfix(Dictionary<HashedString, Func<SimDebugView, int, Color>> ___getColourFuncs)
+            {
+                ___getColourFuncs.Add(TeleportableOverlay.ID, TeleportableOverlay.GetOxygenMapColour);
+            }
+        }
+
+        [HarmonyPatch(typeof(OverlayScreen), "RegisterModes")]
+        public static class OverlayScreen_RegisterModes_Patch
+        {
+            public static void Postfix(OverlayScreen __instance)
+            {
+                typeof(OverlayScreen).GetMethod("RegisterMode", BindingFlags.NonPublic|BindingFlags.Instance).Invoke(__instance, new object[] { new TeleportableOverlay() });
+            }
+        }
+        [HarmonyPatch(typeof(StatusItem), "GetStatusItemOverlayBySimViewMode")]
+        public static class StatusItem_GetStatusItemOverlayBySimViewMode_Patch
+        {
+            public static void Prefix(Dictionary<HashedString, StatusItem.StatusItemOverlays> ___overlayBitfieldMap)
+            {
+                if (!___overlayBitfieldMap.ContainsKey(TeleportableOverlay.ID))
+                {
+                    ___overlayBitfieldMap.Add(TeleportableOverlay.ID, StatusItem.StatusItemOverlays.None);
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(OverlayLegend), "OnSpawn")]
+        public static class OverlayLegend_OnSpawn_Patch
+        {
+            public static void Prefix(List<OverlayLegend.OverlayInfo> ___overlayInfoList)
+            {
+                OverlayLegend.OverlayInfo info = new OverlayLegend.OverlayInfo();
+                info.name = ___overlayInfoList[1].name;
+                info.mode=TeleportableOverlay.ID;
+                info.infoUnits=new List<OverlayInfoUnit>();
+                info.isProgrammaticallyPopulated=true;
+                ___overlayInfoList.Add(info);
             }
         }
     }
