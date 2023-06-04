@@ -119,7 +119,8 @@ namespace TeleportSuitMod
                 if ((__instance.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)//穿着传送服
                 {
                     if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
-                        &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==__instance.GetMyParentWorldId()&&TeleportSuitConfig.CanTeloportTo(cell))
+                        &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==__instance.GetMyParentWorldId()
+                        &&TeleportSuitConfig.CanTeloportTo(cell))
                     {
                         __result=1;
                     }

@@ -124,7 +124,9 @@ namespace TeleportSuitMod
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.NAME.ToString(),
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.STATUS.ToString(),
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITURGENT.TOOLTIP.ToString(),
-                                false
+                                false,
+                                -1,
+                                null
                             });
                     }
                     if (breakTimeUnequipChore==null)
@@ -135,7 +137,9 @@ namespace TeleportSuitMod
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.NAME.ToString(),
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.STATUS.ToString(),
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.TOOLTIP.ToString(),
-                                false
+                                false,
+                                -1,
+                                null
                             });
                     }
                     SuitLocker component = GetComponent<SuitLocker>();
@@ -273,6 +277,7 @@ namespace TeleportSuitMod
                 }
             };
             private WorkChore<EquipTeleportSuitWorkable> equipChore;
+            public static ChoreType equipChoretype = null;
 
             protected override void OnPrefabInit()
             {
@@ -284,10 +289,27 @@ namespace TeleportSuitMod
 
             public void CreateChore()
             {
+                if (equipChoretype==null)
+                {
+                    equipChoretype = (ChoreType)typeof(ChoreTypes).GetMethod("Add", BindingFlags.Instance|BindingFlags.NonPublic).
+                        Invoke(Db.Get().ChoreTypes, new object[] {
+                                "EquipTeleportSuit", new string[0], "", new string[0],
+                                TeleportSuitStrings.DUPLICANTS.CHORES.EQUIPTELEPORTSUIT.NAME.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.EQUIPTELEPORTSUIT.STATUS.ToString(),
+                                TeleportSuitStrings.DUPLICANTS.CHORES.EQUIPTELEPORTSUIT.TOOLTIP.ToString(),
+                                false,
+                                -1,
+                                null
+                        });
+                }
                 if (equipChore == null)
                 {
                     TeleportSuitLocker component = GetComponent<TeleportSuitLocker>();
-                    equipChore = new WorkChore<EquipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitUrgent, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null, ignore_schedule_block: false, only_when_operational: true, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
+                    equipChore = new WorkChore<EquipTeleportSuitWorkable>(equipChoretype, this, null,
+                        run_until_complete: true, null, null, null, allow_in_red_alert: true,
+                        null, ignore_schedule_block: false, only_when_operational: true, null,
+                        is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false,
+                        PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
                     equipChore.AddPrecondition(DoesDupeAtEquipTeleportSuitSchedule);
                     equipChore.AddPrecondition(DoesTeleportSuitLockerHasAvailableSuit, component);
                     equipChore.AddPrecondition(DoesDupeHasNoTeleportSuit);
