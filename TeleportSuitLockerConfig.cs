@@ -6,6 +6,9 @@ namespace TeleportSuitMod
 {
     public class TeleportSuitLockerConfig : IBuildingConfig
     {
+        public static int AdditionalEnergyUsage = 200;
+        public static int BaseEnergyUsage = 120;
+
         public const string ID = "TeleportSuitLocker";
         internal static PBuilding TeleportSuitLockerTemplate;
         public static AssignableSlot TeleportSuitSlot;
@@ -41,7 +44,7 @@ namespace TeleportSuitMod
                     new BuildIngredient(TUNING.MATERIALS.REFINED_METAL, tier: 2),
                 },
                 Placement = BuildLocationRule.OnFloor,
-                PowerInput = new PowerRequirement(120.0f, new CellOffset(0, 0)),
+                PowerInput = new PowerRequirement(BaseEnergyUsage, new CellOffset(0, 0)),
 
                 Tech = techString,
                 Noise=NOISE_POLLUTION.NONE,
@@ -85,7 +88,7 @@ namespace TeleportSuitMod
             conduitConsumer.capacityTag = ElementLoader.FindElementByHash(SimHashes.Oxygen).tag;
             conduitConsumer.wrongElementResult = ConduitConsumer.WrongElementResult.Dump;
             conduitConsumer.forceAlwaysSatisfied = true;
-            conduitConsumer.capacityKG = 80f;
+            conduitConsumer.capacityKG = 75f;
             go.AddOrGet<AnimTileable>().tags = new Tag[2]
             {
                 new Tag("TeleportSuitLocker"),

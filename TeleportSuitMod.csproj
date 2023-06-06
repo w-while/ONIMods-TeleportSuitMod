@@ -71,7 +71,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
+    <Compile Include="PeterHan.BulkSettingsChange\BulkChangePatches.cs" />
+    <Compile Include="PeterHan.BulkSettingsChange\BulkChangeTool.cs" />
+    <Compile Include="PeterHan.BulkSettingsChange\BulkParameterMenu.cs" />
+    <Compile Include="PeterHan.BulkSettingsChange\BulkToolMode.cs" />
+    <Compile Include="PeterHan.BulkSettingsChange\SpriteRegistry.cs" />
     <Compile Include="TeleportableOverlay.cs" />
+    <Compile Include="TeleportRestrictToolSaveData.cs" />
     <Compile Include="TeleportSuitConfig.cs" />
     <Compile Include="TeleportSuitGameTags.cs" />
     <Compile Include="TeleportSuitLocker.cs" />
@@ -91,14 +98,16 @@
     <None Include="anim\assets\teleport_suit_body\teleport_suit_body_build.bytes" />
     <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_anim.bytes" />
     <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_build.bytes" />
+    <None Include="translations\curr_mods_templates.pot" />
+    <None Include="translations\zh.po" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="translations\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
+    <EmbeddedResource Include="Placer.png" />
+    <EmbeddedResource Include="Toggle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

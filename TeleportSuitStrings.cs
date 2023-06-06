@@ -1,5 +1,6 @@
 ﻿using STRINGS;
 using System.Security.Policy;
+using static PartyCake.CreatingStates;
 using static STRINGS.ELEMENTS;
 
 namespace TeleportSuitMod
@@ -69,8 +70,7 @@ namespace TeleportSuitMod
                 public static class TELEPORTSUIT
                 {
                     //"复制人是否该在休息时间脱下传送服"
-                    public static LocString SHOULD_DROP_DURING_BREAK_TITLE = "Should Duplicants take off teleport suit during break time"
-;
+                    public static LocString SHOULD_DROP_DURING_BREAK_TITLE = "Should Duplicants take off teleport suit during break time";
                 }
             }
             public static class OVERLAYS
@@ -82,19 +82,38 @@ namespace TeleportSuitMod
                     //"传送概览"
                     public static LocString BUTTON = "Teleportable Overlay";
                     //"可传送区域"
-                    public static LocString TELEPORTABLEAREA = "Teleportable area";
+                    public static LocString TELEPORTABLEAREA = "Teleportable Area";
+                    //"限制传送区域"
+                    public static LocString TELEPORTRESTRICTEDAREA = "Teleport Restricted Area";
                     public static class ToolTip
                     {
                         //"穿着传送服的复制人可以传送到这些位置"
-                        public static LocString TELEPORTABLEAREA = "Duplicants wearing teleport suit can teleport to these location";
+                        public static LocString TELEPORTABLEAREA = "<b>Teleportable Area</b>\nDuplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to these location";
+
+                        //"复制人被限制传送到这些区域，可以通过右下角的传送限制工具增加或移除该区域"
+                        public static LocString TELEPORTRESTRICTEDAREA = "<b>Teleport Restricted Area</b>\nDuplicants are restricted from teleporting to these areas\nCan be added or removed using the <style=\"KKeyword\">Teleporting Restriction Tool</style> in the lower right corner";
+
                     }
                 }
             }
             public static class TOOLTIPS
             {
                 //显示传送服可以到达的区域
-                public static LocString TELEPORTABLEOVERLAYSTRING = "Display teleportablity of teleport suit";
+                public static LocString TELEPORTABLEOVERLAYSTRING = "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>";
             }
+        }
+        public static class TELEPORT_RESTRICT_TOOL
+        {
+            public static string PLACE_ICON_NAME = "TELEPORTSUITMOD.TOOL.TELEPORTRESTRICTTOOL.PLACER";
+            public static string TOOL_ICON_NAME = "TELEPORTSUITMOD.TOOL.TELEPORTRESTRICTTOOL.ICON";
+
+            public static string ACTION_KEY = "TELEPORTSUITMOD.ACTION.CHANGESETTINGS";
+
+            public static LocString TOOL_DESCRIPTION = "Add or remove teleport restrict area";
+            public static LocString TOOL_TITLE = "Teleport Restrict Tool";
+            public static LocString ACTION_TITLE = "Teleport Restrict Tool";
+            public static LocString TOOL_NAME_APPLYFOG = "Add restrict area";
+            public static LocString TOOL_NAME_REMOVEFOG = "Remove restrict area";
         }
         public static class DUPLICANTS
         {
@@ -155,6 +174,7 @@ namespace TeleportSuitMod
                 }
             }
         }
+
 
     }
 }

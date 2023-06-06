@@ -204,12 +204,10 @@ namespace TeleportSuitMod
                 {
                     if (GetComponent<SuitLocker>().CanDropOffSuit())
                     {
-                        //Console.WriteLine("CanDropOffSuit");
                         GetComponent<SuitLocker>().UnequipFrom(equipment);
                     }
                     else
                     {
-                        //Console.WriteLine("Unassign");
                         equipment.GetAssignable(Db.Get().AssignableSlots.Suit).Unassign();
                     }
                 }
@@ -224,7 +222,7 @@ namespace TeleportSuitMod
             {
                 return new HashedString[1]
                 {
-                new HashedString("none")
+                    new HashedString("none")
                 };
             }
         }
@@ -383,12 +381,22 @@ namespace TeleportSuitMod
                     smi.master.RefreshMeter();
                 }, UpdateRate.RENDER_200ms);
                 empty.EventTransition(GameHashes.OnStorageChange, charging, (StatesInstance smi) => smi.master.GetStoredOutfit() != null);
-                charging.DefaultState(charging.notoperational).EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null).Transition(charged, (StatesInstance smi) => smi.master.IsSuitFullyCharged());
+                charging.DefaultState(charging.notoperational)
+                    .EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null);
+                //.Transition(charged, (StatesInstance smi) => smi.master.IsSuitFullyCharged());
                 charging.notoperational.TagTransition(GameTags.Operational, charging.operational);
                 charging.operational.TagTransition(GameTags.Operational, charging.notoperational, on_remove: true).Update("FillBattery", delegate (StatesInstance smi, float dt)
                 {
                     smi.master.FillBattery(dt);
-                }, UpdateRate.SIM_1000ms);
+                }, UpdateRate.SIM_1000ms)
+                .Enter(delegate (StatesInstance smi)
+                {
+                    smi.setEnergeUsage(true);
+                })
+                .Exit(delegate (StatesInstance smi)
+                {
+                    smi.setEnergeUsage(false);
+                });
                 charged.EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null);
             }
         }
@@ -398,6 +406,18 @@ namespace TeleportSuitMod
             public StatesInstance(TeleportSuitLocker teleport_suit_locker)
                 : base(teleport_suit_locker)
             {
+            }
+            public void setEnergeUsage(bool additionalEnergeUsage)
+            {
+                EnergyConsumer energyConsumer = GetComponent<EnergyConsumer>();
+                if (additionalEnergeUsage)
+                {
+                    energyConsumer.BaseWattageRating = TeleportSuitLockerConfig.AdditionalEnergyUsage+TeleportSuitLockerConfig.BaseEnergyUsage;
+                }
+                else
+                {
+                    energyConsumer.BaseWattageRating =TeleportSuitLockerConfig.BaseEnergyUsage;
+                }
             }
         }
 
@@ -453,6 +473,11 @@ namespace TeleportSuitMod
                 if (!component.IsFull())
                 {
                     component.batteryCharge += dt / batteryChargeTime;
+                }
+                else
+                {
+                    component.batteryCharge=1;
+                    smi.GoTo(smi.sm.charged);
                 }
             }
         }

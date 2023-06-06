@@ -11,20 +11,31 @@ namespace TeleportSuitMod
 {
     internal class TeleportSuitConfig : IEquipmentConfig
     {
+        public static KAnimFile InteractAnim
+        {
+            get
+            {
+                if (interactAnim==null)
+                {
+                    interactAnim=Assets.GetAnim("anim_equip_clothing_kanim");
+                }
+                return interactAnim;
+            }
+        }
+        private static KAnimFile interactAnim = null;
         public const string ID = "Teleport_Suit";
         public static ComplexRecipe recipe;
         public static PathFinder.PotentialPath.Flags TeleportSuitFlags = (PathFinder.PotentialPath.Flags)32;//必须是2的幂且大于8
 
-        public static int TELEPORTCOUNT = 80;
+        public static int TELEPORTCOUNT = 150;
         public static int OXYGENCAPACITY = 75;
-        public static int ATHLETICS = -8;
         public static int SCALDING = 1000;
         public static float RADIATION_SHIELDING = 0.66f;
         public static int STRENGTH = 10;
         public static int INSULATION = 50;
         public static float THERMAL_CONDUCTIVITY_BARRIER = 0.3f;
 
-        private AttributeModifier expertAthleticsModifier;
+        //private AttributeModifier expertAthleticsModifier;
 
         static CellOffset[] bounding_offsets = new CellOffset[2]
             {
@@ -55,6 +66,18 @@ namespace TeleportSuitMod
         }
         static public bool CanTeloportTo(int cell)
         {
+            if (TeleportableOverlay.TeleportRestrict==null)
+            {
+                TeleportableOverlay.TeleportRestrict=new bool[Grid.CellCount];
+            }
+            if (!Grid.IsValidCell(cell))
+            {
+                return false;
+            }
+            if (TeleportableOverlay.TeleportRestrict[cell]==true)
+            {
+                return false;
+            }
             int cell2;
             bool flag4 = false;
             foreach (CellOffset offset in bounding_offsets)
@@ -96,7 +119,7 @@ namespace TeleportSuitMod
             List<AttributeModifier> list = new List<AttributeModifier>();
 
             //修改小人穿上服装之后的属性
-            list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, ATHLETICS, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, ATHLETICS, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             list.Add(new AttributeModifier(Db.Get().Attributes.ScaldingThreshold.Id, SCALDING, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             list.Add(new AttributeModifier(Db.Get().Attributes.RadiationResistance.Id, RADIATION_SHIELDING, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             list.Add(new AttributeModifier(Db.Get().Attributes.Strength.Id, STRENGTH, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
@@ -104,9 +127,12 @@ namespace TeleportSuitMod
             list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER, THERMAL_CONDUCTIVITY_BARRIER, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
 
             //技能减免
-            expertAthleticsModifier = new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, -ATHLETICS, Db.Get().Skills.Suits1.Name);
+            //expertAthleticsModifier = new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, -ATHLETICS, Db.Get().Skills.Suits1.Name);
 
-            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef("Teleport_Suit", TUNING.EQUIPMENT.SUITS.SLOT, SimHashes.Dirt, TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS, "teleport_suit_kanim", "", "teleport_suit_body_kanim", 6, list, null, IsBody: true, EntityTemplates.CollisionShape.CIRCLE, 0.325f, 0.325f, new Tag[2]
+            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef("Teleport_Suit", TUNING.EQUIPMENT.SUITS.SLOT,
+                SimHashes.Dirt, TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS, "teleport_suit_kanim",
+                "", "teleport_suit_body_kanim", 6, list, null,
+                IsBody: true, EntityTemplates.CollisionShape.CIRCLE, 0.325f, 0.325f, new Tag[2]
             {
                 GameTags.Suit,
                 GameTags.Clothes
@@ -129,8 +155,6 @@ namespace TeleportSuitMod
                     if (component3 != null)
                     {
                         component3.SetFlags(TeleportSuitFlags);
-                        //if (TeleportSuitWorldCountManager.Instance!=null)
-                        //{
                         if (TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(targetGameObject2.GetMyWorldId(), out int value))
                         {
                             TeleportSuitWorldCountManager.Instance.WorldCount[targetGameObject2.GetMyWorldId()]++;
@@ -139,13 +163,9 @@ namespace TeleportSuitMod
                         {
                             TeleportSuitWorldCountManager.Instance.WorldCount[targetGameObject2.GetMyWorldId()]=1;
                         }
-                        //}
                     }
                     MinionResume component4 = targetGameObject2.GetComponent<MinionResume>();
-                    if (component4 != null && component4.HasPerk(Db.Get().SkillPerks.ExosuitExpertise.Id))
-                    {
-                        targetGameObject2.GetAttributes().Get(Db.Get().Attributes.Athletics).Add(expertAthleticsModifier);
-                    }
+
                 }
             };
 
@@ -160,18 +180,14 @@ namespace TeleportSuitMod
                         GameObject targetGameObject = soleOwner.GetComponent<MinionAssignablesProxy>().GetTargetGameObject();
                         if ((bool)targetGameObject)
                         {
-                            targetGameObject.GetAttributes()?.Get(Db.Get().Attributes.Athletics).Remove(expertAthleticsModifier);
                             Navigator component = targetGameObject.GetComponent<Navigator>();
                             if (component != null)
                             {
                                 component.ClearFlags(TeleportSuitFlags);
-                                //if (TeleportSuitWorldCountManager.Instance!=null)
-                                //{
                                 if (TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(targetGameObject.GetMyWorldId(), out int value))
                                 {
                                     TeleportSuitWorldCountManager.Instance.WorldCount[targetGameObject.GetMyWorldId()]--;
                                 }
-                                //}
                             }
                             Effects component2 = targetGameObject.GetComponent<Effects>();
                             if (component2 != null && component2.HasEffect("SoiledSuit"))

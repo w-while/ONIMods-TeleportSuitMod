@@ -24,13 +24,16 @@ using YamlDotNet.Core.Tokens;
 using static OverlayLegend;
 using static STRINGS.UI.USERMENUACTIONS;
 using System.Linq;
+using PeterHan.PLib.Actions;
+using TeleportSuitMod.PeterHan.BulkSettingsChange;
 
 namespace TeleportSuitMod
 {
     public class TeleportSuitPatches : KMod.UserMod2
     {
         static FieldInfo SuitLockerFieldInfo = null;
-
+        private static readonly IDetouredField<TransitionDriver, Navigator.ActiveTransition> TRANSITION =
+            PDetours.DetourField<TransitionDriver, Navigator.ActiveTransition>("transition");
         public override void OnLoad(Harmony harmony)
         {
             base.OnLoad(harmony);
@@ -43,6 +46,9 @@ namespace TeleportSuitMod
 
             //生成字符串
             LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.UI));
+
+            BulkChangePatches.BulkChangeAction = new PActionManager().CreateAction(TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_KEY,
+                TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE);
 
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
@@ -202,15 +208,43 @@ namespace TeleportSuitMod
             }
         }
 
+        //[HarmonyPatch(typeof(TransitionDriver), nameof(TransitionDriver.UpdateTransition))]
+        //public static class TransitionDriver_UpdateTransition_Patch
+        //{
+        //    public static bool Prefix(Navigator ___navigator)
+        //    {
+        //        if (___navigator!=null&&((___navigator.flags&TeleportSuitConfig.TeleportSuitFlags)!=0))
+        //        {
+        //            return false;
+        //        }
+        //        return true;
+        //    }
+        //}
         //穿上传送服之后禁用寻路并传送小人
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
         public static class PathFinder_UpdatePath_Patch
         {
-            public static void Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
+            public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
             {
-                if (__instance.target!=null&&__instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags))
+                if (__instance.target!=null&&__instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags)&&Grid.PosToCell(__instance) != ___reservedCell)
                 {
-                    int cellPreferences = ___tactic.GetCellPreferences(Grid.PosToCell(__instance.target), __instance.targetOffsets, __instance);
+                    bool needTeleport = true;
+                    int mycell = Grid.PosToCell(__instance);
+                    int target_position_cell = Grid.PosToCell(__instance.target);
+                    for (int i = 0; i<__instance.targetOffsets.Length; i++)
+                    {
+                        int cell = Grid.OffsetCell(target_position_cell, __instance.targetOffsets[i]);
+                        if (__instance.CanReach(cell)&&mycell==cell)
+                        {
+                            needTeleport=false;
+                        }
+                    }
+                    if (!needTeleport)
+                    {
+                        __instance.Stop(arrived_at_destination: true, false);
+                        return false;
+                    }
+                    int cellPreferences = ___tactic.GetCellPreferences(target_position_cell, __instance.targetOffsets, __instance);
                     NavigationReservations.Instance.RemoveOccupancy(___reservedCell);
                     ___reservedCell =cellPreferences;
                     NavigationReservations.Instance.AddOccupancy(cellPreferences);
@@ -223,33 +257,62 @@ namespace TeleportSuitMod
                             if (assignable!=null)
                             {
                                 TeleportSuitTank tank = assignable.GetComponent<TeleportSuitTank>();
-                                if (tank!=null)
+                                if (tank!=null&&tank.batteryCharge > 0)
                                 {
                                     tank.batteryCharge -=1f/TeleportSuitConfig.TELEPORTCOUNT;
                                 }
                             }
                         }
-                        __instance.Pause("teleporting");
-                        Vector3 position = Grid.CellToPos(___reservedCell, CellAlignment.Bottom, (SceneLayer)25);
-                        __instance.transform.SetPosition(position);
-                        __instance.Unpause("teleported");
-                        if (Grid.HasLadder[___reservedCell])
-                        {
-                            __instance.CurrentNavType = NavType.Ladder;
-                        }
-                        if (Grid.HasPole[___reservedCell])
-                        {
-                            __instance.CurrentNavType = NavType.Pole;
 
-                        }
-                        if (GameNavGrids.FloorValidator.IsWalkableCell(___reservedCell, Grid.CellBelow(___reservedCell), true))
+                        __instance.transitionDriver.EndTransition();
+                        __instance.smi.GoTo(__instance.smi.sm.normal.moving);
+                        Navigator.ActiveTransition transition = TRANSITION.Get(__instance.transitionDriver);
+                        transition= new Navigator.ActiveTransition();
+                        KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
+                        reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
+                        reactor_anim.Play("working_pre");
+                        reactor_anim.Queue("working_loop");
+                        reactor_anim.Queue("working_pst");
+                        int reservedCell = ___reservedCell;
+                        Action<object> action = null;
+                        action = delegate (object data)
                         {
-                            __instance.CurrentNavType = NavType.Floor;
-                        }
+                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
+                            Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (SceneLayer)25);
+                            __instance.transform.SetPosition(position);
+                            if (Grid.HasLadder[reservedCell])
+                            {
+                                __instance.CurrentNavType = NavType.Ladder;
+                            }
+                            if (Grid.HasPole[reservedCell])
+                            {
+                                __instance.CurrentNavType = NavType.Pole;
+                            }
+                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
+                            {
+                                __instance.CurrentNavType = NavType.Floor;
+                            }
+                            __instance.Stop(arrived_at_destination: true, false);
+                            if (action==null)
+                            {
+                                Console.WriteLine("action is null!!!!");
+                            }
+                            __instance.Unsubscribe(-1061186183, action);
+
+                        };
+                        __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
                     }
+                    else
+                    {
+                        Console.WriteLine("teleporter call stop");
+                        __instance.Stop();
+                    }
+                    return false;
                 }
+                return true;
             }
         }
+
 
         //取消存放柜复制人主动归还的任务
         [HarmonyPatch(typeof(SuitLocker.ReturnSuitWorkable), nameof(SuitLocker.ReturnSuitWorkable.CreateChore))]
@@ -271,6 +334,39 @@ namespace TeleportSuitMod
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(SuitLocker), nameof(SuitLocker.IsSuitFullyCharged))]
+        public static class SuitLocker_IsSuitFullyCharged_Patch
+        {
+            public static bool Prefix(SuitLocker __instance, ref bool __result)
+            {
+                if (__instance.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
+                {
+                    KPrefabID suit = __instance.GetStoredOutfit();
+                    if (suit!=null)
+                    {
+                        __result = true;
+                        SuitTank suit_tank = suit.GetComponent<SuitTank>();
+                        if (suit_tank != null && suit_tank.PercentFull() < 1f)
+                        {
+                            __result = false;
+                        }
+                        TeleportSuitTank teleport_suit_tank = suit.GetComponent<TeleportSuitTank>();
+                        if (teleport_suit_tank != null && teleport_suit_tank.PercentFull() < 1f)
+                        {
+                            __result = false;
+                        }
+                    }
+                    else
+                    {
+                        __result = false;
+                    }
+                    return false;
+                }
+                return true;
+            }
+        }
+
         //取消选中穿着传送服的小人时绘制路径
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
         public static class Navigator_DrawPath_Patch
@@ -409,5 +505,24 @@ namespace TeleportSuitMod
                 ___overlayInfoList.Add(info);
             }
         }
+
+        [HarmonyPatch(typeof(SaveGame), "OnPrefabInit")]//把黑雾中覆盖的template数据保存到存档中
+        public static class SaveGame_OnPrefabInit_Patch
+        {
+            internal static void Postfix(SaveGame __instance)
+            {
+                __instance.gameObject.AddOrGet<TeleportRestrictToolSaveData>();
+            }
+        }
+
+        [HarmonyPatch(typeof(LoadScreen), nameof(LoadScreen.ForceStopGame))]//退出一个存档时要把templates设置为空，否则可能会影响下一个存档
+        public static class LoadScreen_ForceStopGame_Patch
+        {
+            internal static void Prefix()
+            {
+                TeleportableOverlay.TeleportRestrict=null;
+            }
+        }
+
     }
 }
