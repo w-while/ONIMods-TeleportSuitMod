@@ -118,16 +118,22 @@ namespace TeleportSuitMod
             {
                 if ((__instance.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)//穿着传送服
                 {
-                    if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
-                        &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==__instance.GetMyParentWorldId()
-                        &&TeleportSuitConfig.CanTeloportTo(cell))
+                    __result=-1;
+                    if (worldid.TryGetValue(__instance.PathProber, out int id)&&id!=-1)
                     {
-                        __result=1;
+                        if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
+                                &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==id
+                                &&TeleportSuitConfig.CanTeloportTo(cell))
+                        {
+                            __result=1;
+                        }
                     }
                     else
                     {
-                        __result=-1;
+                        Console.WriteLine("error!!! in Navigator_GetNavigationCost_Patch");
                     }
+
+
                     return false;
                 }
 
@@ -156,7 +162,7 @@ namespace TeleportSuitMod
                                 Vector2I vector2I = Grid.CellToXY(cell);
                                 ___flipRecoverEmote = Grid.CellToXY(num).x < vector2I.x;
                                 ___navigator.transform.SetPosition(Grid.CellToPosCBC(num, Grid.SceneLayer.Move));
-
+                                ___navigator.CurrentNavType = transition.end;
                                 FallMonitor.Instance sMI = ___navigator.GetSMI<FallMonitor.Instance>();
                                 //sMI.UpdateFalling();
                                 sMI.sm.isFalling.Set(false, sMI);
@@ -171,14 +177,25 @@ namespace TeleportSuitMod
             }
         }
 
-        //取消穿着传送服的小人到各个格子的可达性更新，可能可以增加一些帧数，但其实影响不大
+        public static Dictionary<PathProber, int> worldid = new Dictionary<PathProber, int>();
+        //取消穿着传送服的小人到各个格子的可达性更新，并且记录小人的世界信息，
+        //因为在Navigator_GetNavigationCost_Patch中获取世界可能会触发unity的gameobject获取报错
         [HarmonyPatch(typeof(PathProber), nameof(PathProber.UpdateProbe))]
         public static class PathProber_UpdateProbe_Patch
         {
-            public static bool Prefix(PotentialPath.Flags flags)
+            public static bool Prefix(PotentialPath.Flags flags, PathProber __instance, int cell)
             {
                 if ((flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
                 {
+                    if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue)
+                    {
+                        worldid[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                    }
+                    else
+                    {
+                        worldid[__instance]=-1;
+                    }
+
                     return false;
                 }
                 return true;
@@ -216,6 +233,19 @@ namespace TeleportSuitMod
                         Vector3 position = Grid.CellToPos(___reservedCell, CellAlignment.Bottom, (SceneLayer)25);
                         __instance.transform.SetPosition(position);
                         __instance.Unpause("teleported");
+                        if (Grid.HasLadder[___reservedCell])
+                        {
+                            __instance.CurrentNavType = NavType.Ladder;
+                        }
+                        if (Grid.HasPole[___reservedCell])
+                        {
+                            __instance.CurrentNavType = NavType.Pole;
+
+                        }
+                        if (GameNavGrids.FloorValidator.IsWalkableCell(___reservedCell, Grid.CellBelow(___reservedCell), true))
+                        {
+                            __instance.CurrentNavType = NavType.Floor;
+                        }
                     }
                 }
             }
