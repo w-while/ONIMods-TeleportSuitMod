@@ -30,7 +30,7 @@ namespace TeleportSuitMod
         }
         [JsonProperty]
         public int ConfigVersion { get; set; }
-        [Option("STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE", "", null)]
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE", "", null)]
         [JsonProperty]
         public bool ShouldDropDuringBreak { get; set; } = true;
     }

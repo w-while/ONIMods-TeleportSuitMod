@@ -54,7 +54,7 @@ namespace TeleportSuitMod
         {
             public static class FRONTEND
             {
-                public static class TELEPORTSUIT
+                public static class TELEPORTSUITMOD
                 {
                     public static LocString SHOULD_DROP_DURING_BREAK_TITLE = "Should Duplicants take off teleport suit during break time";
                 }

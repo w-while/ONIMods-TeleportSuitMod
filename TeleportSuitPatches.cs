@@ -38,18 +38,14 @@ namespace TeleportSuitMod
         {
             base.OnLoad(harmony);
             PUtil.InitLibrary();
+            LocString.CreateLocStringKeys(type: typeof(TeleportSuitStrings.UI));
             new POptions().RegisterOptions(this, typeof(TeleportSuitOptions));
             PBuildingManager buildingManager = new PBuildingManager();
             buildingManager.Register(TeleportSuitLockerConfig.CreateBuilding());
             new PLocalization().Register();
             new PVersionCheck().Register(this, new SteamVersionChecker());
-
-            //生成字符串
-            LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.UI));
-
             BulkChangePatches.BulkChangeAction = new PActionManager().CreateAction(TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_KEY,
                 TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE);
-
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
             gameObject.SetActive(true);
@@ -125,7 +121,7 @@ namespace TeleportSuitMod
                 if ((__instance.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)//穿着传送服
                 {
                     __result=-1;
-                    if (worldid.TryGetValue(__instance.PathProber, out int id)&&id!=-1)
+                    if (worldId.TryGetValue(__instance.PathProber, out int id)&&id!=-1)
                     {
                         if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
                                 &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==id
@@ -134,12 +130,6 @@ namespace TeleportSuitMod
                             __result=1;
                         }
                     }
-                    else
-                    {
-                        Console.WriteLine("error!!! in Navigator_GetNavigationCost_Patch");
-                    }
-
-
                     return false;
                 }
 
@@ -183,7 +173,7 @@ namespace TeleportSuitMod
             }
         }
 
-        public static Dictionary<PathProber, int> worldid = new Dictionary<PathProber, int>();
+        public static Dictionary<PathProber, int> worldId = new Dictionary<PathProber, int>();
         //取消穿着传送服的小人到各个格子的可达性更新，并且记录小人的世界信息，
         //因为在Navigator_GetNavigationCost_Patch中获取世界可能会触发unity的gameobject获取报错
         [HarmonyPatch(typeof(PathProber), nameof(PathProber.UpdateProbe))]
@@ -195,11 +185,11 @@ namespace TeleportSuitMod
                 {
                     if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue)
                     {
-                        worldid[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                        worldId[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
                     }
                     else
                     {
-                        worldid[__instance]=-1;
+                        worldId[__instance]=-1;
                     }
 
                     return false;
