@@ -12,20 +12,9 @@ namespace TeleportSuitMod
         public const string ID = "TeleportSuitLocker";
         internal static PBuilding TeleportSuitLockerTemplate;
         public static AssignableSlot TeleportSuitSlot;
-        public static string techStringDlc = "RadiationProtection";
-        public static string techStringVanilla = "Jetpacks";
 
         public static PBuilding CreateBuilding()
         {
-            string techString = "";
-            if (DlcManager.IsContentActive("EXPANSION1_ID"))
-            {
-                techString = techStringDlc;
-            }
-            else
-            {
-                techString = techStringVanilla;
-            }
             return TeleportSuitLockerTemplate = new PBuilding(ID, TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME)
             {
                 //AddAfter = PressureDoorConfig.ID,
@@ -46,7 +35,7 @@ namespace TeleportSuitMod
                 Placement = BuildLocationRule.OnFloor,
                 PowerInput = new PowerRequirement(BaseEnergyUsage, new CellOffset(0, 0)),
 
-                Tech = techString,
+                Tech = TeleportSuitStrings.TechString,
                 Noise=NOISE_POLLUTION.NONE,
             };
         }

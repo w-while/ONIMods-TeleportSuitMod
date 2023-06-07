@@ -7,10 +7,10 @@ using UnityEngine;
 
 namespace TeleportSuitMod
 {
-    public class TeleportableOverlay : OverlayModes.Mode
+    public class TeleportationOverlay : OverlayModes.Mode
     {
         public static bool[] TeleportRestrict = null;
-        public static readonly HashedString ID = "Teleportable";
+        public static readonly HashedString ID = "Teleportation";
         public override string GetSoundName()
         {
             return "SuitRequired";
@@ -42,10 +42,10 @@ namespace TeleportSuitMod
         {
             return new List<LegendEntry>()
             {
-                new LegendEntry(TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA,
-                TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA, Color.blue),
-                new LegendEntry(TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA,
-                TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA, Color.red),
+                new LegendEntry(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA,
+                TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA, Color.blue),
+                new LegendEntry(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA,
+                TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA, Color.red),
             };
         }
     }

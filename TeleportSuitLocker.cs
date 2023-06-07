@@ -4,7 +4,6 @@ using System;
 using System.Reflection;
 using TUNING;
 using UnityEngine;
-using static TeleportSuitMod.TeleportSuitLocker;
 
 
 namespace TeleportSuitMod

@@ -4,8 +4,6 @@ using Klei.AI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static GameNavGrids;
-using static STRINGS.UI.USERMENUACTIONS;
 
 namespace TeleportSuitMod
 {
@@ -23,7 +21,8 @@ namespace TeleportSuitMod
             }
         }
         private static KAnimFile interactAnim = null;
-        public const string ID = "Teleport_Suit";
+        public static string ID = "Teleport_Suit";
+        public static string WORN_ID = "Worn_Teleport_Suit";
         public static ComplexRecipe recipe;
         public static PathFinder.PotentialPath.Flags TeleportSuitFlags = (PathFinder.PotentialPath.Flags)32;//必须是2的幂且大于8
 
@@ -66,15 +65,15 @@ namespace TeleportSuitMod
         }
         static public bool CanTeloportTo(int cell)
         {
-            if (TeleportableOverlay.TeleportRestrict==null)
+            if (TeleportationOverlay.TeleportRestrict==null)
             {
-                TeleportableOverlay.TeleportRestrict=new bool[Grid.CellCount];
+                TeleportationOverlay.TeleportRestrict=new bool[Grid.CellCount];
             }
             if (!Grid.IsValidCell(cell))
             {
                 return false;
             }
-            if (TeleportableOverlay.TeleportRestrict[cell]==true)
+            if (TeleportationOverlay.TeleportRestrict[cell]==true)
             {
                 return false;
             }
@@ -93,7 +92,7 @@ namespace TeleportSuitMod
                     return false;
                 }
             }
-            if (FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true)||Grid.HasLadder[cell]||Grid.HasPole[cell])
+            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true)||Grid.HasLadder[cell]||Grid.HasPole[cell])
             {
                 flag4=true;
             }
@@ -129,7 +128,7 @@ namespace TeleportSuitMod
             //技能减免
             //expertAthleticsModifier = new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, -ATHLETICS, Db.Get().Skills.Suits1.Name);
 
-            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef("Teleport_Suit", TUNING.EQUIPMENT.SUITS.SLOT,
+            EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef(TeleportSuitConfig.ID, TUNING.EQUIPMENT.SUITS.SLOT,
                 SimHashes.Dirt, TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS, "teleport_suit_kanim",
                 "", "teleport_suit_body_kanim", 6, list, null,
                 IsBody: true, EntityTemplates.CollisionShape.CIRCLE, 0.325f, 0.325f, new Tag[2]
@@ -137,7 +136,7 @@ namespace TeleportSuitMod
                 GameTags.Suit,
                 GameTags.Clothes
             });
-            equipmentDef.wornID = "Worn_Teleport_Suit";
+            equipmentDef.wornID = TeleportSuitConfig.WORN_ID;
             equipmentDef.RecipeDescription = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC;
             //免疫debuff
             equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("SoakingWet"));
@@ -201,7 +200,7 @@ namespace TeleportSuitMod
                 }
             };
 
-            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs, "Teleport_Suit");
+            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs, TeleportSuitConfig.ID);
             GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs, "Helmet");
             return equipmentDef;
         }
@@ -220,7 +219,7 @@ namespace TeleportSuitMod
             component.AddTag(GameTags.AirtightSuit);
 
             Durability durability = go.AddComponent<Durability>();
-            durability.wornEquipmentPrefabID = "Worn_Teleport_Suit";
+            durability.wornEquipmentPrefabID = TeleportSuitConfig.WORN_ID;
             durability.durabilityLossPerCycle = TUNING.EQUIPMENT.SUITS.ATMOSUIT_DECAY;
 
             Storage storage = go.AddOrGet<Storage>();

@@ -1,12 +1,25 @@
 ﻿using STRINGS;
 using System.Security.Policy;
-using static PartyCake.CreatingStates;
-using static STRINGS.ELEMENTS;
 
 namespace TeleportSuitMod
 {
     public static class TeleportSuitStrings
     {
+        private static string techStringDlc = "RadiationProtection";
+        private static string techStringVanilla = "Jetpacks";
+
+        private static string techString = null;
+        public static string TechString
+        {
+            get
+            {
+                if (techString==null)
+                {
+                    techString=DlcManager.IsContentActive("EXPANSION1_ID") ? techStringDlc : techStringVanilla;
+                }
+                return techString;
+            }
+        }
         public static LocString TELEPORTSUIT_BATTERY = string.Concat(EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME, " ({0})");
         public static class EQUIPMENT
         {
@@ -14,7 +27,7 @@ namespace TeleportSuitMod
             {
                 public class TELEPORT_SUIT
                 {
-                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit", "TELEPORT_SUIT");
+                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit", TeleportSuitConfig.ID);
 
                     public static LocString DESC = "Say goodbye to  commutes";
 
@@ -28,9 +41,9 @@ namespace TeleportSuitMod
 
                     public static LocString SUIT_OUT_OF_BATTERIES = "Teleport Suit Batteries Empty";
 
-                    public static LocString WORN_NAME = STRINGS.UI.FormatAsLink("Worn Teleport Suit", "TELEPORT_SUIT");
+                    public static LocString WORN_NAME = STRINGS.UI.FormatAsLink("Worn Teleport Suit", TeleportSuitConfig.ID);
 
-                    public static LocString WORN_DESC = "A worn out " + STRINGS.UI.FormatAsLink("Teleport Suit", "TELEPORT_SUIT") + ".\n\nSuits can be repaired at an " + STRINGS.UI.FormatAsLink("Exosuit Forge", "SUITFABRICATOR") + "."
+                    public static LocString WORN_DESC = "A worn out " + STRINGS.UI.FormatAsLink("Teleport Suit", TeleportSuitConfig.ID) + ".\n\nSuits can be repaired at an " + STRINGS.UI.FormatAsLink("Exosuit Forge", "SUITFABRICATOR") + "."
 ;
                 }
             }
@@ -61,10 +74,11 @@ namespace TeleportSuitMod
             }
             public static class OVERLAYS
             {
-                public static class TELEPORTABLE
+                public static class TELEPORTATION
                 {
-                    public static LocString NAME = "TELEPORTABLE OVERLAY";
-                    public static LocString BUTTON = "Teleportable Overlay";
+                    public static string ICON_NAME = "TELEPORTSUITMOD.OVERLAYS.TELEPORTATION.ICON";
+                    public static LocString NAME = "TELEPORTATION OVERLAY";
+                    public static LocString BUTTON = "Teleportation Overlay";
                     public static LocString TELEPORTABLEAREA = "Teleportable Area";
                     public static LocString TELEPORTRESTRICTEDAREA = "Teleport Restricted Area";
                     public static class ToolTip
@@ -78,14 +92,13 @@ namespace TeleportSuitMod
             }
             public static class TOOLTIPS
             {
-                public static LocString TELEPORTABLEOVERLAYSTRING = "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>";
+                public static LocString TELEPORTATIONOVERLAYSTRING = "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>";
             }
         }
         public static class TELEPORT_RESTRICT_TOOL
         {
             public static string PLACE_ICON_NAME = "TELEPORTSUITMOD.TOOL.TELEPORTRESTRICTTOOL.PLACER";
             public static string TOOL_ICON_NAME = "TELEPORTSUITMOD.TOOL.TELEPORTRESTRICTTOOL.ICON";
-
             public static string ACTION_KEY = "TELEPORTSUITMOD.ACTION.CHANGESETTINGS";
 
             public static LocString TOOL_DESCRIPTION = "Add or remove teleport restrict area";
@@ -135,6 +148,28 @@ namespace TeleportSuitMod
                     public static LocString STATUS = "Wearing teleport suit";
 
                     public static LocString TOOLTIP = "When a teleport suit is available, replicants will wear it during work time";
+                }
+            }
+        }
+        public static class RESEARCH
+        {
+            public static class OTHER_TECH_ITEMS
+            {
+                public static class TELEPORTATION_OVERLAY
+                {
+                    public static string TECH_ITEM_NAME = "TeleportationOverlayTechItem";
+
+                    public static LocString NAME = STRINGS.UI.FormatAsOverlay("Teleportion Overlay");
+
+                    public static LocString DESC = "Enables access to the " +STRINGS.UI.FormatAsOverlay("Teleportion Overlay") + ".";
+                }
+                public static class TELEPORT_SUIT
+                {
+                    public static string TECH_ITEM_NAME = "TeleportSuitTechItem";
+
+                    public static LocString NAME = STRINGS.UI.PRE_KEYWORD + "Teleport Suit" + STRINGS.UI.PST_KEYWORD + " Pattern";
+
+                    public static LocString DESC = "Enables fabrication of " + STRINGS.UI.PRE_KEYWORD + "Teleport Suits" + STRINGS.UI.PST_KEYWORD + " at the " + STRINGS.BUILDINGS.PREFABS.SUITFABRICATOR.NAME;
                 }
             }
         }

@@ -14,12 +14,12 @@ namespace TeleportSuitMod
         [OnSerializing]
         internal void OnSerializing()
         {
-            this.TeleportRestrictSerialize=TeleportableOverlay.TeleportRestrict;
+            this.TeleportRestrictSerialize=TeleportationOverlay.TeleportRestrict;
         }
         [OnDeserialized]
         internal void OnDeserialized()
         {
-            TeleportableOverlay.TeleportRestrict=this.TeleportRestrictSerialize;
+            TeleportationOverlay.TeleportRestrict=this.TeleportRestrictSerialize;
         }
     }
 }

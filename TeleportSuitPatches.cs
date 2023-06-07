@@ -8,24 +8,17 @@ using PeterHan.PLib.Database;
 using PeterHan.PLib.Detours;
 using ProcGen.Map;
 using System;
-using static Grid;
 using UnityEngine;
-using static STRINGS.INPUT_BINDINGS;
-using static UnityEngine.GraphicsBuffer;
-using static STRINGS.BUILDINGS.PREFABS;
 using System.Reflection;
-using static STRINGS.MISC.NOTIFICATIONS;
 using PeterHan.PLib.PatchManager;
 using PeterHan.PLib.Options;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using static PathFinder;
 using YamlDotNet.Core.Tokens;
-using static OverlayLegend;
-using static STRINGS.UI.USERMENUACTIONS;
 using System.Linq;
 using PeterHan.PLib.Actions;
 using TeleportSuitMod.PeterHan.BulkSettingsChange;
+using Database;
 
 namespace TeleportSuitMod
 {
@@ -63,7 +56,7 @@ namespace TeleportSuitMod
                 };
                 ComplexRecipe.RecipeElement[] array16 = new ComplexRecipe.RecipeElement[1]
                 {
-                    new ComplexRecipe.RecipeElement("Teleport_Suit".ToTag(), 1f, ComplexRecipe.RecipeElement.TemperatureOperation.Heated)
+                    new ComplexRecipe.RecipeElement(TeleportSuitConfig.ID.ToTag(), 1f, ComplexRecipe.RecipeElement.TemperatureOperation.Heated)
                 };
                 TeleportSuitConfig.recipe = new ComplexRecipe(ComplexRecipeManager.MakeRecipeID("SuitFabricator", array15, array16), array15, array16)
                 {
@@ -71,17 +64,17 @@ namespace TeleportSuitMod
                     description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC,
                     nameDisplay = ComplexRecipe.RecipeNameDisplay.ResultWithIngredient,
                     fabricators = new List<Tag> { "SuitFabricator" },
-                    requiredTech = DlcManager.IsContentActive("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
+                    requiredTech = TeleportSuitStrings.TechString,
                     sortOrder = 1
                 };
                 ComplexRecipe.RecipeElement[] array17 = new ComplexRecipe.RecipeElement[2]
                 {
-                    new ComplexRecipe.RecipeElement("Worn_Teleport_Suit".ToTag(), 1f),
+                    new ComplexRecipe.RecipeElement(TeleportSuitConfig.WORN_ID.ToTag(), 1f),
                     new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 5f)
                 };
                 ComplexRecipe.RecipeElement[] array18 = new ComplexRecipe.RecipeElement[1]
                 {
-                    new ComplexRecipe.RecipeElement("Teleport_Suit".ToTag(), 1f, ComplexRecipe.RecipeElement.TemperatureOperation.Heated)
+                    new ComplexRecipe.RecipeElement(TeleportSuitConfig.ID.ToTag(), 1f, ComplexRecipe.RecipeElement.TemperatureOperation.Heated)
                 };
                 TeleportSuitConfig.recipe = new ComplexRecipe(ComplexRecipeManager.MakeRecipeID("SuitFabricator", array17, array18), array17, array18)
                 {
@@ -89,7 +82,7 @@ namespace TeleportSuitMod
                     description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC,
                     nameDisplay = ComplexRecipe.RecipeNameDisplay.ResultWithIngredient,
                     fabricators = new List<Tag> { "SuitFabricator" },
-                    requiredTech = DlcManager.IsExpansion1Id("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
+                    requiredTech = TeleportSuitStrings.TechString,
                     sortOrder = 1
                 };
             }
@@ -179,7 +172,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(PathProber), nameof(PathProber.UpdateProbe))]
         public static class PathProber_UpdateProbe_Patch
         {
-            public static bool Prefix(PotentialPath.Flags flags, PathProber __instance, int cell)
+            public static bool Prefix(PathFinder.PotentialPath.Flags flags, PathProber __instance, int cell)
             {
                 if ((flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
                 {
@@ -198,18 +191,6 @@ namespace TeleportSuitMod
             }
         }
 
-        //[HarmonyPatch(typeof(TransitionDriver), nameof(TransitionDriver.UpdateTransition))]
-        //public static class TransitionDriver_UpdateTransition_Patch
-        //{
-        //    public static bool Prefix(Navigator ___navigator)
-        //    {
-        //        if (___navigator!=null&&((___navigator.flags&TeleportSuitConfig.TeleportSuitFlags)!=0))
-        //        {
-        //            return false;
-        //        }
-        //        return true;
-        //    }
-        //}
         //穿上传送服之后禁用寻路并传送小人
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
         public static class PathFinder_UpdatePath_Patch
@@ -268,7 +249,7 @@ namespace TeleportSuitMod
                         action = delegate (object data)
                         {
                             __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
-                            Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (SceneLayer)25);
+                            Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
                             __instance.transform.SetPosition(position);
                             if (Grid.HasLadder[reservedCell])
                             {
@@ -381,9 +362,9 @@ namespace TeleportSuitMod
                 Navigator nav = __instance.GetNavigator();
                 if (nav!=null&&(nav.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
                 {
-                    if (OverlayScreen.Instance.mode != TeleportableOverlay.ID)
+                    if (OverlayScreen.Instance.mode != TeleportationOverlay.ID)
                     {
-                        OverlayScreen.Instance.ToggleOverlay(TeleportableOverlay.ID);
+                        OverlayScreen.Instance.ToggleOverlay(TeleportationOverlay.ID);
                     }
                     preDraw=true;
                     return false;
@@ -398,7 +379,6 @@ namespace TeleportSuitMod
         }
 
         [HarmonyPatch(typeof(SuitLocker.ReturnSuitWorkable), nameof(SuitLocker.ReturnSuitWorkable.CancelChore))]
-
         public static class SuitLocker_ReturnSuitWorkable_CancelChore_Patch
         {
             public static bool Prefix(SuitLocker.ReturnSuitWorkable __instance)
@@ -416,7 +396,6 @@ namespace TeleportSuitMod
                 return true;
             }
         }
-
 
         [HarmonyPatch(typeof(SuitLocker), nameof(SuitLocker.UpdateSuitMarkerStates))]
         public static class SuitLocker_UpdateSuitMarkerStates_Patch
@@ -438,15 +417,16 @@ namespace TeleportSuitMod
         {
             public static void Postfix(List<OverlayMenu.ToggleInfo> ___overlayToggleInfos)
             {
+                Assets.Sprites.Add(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME, SpriteRegistry.GetOverlayIcon());
                 Type type = typeof(OverlayMenu).GetNestedType("OverlayToggleInfo", BindingFlags.NonPublic|BindingFlags.Instance);
                 object[] parameters = new object[] {
-                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON.ToString(),
-                    "overlay_suit",
-                    TeleportableOverlay.ID,
-                    DlcManager.IsContentActive("EXPANSION1_ID") ? TeleportSuitLockerConfig.techStringDlc : TeleportSuitLockerConfig.techStringVanilla,
+                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON.ToString(),
+                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME,
+                    TeleportationOverlay.ID,
+                    TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME,
                     Action.NumActions,
-                    TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING.ToString(),
-                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON.ToString()
+                    TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING.ToString(),
+                    TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON.ToString()
                 };
                 object obj = Activator.CreateInstance(type, parameters);
                 ___overlayToggleInfos.Add((KIconToggleMenu.ToggleInfo)obj);
@@ -458,7 +438,7 @@ namespace TeleportSuitMod
         {
             public static void Postfix(Dictionary<HashedString, Func<SimDebugView, int, Color>> ___getColourFuncs)
             {
-                ___getColourFuncs.Add(TeleportableOverlay.ID, TeleportableOverlay.GetOxygenMapColour);
+                ___getColourFuncs.Add(TeleportationOverlay.ID, TeleportationOverlay.GetOxygenMapColour);
             }
         }
 
@@ -467,17 +447,18 @@ namespace TeleportSuitMod
         {
             public static void Postfix(OverlayScreen __instance)
             {
-                typeof(OverlayScreen).GetMethod("RegisterMode", BindingFlags.NonPublic|BindingFlags.Instance).Invoke(__instance, new object[] { new TeleportableOverlay() });
+                typeof(OverlayScreen).GetMethod("RegisterMode", BindingFlags.NonPublic|BindingFlags.Instance).Invoke(__instance, new object[] { new TeleportationOverlay() });
             }
         }
+
         [HarmonyPatch(typeof(StatusItem), "GetStatusItemOverlayBySimViewMode")]
         public static class StatusItem_GetStatusItemOverlayBySimViewMode_Patch
         {
             public static void Prefix(Dictionary<HashedString, StatusItem.StatusItemOverlays> ___overlayBitfieldMap)
             {
-                if (!___overlayBitfieldMap.ContainsKey(TeleportableOverlay.ID))
+                if (!___overlayBitfieldMap.ContainsKey(TeleportationOverlay.ID))
                 {
-                    ___overlayBitfieldMap.Add(TeleportableOverlay.ID, StatusItem.StatusItemOverlays.None);
+                    ___overlayBitfieldMap.Add(TeleportationOverlay.ID, StatusItem.StatusItemOverlays.None);
                 }
             }
         }
@@ -488,15 +469,16 @@ namespace TeleportSuitMod
             public static void Prefix(List<OverlayLegend.OverlayInfo> ___overlayInfoList)
             {
                 OverlayLegend.OverlayInfo info = new OverlayLegend.OverlayInfo();
-                info.name = "STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME";
-                info.mode=TeleportableOverlay.ID;
-                info.infoUnits=new List<OverlayInfoUnit>();
+                info.name = "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME";
+                info.mode=TeleportationOverlay.ID;
+                info.infoUnits=new List<OverlayLegend.OverlayInfoUnit>();
                 info.isProgrammaticallyPopulated=true;
                 ___overlayInfoList.Add(info);
             }
         }
 
-        [HarmonyPatch(typeof(SaveGame), "OnPrefabInit")]//把黑雾中覆盖的template数据保存到存档中
+        //把限制传送区域的数据保存到存档中
+        [HarmonyPatch(typeof(SaveGame), "OnPrefabInit")]
         public static class SaveGame_OnPrefabInit_Patch
         {
             internal static void Postfix(SaveGame __instance)
@@ -505,14 +487,43 @@ namespace TeleportSuitMod
             }
         }
 
-        [HarmonyPatch(typeof(LoadScreen), nameof(LoadScreen.ForceStopGame))]//退出一个存档时要把templates设置为空，否则可能会影响下一个存档
+        //退出一个存档时要把需要保存的数据设置为空，否则可能会影响下一个存档
+        [HarmonyPatch(typeof(LoadScreen), nameof(LoadScreen.ForceStopGame))]
         public static class LoadScreen_ForceStopGame_Patch
         {
             internal static void Prefix()
             {
-                TeleportableOverlay.TeleportRestrict=null;
+                TeleportationOverlay.TeleportRestrict=null;
             }
         }
 
+        [HarmonyPatch(typeof(TechItems), nameof(TechItems.Init))]
+        public static class TechItems_Init_Patch
+        {
+            public static void Prefix()
+            {
+                Db.Get().TechItems.AddTechItem(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.TECH_ITEM_NAME,
+                    TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.NAME,
+                    TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC,
+                    (string anim, bool centered) => Def.GetUISprite(TeleportSuitConfig.ID.ToTag()).first,
+                    DlcManager.AVAILABLE_ALL_VERSIONS);
+                Db.Get().TechItems.AddTechItem(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME,
+                    TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.NAME,
+                    TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC,
+                    (string anim, bool centered) => SpriteRegistry.GetOverlayIcon(), DlcManager.AVAILABLE_ALL_VERSIONS);
+            }
+        }
+
+        [HarmonyPatch(typeof(Techs), nameof(Techs.Init))]
+        public static class Techs_Init_Patch
+        {
+            public static void Postfix()
+            {
+                Tech techs = Db.Get().Techs.TryGet(TeleportSuitStrings.TechString);
+                techs.unlockedItemIDs.Add(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.TECH_ITEM_NAME);
+                techs.unlockedItemIDs.Add(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME);
+
+            }
+        }
     }
 }

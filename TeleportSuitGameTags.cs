@@ -8,6 +8,6 @@ namespace TeleportSuitMod
 {
     public class TeleportSuitGameTags
     {
-        public static readonly Tag TeleportSuit = TagManager.Create("Teleport_Suit");
+        public static readonly Tag TeleportSuit = TagManager.Create(TeleportSuitConfig.ID);
     }
 }

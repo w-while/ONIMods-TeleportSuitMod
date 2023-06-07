@@ -21,7 +21,6 @@ using PeterHan.PLib.Core;
 using PeterHan.PLib.Detours;
 using System;
 using UnityEngine;
-using static TeleportSuitMod.TeleportSuitStrings;
 
 namespace TeleportSuitMod.PeterHan.BulkSettingsChange
 {
@@ -305,7 +304,7 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
             //	OverlayScreen.Instance.ToggleOverlay(OverlayModes.Priorities.ID);
             //} else {
             // Enable/Disable Auto-Repair, Compost, Empty Storage
-            //OverlayScreen.Instance.ToggleOverlay(TeleportableOverlay.ID);
+            //OverlayScreen.Instance.ToggleOverlay(TeleportationOverlay.ID);
 
             //ToolMenu.Instance.PriorityScreen.Show(show: false);
             //OverlayScreen.Instance.ToggleOverlay(OverlayModes.None.ID);
@@ -370,9 +369,9 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
 
         protected override void OnActivateTool()
         {
-            if (TeleportableOverlay.TeleportRestrict==null)
+            if (TeleportationOverlay.TeleportRestrict==null)
             {
-                TeleportableOverlay.TeleportRestrict = new bool[Grid.CellCount];
+                TeleportationOverlay.TeleportRestrict = new bool[Grid.CellCount];
             }
             var menu = BulkParameterMenu.Instance;
             base.OnActivateTool();
@@ -402,11 +401,11 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
             {
                 if (TeleportRestrictTools.AddRestrictArea.IsOn(menu))
                 {
-                    TeleportableOverlay.TeleportRestrict[cell]=true;
+                    TeleportationOverlay.TeleportRestrict[cell]=true;
                 }
                 else if (TeleportRestrictTools.RemoveRestrictArea.IsOn(menu))
                 {
-                    TeleportableOverlay.TeleportRestrict[cell]=false;
+                    TeleportationOverlay.TeleportRestrict[cell]=false;
 
                 }
             }
@@ -462,16 +461,16 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
                 offsTransform.localScale = new Vector3(scaleWidth, scaleWidth, 1.0f);
             }
             visualizer.SetActive(false);
-            viewMode=TeleportableOverlay.ID;
+            viewMode=TeleportationOverlay.ID;
         }
     }
     public static class TeleportRestrictTools
     {
         public static BulkToolMode AddRestrictArea = new BulkToolMode(
-            "AddTeleportRestrictArea", TELEPORT_RESTRICT_TOOL.TOOL_NAME_APPLYFOG,
+            "AddTeleportRestrictArea", TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.TOOL_NAME_APPLYFOG,
             "");
         public static BulkToolMode RemoveRestrictArea = new BulkToolMode(
-            "RemoveTeleportRestrictArea", TELEPORT_RESTRICT_TOOL.TOOL_NAME_REMOVEFOG,
+            "RemoveTeleportRestrictArea", TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.TOOL_NAME_REMOVEFOG,
             "");
     }
 }

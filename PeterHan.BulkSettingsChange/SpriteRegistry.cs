@@ -21,7 +21,6 @@ using PeterHan.PLib.Core;
 using PeterHan.PLib.UI;
 using System;
 using UnityEngine;
-using static TeleportSuitMod.TeleportSuitStrings;
 
 namespace TeleportSuitMod.PeterHan.BulkSettingsChange
 {
@@ -45,6 +44,8 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
         /// </summary>
         private static Sprite TOOL_ICON;
 
+        private static Sprite OVERLAY_ICON;
+
         public static Sprite GetPlaceIcon()
         {
             LoadSprites();
@@ -57,6 +58,12 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
             return TOOL_ICON;
         }
 
+        public static Sprite GetOverlayIcon()
+        {
+            LoadSprites();
+            return OVERLAY_ICON;
+        }
+
         /// <summary>
         /// Loads the sprites if they are not already loaded.
         /// </summary>
@@ -66,10 +73,12 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
             {
                 try
                 {
-                    PLACE_ICON = PUIUtils.LoadSprite("TeleportSuitMod.Placer.png");
-                    PLACE_ICON.name = TELEPORT_RESTRICT_TOOL.PLACE_ICON_NAME;
-                    TOOL_ICON = PUIUtils.LoadSprite("TeleportSuitMod.Toggle.png");
-                    TOOL_ICON.name = TELEPORT_RESTRICT_TOOL.TOOL_ICON_NAME;
+                    PLACE_ICON = PUIUtils.LoadSprite("TeleportSuitMod.images.Placer.png");
+                    PLACE_ICON.name = TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.PLACE_ICON_NAME;
+                    TOOL_ICON = PUIUtils.LoadSprite("TeleportSuitMod.images.Toggle.png");
+                    TOOL_ICON.name = TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.TOOL_ICON_NAME;
+                    OVERLAY_ICON = PUIUtils.LoadSprite("TeleportSuitMod.images.OverlayIcon.png");
+                    OVERLAY_ICON.name = TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME;
                 }
                 catch (ArgumentException e)
                 {

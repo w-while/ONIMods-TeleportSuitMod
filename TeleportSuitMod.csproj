@@ -77,7 +77,7 @@
     <Compile Include="PeterHan.BulkSettingsChange\BulkParameterMenu.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkToolMode.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\SpriteRegistry.cs" />
-    <Compile Include="TeleportableOverlay.cs" />
+    <Compile Include="TeleportationOverlay.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
     <Compile Include="TeleportSuitConfig.cs" />
     <Compile Include="TeleportSuitGameTags.cs" />
@@ -106,8 +106,9 @@
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
-    <EmbeddedResource Include="Placer.png" />
-    <EmbeddedResource Include="Toggle.png" />
+    <Content Include="images\OverlayIcon.png" />
+    <EmbeddedResource Include="images\Placer.png" />
+    <EmbeddedResource Include="images\Toggle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

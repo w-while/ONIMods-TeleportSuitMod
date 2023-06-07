@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static Components;
-using static STRINGS.BUILDINGS;
-using static STRINGS.UI.STARMAP;
 
 namespace TeleportSuitMod
 {
-    //该类用于维护一个世界中是否有穿着传送服的小人，用于更新殖民地能拿到的所有掉落物/库存
+    //该类用于维护一个世界中是否有穿着传送服的小人，用于更新殖民地能否拿到的所有掉落物/库存
     public class TeleportSuitWorldCountManager : KMonoBehaviour, ISim1000ms
     {
         public static TeleportSuitWorldCountManager Instance;
