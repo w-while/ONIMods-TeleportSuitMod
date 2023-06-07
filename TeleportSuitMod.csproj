@@ -103,6 +103,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
+    <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_anim.bytes" />
+    <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_build.bytes" />
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />

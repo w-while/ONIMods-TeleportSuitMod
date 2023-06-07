@@ -15,7 +15,7 @@ namespace TeleportSuitMod
             {
                 if (interactAnim==null)
                 {
-                    interactAnim=Assets.GetAnim("anim_equip_clothing_kanim");
+                    interactAnim=Assets.GetAnim("anim_teleport_suit_teleporting_kanim");
                 }
                 return interactAnim;
             }
