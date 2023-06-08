@@ -113,7 +113,7 @@ namespace TeleportSuitMod
         }
         public EquipmentDef CreateEquipmentDef()
         {
-            LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.EQUIPMENT));
+            //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.EQUIPMENT));
 
             List<AttributeModifier> list = new List<AttributeModifier>();
 

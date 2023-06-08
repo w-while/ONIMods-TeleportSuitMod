@@ -1,5 +1,4 @@
-﻿using STRINGS;
-using System.Security.Policy;
+﻿using System.Security.Policy;
 
 namespace TeleportSuitMod
 {
@@ -172,6 +171,13 @@ namespace TeleportSuitMod
                     public static LocString DESC = "Enables fabrication of " + STRINGS.UI.PRE_KEYWORD + "Teleport Suits" + STRINGS.UI.PST_KEYWORD + " at the " + STRINGS.BUILDINGS.PREFABS.SUITFABRICATOR.NAME;
                 }
             }
+        }
+        internal static void DoReplacement()
+        {
+            LocString.CreateLocStringKeys(typeof(EQUIPMENT));
+            LocString.CreateLocStringKeys(typeof(BUILDINGS));
+            LocString.CreateLocStringKeys(typeof(UI));
+
         }
     }
 }

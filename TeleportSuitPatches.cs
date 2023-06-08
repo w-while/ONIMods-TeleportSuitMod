@@ -31,8 +31,9 @@ namespace TeleportSuitMod
         {
             base.OnLoad(harmony);
             PUtil.InitLibrary();
-            LocString.CreateLocStringKeys(type: typeof(TeleportSuitStrings.UI));
+            new PPatchManager(harmony).RegisterPatchClass(typeof(TeleportSuitPatches));
             new POptions().RegisterOptions(this, typeof(TeleportSuitOptions));
+            new TeleportSuitMod.SanchozzONIMods.Lib.KAnimGroupManager().RegisterInteractAnims("anim_teleport_suit_teleporting_kanim");
             PBuildingManager buildingManager = new PBuildingManager();
             buildingManager.Register(TeleportSuitLockerConfig.CreateBuilding());
             new PLocalization().Register();
@@ -42,6 +43,13 @@ namespace TeleportSuitMod
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
             gameObject.SetActive(true);
+        }
+        [PLibMethod(RunAt.BeforeDbInit)]
+        internal static void BeforeDbInit()
+        {
+            SanchozzONIMods.Lib.Utils.InitLocalization(typeof(TeleportSuitStrings));
+            var icon = SpriteRegistry.GetToolIcon();
+            Assets.Sprites.Add(icon.name, icon);
         }
 
         [HarmonyPatch(typeof(SuitFabricatorConfig), "ConfigureRecipes")]
@@ -264,18 +272,13 @@ namespace TeleportSuitMod
                                 __instance.CurrentNavType = NavType.Floor;
                             }
                             __instance.Stop(arrived_at_destination: true, false);
-                            if (action==null)
-                            {
-                                Console.WriteLine("action is null!!!!");
-                            }
-                            __instance.Unsubscribe(-1061186183, action);
+                            __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
 
                         };
                         __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
                     }
                     else
                     {
-                        Console.WriteLine("teleporter call stop");
                         __instance.Stop();
                     }
                     return false;

@@ -108,33 +108,33 @@ msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
 msgid "Mods"
 msgstr ""
 
-#. STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE"
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr "复制人是否该在休息时间脱下传送服"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.BUTTON
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.BUTTON"
-msgid "Teleportable Overlay"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
+msgid "Teleportation Overlay"
 msgstr "传送概览"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME"
-msgid "TELEPORTABLE OVERLAY"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.NAME
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME"
+msgid "TELEPORTATION OVERLAY"
 msgstr "传送概览"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
 msgid "Teleportable Area"
 msgstr "可传送区域"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
 msgid "Teleport Restricted Area"
 msgstr "限制传送区域"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
 msgid ""
 "<b>Teleportable Area</b>\n"
 "Duplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to "
@@ -143,8 +143,8 @@ msgstr ""
 "<b>可传送区域</b>\n"
 "装备 <style=\"KKeyword\">传送服</style> 的复制人可以传送到这些区域"
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
 msgid ""
 "<b>Teleport Restricted Area</b>\n"
 "Duplicants are restricted from teleporting to these areas\n"
@@ -156,8 +156,8 @@ msgstr ""
 "可以使用右下角的 <style=\"KKeyword\">传送限制工具</style> 来移除或者增加该区"
 "域"
 
-#. STRINGS.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING
-msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING"
+#. STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
+msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
 
@@ -369,6 +369,38 @@ msgctxt ""
 msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
 msgstr "<link=\"TELEPORTSUIT\">破损的传送服</link>"
 
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT."
+"DESC"
+msgid ""
+"Enables fabrication of <style=\"KKeyword\">Teleport Suits</style> at the "
+"<link=\"SUITFABRICATOR\">Exosuit Forge</link>"
+msgstr ""
+"允许在<link=\"SUITFABRICATOR\">太空服锻造台</link>制造<style=\"KKeyword\">传"
+"送服</style> "
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT."
+"NAME"
+msgid "<style=\"KKeyword\">Teleport Suit</style> Pattern"
+msgstr "<style=\"KKeyword\">传送服</style>样式"
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS."
+"TELEPORTATION_OVERLAY.DESC"
+msgid "Enables access to the <b>Teleportion Overlay</b>."
+msgstr "启用<b>传送概览</b>"
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.NAME
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS."
+"TELEPORTATION_OVERLAY.NAME"
+msgid "<b>Teleportion Overlay</b>"
+msgstr "<b>传送概览</b>"
+
 #. TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE
 msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE"
@@ -404,39 +436,40 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY"
 msgid "Teleport Suit Battery ({0})"
 msgstr "传送服电量 ({0})"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT."
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
 "SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr "复制人是否该在休息时间脱下传送服"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON"
-msgid "Teleportable Overlay"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON"
+msgid "Teleportation Overlay"
 msgstr "传送概览"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.NAME
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.NAME"
-msgid "TELEPORTABLE OVERLAY"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.NAME"
+msgid "TELEPORTATION OVERLAY"
 msgstr "传送概览"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA"
+"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION."
+"TELEPORTABLEAREA"
 msgid "Teleportable Area"
 msgstr "可传送区域"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE."
+"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION."
 "TELEPORTRESTRICTEDAREA"
 msgid "Teleport Restricted Area"
 msgstr "限制传送区域"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip."
+"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip."
 "TELEPORTABLEAREA"
 msgid ""
 "<b>Teleportable Area</b>\n"
@@ -446,9 +479,9 @@ msgstr ""
 "<b>可传送区域</b>\n"
 "装备 <style=\"KKeyword\">传送服</style> 的复制人可以传送到这些区域"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip."
+"TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip."
 "TELEPORTRESTRICTEDAREA"
 msgid ""
 "<b>Teleport Restricted Area</b>\n"
@@ -461,8 +494,65 @@ msgstr ""
 "可以使用右下角的 <style=\"KKeyword\">传送限制工具</style> 来移除或者增加该区"
 "域"
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING
+#. TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
 msgctxt ""
-"TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING"
+"TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT."
+#~ "SHOULD_DROP_DURING_BREAK_TITLE"
+#~ msgid "Should Duplicants take off teleport suit during break time"
+#~ msgstr "复制人是否该在休息时间脱下传送服"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON"
+#~ msgid "Teleportable Overlay"
+#~ msgstr "传送概览"
+
+#~ msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.NAME"
+#~ msgid "TELEPORTABLE OVERLAY"
+#~ msgstr "传送概览"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE."
+#~ "TELEPORTABLEAREA"
+#~ msgid "Teleportable Area"
+#~ msgstr "可传送区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE."
+#~ "TELEPORTRESTRICTEDAREA"
+#~ msgid "Teleport Restricted Area"
+#~ msgstr "限制传送区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip."
+#~ "TELEPORTABLEAREA"
+#~ msgid ""
+#~ "<b>Teleportable Area</b>\n"
+#~ "Duplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport "
+#~ "to these location"
+#~ msgstr ""
+#~ "<b>可传送区域</b>\n"
+#~ "装备 <style=\"KKeyword\">传送服</style> 的复制人可以传送到这些区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip."
+#~ "TELEPORTRESTRICTEDAREA"
+#~ msgid ""
+#~ "<b>Teleport Restricted Area</b>\n"
+#~ "Duplicants are restricted from teleporting to these areas\n"
+#~ "Can be added or removed using the <style=\"KKeyword\">Teleporting "
+#~ "Restriction Tool</style> in the lower right corner"
+#~ msgstr ""
+#~ "<b>限制传送区域</b>\n"
+#~ "复制人传送到这些区域是被禁止的\n"
+#~ "可以使用右下角的 <style=\"KKeyword\">传送限制工具</style> 来移除或者增加该"
+#~ "区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING"
+#~ msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
+#~ msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"

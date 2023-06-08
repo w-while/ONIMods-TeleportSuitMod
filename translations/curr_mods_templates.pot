@@ -73,43 +73,43 @@ msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
 msgid "Mods"
 msgstr ""
 
-#. STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE"
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.BUTTON
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.BUTTON"
-msgid "Teleportable Overlay"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
+msgid "Teleportation Overlay"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.NAME"
-msgid "TELEPORTABLE OVERLAY"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.NAME
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME"
+msgid "TELEPORTATION OVERLAY"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
 msgid "Teleportable Area"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
 msgid "Teleport Restricted Area"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
 msgid "<b>Teleportable Area</b>\nDuplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to these location"
 msgstr ""
 
-#. STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA"
+#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
+msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
 msgid "<b>Teleport Restricted Area</b>\nDuplicants are restricted from teleporting to these areas\nCan be added or removed using the <style=\"KKeyword\">Teleporting Restriction Tool</style> in the lower right corner"
 msgstr ""
 
-#. STRINGS.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING
-msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING"
+#. STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
+msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr ""
 
@@ -248,6 +248,26 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WOR
 msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
 msgstr ""
 
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC
+msgctxt "TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC"
+msgid "Enables fabrication of <style=\"KKeyword\">Teleport Suits</style> at the <link=\"SUITFABRICATOR\">Exosuit Forge</link>"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.NAME"
+msgid "<style=\"KKeyword\">Teleport Suit</style> Pattern"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC
+msgctxt "TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC"
+msgid "Enables access to the <b>Teleportion Overlay</b>."
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.NAME"
+msgid "<b>Teleportion Overlay</b>"
+msgstr ""
+
 #. TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE"
 msgid "Teleport Restrict Tool"
@@ -278,43 +298,43 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY"
 msgid "Teleport Suit Battery ({0})"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT.SHOULD_DROP_DURING_BREAK_TITLE"
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON"
-msgid "Teleportable Overlay"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON"
+msgid "Teleportation Overlay"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.NAME
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.NAME"
-msgid "TELEPORTABLE OVERLAY"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.NAME"
+msgid "TELEPORTATION OVERLAY"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTABLEAREA"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
 msgid "Teleportable Area"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.TELEPORTRESTRICTEDAREA"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
 msgid "Teleport Restricted Area"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTABLEAREA"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
 msgid "<b>Teleportable Area</b>\nDuplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to these location"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.ToolTip.TELEPORTRESTRICTEDAREA"
+#. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
 msgid "<b>Teleport Restricted Area</b>\nDuplicants are restricted from teleporting to these areas\nCan be added or removed using the <style=\"KKeyword\">Teleporting Restriction Tool</style> in the lower right corner"
 msgstr ""
 
-#. TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING
-msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTABLEOVERLAYSTRING"
+#. TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr ""
 

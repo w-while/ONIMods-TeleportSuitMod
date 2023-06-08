@@ -43,7 +43,7 @@ namespace TeleportSuitMod
 
         public override BuildingDef CreateBuildingDef()
         {
-            LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.BUILDINGS));
+            //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.BUILDINGS));
             BuildingDef obj = TeleportSuitLockerTemplate.CreateDef();
             obj.BaseMeltingPoint=1600f;
             obj.PreventIdleTraversalPastBuilding = true;
