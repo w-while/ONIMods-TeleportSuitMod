@@ -66,12 +66,11 @@ namespace TeleportSuitMod
             conduitConsumer.capacityTag = ElementLoader.FindElementByHash(SimHashes.Oxygen).tag;
             conduitConsumer.wrongElementResult = ConduitConsumer.WrongElementResult.Dump;
             conduitConsumer.forceAlwaysSatisfied = true;
-            conduitConsumer.capacityKG = 200f;
+            conduitConsumer.capacityKG = 100f;
             go.AddOrGet<AnimTileable>().tags = new Tag[1]
             {
                 new Tag("TeleportSuitLocker"),
             };
-            //todo:
             Ownable ownable = go.AddOrGet<Ownable>();
             if (TeleportSuitSlot==null)
             {

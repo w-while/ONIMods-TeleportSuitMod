@@ -419,11 +419,9 @@ namespace TeleportSuitMod.PeterHan.BulkSettingsChange
             gameObject.AddComponent<BulkChangeHover>();
             // Allow priority setting for the enable/disable building chores
             interceptNumberKeysForPriority = true;
-            // HACK: Get the cursor from the disinfect tool
             var inst = DisinfectTool.Instance;
             cursor = CURSOR.Get(inst);
             BOX_CURSOR.Set(this, cursor);
-            // HACK: Get the area visualizer from the disinfect tool
             var avTemplate = AREA_VISUALIZER.Get(inst);
             if (avTemplate != null)
             {

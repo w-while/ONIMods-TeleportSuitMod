@@ -52,6 +52,7 @@ namespace TeleportSuitMod
             Assets.Sprites.Add(icon.name, icon);
         }
 
+        //添加锻造台的配方
         [HarmonyPatch(typeof(SuitFabricatorConfig), "ConfigureRecipes")]
         public static class SuitFabricatorConfig_ConfigureRecipes_Patch
         {
@@ -60,7 +61,7 @@ namespace TeleportSuitMod
                 ComplexRecipe.RecipeElement[] array15 = new ComplexRecipe.RecipeElement[2]
                 {
                     new ComplexRecipe.RecipeElement(SimHashes.Tungsten.ToString(), 200f),
-                    new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 10f)
+                    new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 50f)
                 };
                 ComplexRecipe.RecipeElement[] array16 = new ComplexRecipe.RecipeElement[1]
                 {
@@ -78,7 +79,7 @@ namespace TeleportSuitMod
                 ComplexRecipe.RecipeElement[] array17 = new ComplexRecipe.RecipeElement[2]
                 {
                     new ComplexRecipe.RecipeElement(TeleportSuitConfig.WORN_ID.ToTag(), 1f),
-                    new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 5f)
+                    new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 20f)
                 };
                 ComplexRecipe.RecipeElement[] array18 = new ComplexRecipe.RecipeElement[1]
                 {
@@ -96,7 +97,7 @@ namespace TeleportSuitMod
             }
         }
 
-        //修改后可以更新小人能拿到的东西
+        //修改整个殖民地能否到达某个方块，会影响世界的库存等等
         [HarmonyPatch(typeof(MinionGroupProber), "IsReachable_AssumeLock")]
         public static class MinionGroupProber_IsReachable_AssumeLock_Patch
         {
@@ -138,7 +139,7 @@ namespace TeleportSuitMod
             }
         }
 
-        //当小人检测到下落时直接传送到安全可达地点，可以不加，加的话用传送快一些
+        //当小人检测到下落时直接传送到安全可达地点，可以不加，加的话用传送流畅
         [HarmonyPatch(typeof(FallMonitor.Instance), nameof(FallMonitor.Instance.Recover))]
         public static class FallMonitor_Instance_Recover
         {
@@ -175,7 +176,7 @@ namespace TeleportSuitMod
         }
 
         public static Dictionary<PathProber, int> worldId = new Dictionary<PathProber, int>();
-        //取消穿着传送服的小人到各个格子的可达性更新，并且记录小人的世界信息，
+        //取消穿着传送服的小人到各个格子的可达性更新（为了优化一点性能），并且记录小人的世界信息，
         //因为在Navigator_GetNavigationCost_Patch中获取世界可能会触发unity的gameobject获取报错
         [HarmonyPatch(typeof(PathProber), nameof(PathProber.UpdateProbe))]
         public static class PathProber_UpdateProbe_Patch
@@ -287,60 +288,6 @@ namespace TeleportSuitMod
             }
         }
 
-
-        //取消存放柜复制人主动归还的任务
-        [HarmonyPatch(typeof(SuitLocker.ReturnSuitWorkable), nameof(SuitLocker.ReturnSuitWorkable.CreateChore))]
-        public static class SuitLocker_ReturnSuitWorkable_CreateChore_Patch
-        {
-            public static bool Prefix(SuitLocker.ReturnSuitWorkable __instance)
-            {
-                SuitLocker component = __instance.GetComponent<SuitLocker>();
-                if (component.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
-                {
-                    component.returnSuitWorkable.CancelChore();
-                    TeleportSuitLocker teleportSuitLocker = __instance.gameObject.GetComponent<TeleportSuitLocker>();
-                    if (teleportSuitLocker!=null)
-                    {
-                        teleportSuitLocker.unequipTeleportSuitWorkable.CreateChore();
-                    }
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        [HarmonyPatch(typeof(SuitLocker), nameof(SuitLocker.IsSuitFullyCharged))]
-        public static class SuitLocker_IsSuitFullyCharged_Patch
-        {
-            public static bool Prefix(SuitLocker __instance, ref bool __result)
-            {
-                if (__instance.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
-                {
-                    KPrefabID suit = __instance.GetStoredOutfit();
-                    if (suit!=null)
-                    {
-                        __result = true;
-                        SuitTank suit_tank = suit.GetComponent<SuitTank>();
-                        if (suit_tank != null && suit_tank.PercentFull() < 1f)
-                        {
-                            __result = false;
-                        }
-                        TeleportSuitTank teleport_suit_tank = suit.GetComponent<TeleportSuitTank>();
-                        if (teleport_suit_tank != null && teleport_suit_tank.PercentFull() < 1f)
-                        {
-                            __result = false;
-                        }
-                    }
-                    else
-                    {
-                        __result = false;
-                    }
-                    return false;
-                }
-                return true;
-            }
-        }
-
         //取消选中穿着传送服的小人时绘制路径
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
         public static class Navigator_DrawPath_Patch
@@ -381,6 +328,60 @@ namespace TeleportSuitMod
             }
         }
 
+        //取消存放柜复制人主动归还的任务
+        [HarmonyPatch(typeof(SuitLocker.ReturnSuitWorkable), nameof(SuitLocker.ReturnSuitWorkable.CreateChore))]
+        public static class SuitLocker_ReturnSuitWorkable_CreateChore_Patch
+        {
+            public static bool Prefix(SuitLocker.ReturnSuitWorkable __instance)
+            {
+                SuitLocker component = __instance.GetComponent<SuitLocker>();
+                if (component.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
+                {
+                    component.returnSuitWorkable.CancelChore();
+                    TeleportSuitLocker teleportSuitLocker = __instance.gameObject.GetComponent<TeleportSuitLocker>();
+                    if (teleportSuitLocker!=null)
+                    {
+                        teleportSuitLocker.unequipTeleportSuitWorkable.CreateChore();
+                    }
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        //传送服是否已经满了的判定修改
+        [HarmonyPatch(typeof(SuitLocker), nameof(SuitLocker.IsSuitFullyCharged))]
+        public static class SuitLocker_IsSuitFullyCharged_Patch
+        {
+            public static bool Prefix(SuitLocker __instance, ref bool __result)
+            {
+                if (__instance.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
+                {
+                    KPrefabID suit = __instance.GetStoredOutfit();
+                    if (suit!=null)
+                    {
+                        __result = true;
+                        SuitTank suit_tank = suit.GetComponent<SuitTank>();
+                        if (suit_tank != null && suit_tank.PercentFull() < 1f)
+                        {
+                            __result = false;
+                        }
+                        TeleportSuitTank teleport_suit_tank = suit.GetComponent<TeleportSuitTank>();
+                        if (teleport_suit_tank != null && teleport_suit_tank.PercentFull() < 1f)
+                        {
+                            __result = false;
+                        }
+                    }
+                    else
+                    {
+                        __result = false;
+                    }
+                    return false;
+                }
+                return true;
+            }
+        }
+
         [HarmonyPatch(typeof(SuitLocker.ReturnSuitWorkable), nameof(SuitLocker.ReturnSuitWorkable.CancelChore))]
         public static class SuitLocker_ReturnSuitWorkable_CancelChore_Patch
         {
@@ -415,6 +416,7 @@ namespace TeleportSuitMod
             }
         }
 
+        //添加概览
         [HarmonyPatch(typeof(OverlayMenu), "InitializeToggles")]
         public static class OverlayMenu_InitializeToggles_Patch
         {
@@ -500,6 +502,7 @@ namespace TeleportSuitMod
             }
         }
 
+        //添加科技
         [HarmonyPatch(typeof(TechItems), nameof(TechItems.Init))]
         public static class TechItems_Init_Patch
         {

@@ -24,16 +24,24 @@
 			<InstallFolder>$(RootInstallFolder)$(ArchivedVersionPath)</InstallFolder>
 		</PropertyGroup>
 
+		<PropertyGroup>
+			<OutputFolder>$(ProjectDir)</OutputFolder>
+		</PropertyGroup>
+		<PropertyGroup Condition="Exists('$(ProjectDir)\OutputFiles')">
+			<OutputFolder>$(ProjectDir)\OutputFiles</OutputFolder>
+		</PropertyGroup>
+
 		<!--复制文件到MOD目录-->
 		<ItemGroup>
-			<AnimFiles Include="$(ProjectDir)\anim\**\*.*" />
-			<TranslationFiles Include="$(ProjectDir)\translations\*.po" />
-			<WorldGenFiles Include="$(ProjectDir)\worldgen\**\*.*" />
-			<WorldGenTemplates Include="$(ProjectDir)\templates\**\*.*" />
-			<YamlFiles Include="$(ProjectDir)\*.yaml" />
-			<PLibFiles Include="$(ProjectDir)\PLib.dll" />
+			<AnimFiles Include="$(OutputFolder)\anim\**\*.*" />
+			<TranslationFiles Include="$(OutputFolder)\translations\*.po" />
+			<WorldGenFiles Include="$(OutputFolder)\worldgen\**\*.*" />
+			<WorldGenTemplates Include="$(OutputFolder)\templates\**\*.*" />
+			<YamlFiles Include="$(OutputFolder)\*.yaml" />
+			<PLibFiles Include="$(OutputFolder)\PLib.dll" />
 		</ItemGroup>
 
+		<!--InstallFolder是Mods路径下的Dev文件夹-->
 		<Copy SourceFiles="@(AnimFiles)" DestinationFiles="@(AnimFiles->'$(InstallFolder)\anim\%(RecursiveDir)%(Filename)%(Extension)')" />
 		<Copy SourceFiles="@(TranslationFiles)" DestinationFolder="$(InstallFolder)\translations" />
 		<Copy SourceFiles="@(WorldGenFiles)" DestinationFiles="@(WorldGenFiles->'$(InstallFolder)\worldgen\%(RecursiveDir)%(Filename)%(Extension)')" />
@@ -43,3 +51,25 @@
 		<Copy SourceFiles="@(PLibFiles)" DestinationFolder="$(InstallFolder)" Condition=" Exists(@(PLibFiles))"/>
 	</Target>
 </Project>
+
+<!--Modified from https://github.com/peterhaneve/ONIMods/tree/main/PLib-->
+<!--Peter Han's MIT License:-->
+<!--Copyright (c) 2023 Peter Han
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.-->

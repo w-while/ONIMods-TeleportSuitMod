@@ -43,7 +43,7 @@ namespace TeleportSuitMod
                     {
                         return false;
                     }
-                    if (component3 != null && component3.NeedsRecharging())
+                    if (component3 != null && component3.PercentFull() < TeleportSuitTank.REFILL_PERCENT)
                     {
                         return true;
                     }
@@ -381,21 +381,13 @@ namespace TeleportSuitMod
                 }, UpdateRate.RENDER_200ms);
                 empty.EventTransition(GameHashes.OnStorageChange, charging, (StatesInstance smi) => smi.master.GetStoredOutfit() != null);
                 charging.DefaultState(charging.notoperational)
-                    .EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null);
-                //.Transition(charged, (StatesInstance smi) => smi.master.IsSuitFullyCharged());
+                    .EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null)
+                    .Transition(charged, (StatesInstance smi) => smi.master.IsSuitFullyCharged());
                 charging.notoperational.TagTransition(GameTags.Operational, charging.operational);
                 charging.operational.TagTransition(GameTags.Operational, charging.notoperational, on_remove: true).Update("FillBattery", delegate (StatesInstance smi, float dt)
                 {
                     smi.master.FillBattery(dt);
-                }, UpdateRate.SIM_1000ms)
-                .Enter(delegate (StatesInstance smi)
-                {
-                    smi.setEnergeUsage(true);
-                })
-                .Exit(delegate (StatesInstance smi)
-                {
-                    smi.setEnergeUsage(false);
-                });
+                }, UpdateRate.SIM_1000ms);
                 charged.EventTransition(GameHashes.OnStorageChange, empty, (StatesInstance smi) => smi.master.GetStoredOutfit() == null);
             }
         }
@@ -405,18 +397,6 @@ namespace TeleportSuitMod
             public StatesInstance(TeleportSuitLocker teleport_suit_locker)
                 : base(teleport_suit_locker)
             {
-            }
-            public void setEnergeUsage(bool additionalEnergeUsage)
-            {
-                EnergyConsumer energyConsumer = GetComponent<EnergyConsumer>();
-                if (additionalEnergeUsage)
-                {
-                    energyConsumer.BaseWattageRating = TeleportSuitLockerConfig.AdditionalEnergyUsage+TeleportSuitLockerConfig.BaseEnergyUsage;
-                }
-                else
-                {
-                    energyConsumer.BaseWattageRating =TeleportSuitLockerConfig.BaseEnergyUsage;
-                }
             }
         }
 
@@ -436,7 +416,7 @@ namespace TeleportSuitMod
 
         private MeterController battery_meter;
 
-        private float batteryChargeTime = 60f;
+        private static float batteryChargeTime = 60f;//充满电需要的时间。单位:s
 
         protected override void OnSpawn()
         {
@@ -465,34 +445,20 @@ namespace TeleportSuitMod
 
         private void FillBattery(float dt)
         {
-            KPrefabID storedOutfit = suit_locker.GetStoredOutfit();
-            if (!(storedOutfit == null))
+            KPrefabID suit = suit_locker.GetStoredOutfit();
+            if (!(suit == null))
             {
-                TeleportSuitTank component = storedOutfit.GetComponent<TeleportSuitTank>();
-                if (!component.IsFull())
+                TeleportSuitTank suit_tank = suit.GetComponent<TeleportSuitTank>();
+                if (!suit_tank.IsFull())
                 {
-                    component.batteryCharge += dt / batteryChargeTime;
-                }
-                else
-                {
-                    component.batteryCharge=1;
-                    smi.GoTo(smi.sm.charged);
+                    suit_tank.batteryCharge += dt / batteryChargeTime;
                 }
             }
         }
 
         private void RefreshMeter()
         {
-            if (o2_meter==null)
-            {
-                //Console.WriteLine("o2_meter is null");
-                return;
-            }
-            if (battery_meter==null)
-            {
-                //Console.WriteLine(value: "battery_meter is null");
-                return;
-            }
+
             KPrefabID storedOutfit = GetStoredOutfit();
             if (storedOutfit == null)
             {
