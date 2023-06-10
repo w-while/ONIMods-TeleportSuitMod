@@ -7,7 +7,7 @@ namespace TeleportSuitMod
     public class TeleportSuitLockerConfig : IBuildingConfig
     {
         public static int AdditionalEnergyUsage = 200;
-        public static int BaseEnergyUsage = 120;
+        public static int BaseEnergyUsage = 200;
 
         public const string ID = "TeleportSuitLocker";
         internal static PBuilding TeleportSuitLockerTemplate;

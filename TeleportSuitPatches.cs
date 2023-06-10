@@ -1,5 +1,4 @@
 ﻿
-using Epic.OnlineServices;
 using HarmonyLib;
 using PeterHan.PLib.AVC;
 using PeterHan.PLib.Buildings;
@@ -250,7 +249,7 @@ namespace TeleportSuitMod
                         transition= new Navigator.ActiveTransition();
                         KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
                         reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
-                        reactor_anim.Play("working_pre");
+                        //reactor_anim.Play("working_pre");
                         reactor_anim.Queue("working_loop");
                         reactor_anim.Queue("working_pst");
                         int reservedCell = ___reservedCell;
@@ -422,7 +421,10 @@ namespace TeleportSuitMod
         {
             public static void Postfix(List<OverlayMenu.ToggleInfo> ___overlayToggleInfos)
             {
-                Assets.Sprites.Add(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME, SpriteRegistry.GetOverlayIcon());
+                if (!Assets.Sprites.ContainsKey(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME))
+                {
+                    Assets.Sprites.Add(TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.ICON_NAME, SpriteRegistry.GetOverlayIcon());
+                }
                 Type type = typeof(OverlayMenu).GetNestedType("OverlayToggleInfo", BindingFlags.NonPublic|BindingFlags.Instance);
                 object[] parameters = new object[] {
                     TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON.ToString(),
