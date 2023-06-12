@@ -1,5 +1,4 @@
-﻿
-using HarmonyLib;
+﻿using HarmonyLib;
 using PeterHan.PLib.AVC;
 using PeterHan.PLib.Buildings;
 using PeterHan.PLib.Core;
@@ -100,15 +99,14 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(MinionGroupProber), "IsReachable_AssumeLock")]
         public static class MinionGroupProber_IsReachable_AssumeLock_Patch
         {
-            public static bool Prefix(int cell, ref bool __result)
+            public static void Postfix(int cell, ref bool __result)
             {
-                if (TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
+                //如果判定为无法常规到达，则开始判定是否能传送到达
+                if (__result==false&&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
                     ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)&&value>0)
                 {
                     __result=TeleportSuitConfig.CanTeloportTo(cell);
-                    return false;
                 }
-                return true;
             }
         }
 
@@ -193,6 +191,68 @@ namespace TeleportSuitMod
                         worldId[__instance]=-1;
                     }
 
+                    return false;
+                }
+                return true;
+            }
+        }
+        static int maxQueryRange = 50;
+        //顺序很重要
+        static int[][] dr = new int[4][] { new int[] { 1, 1 }, new int[] { 1, -1 }, new int[] { -1, -1, }, new int[] { -1, 1 } };
+        static Func<int, int>[] funs = new Func<int, int>[4] { Grid.CellBelow, Grid.CellLeft, Grid.CellAbove, Grid.CellRight };
+
+        //todo:
+        //修改穿着传送服的小人RunQuery的方式
+        //具体为以小人为中心往外扩张查找
+        [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
+        public static class Navigator_RunQuery_Patch
+        {
+            public static bool Prefix(Navigator __instance, PathFinderQuery query)
+            {
+                if ((__instance.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
+                {
+                    query.ClearResult();
+                    int rootCell = Grid.PosToCell(__instance);
+                    if (query.IsMatch(rootCell, rootCell, 0))
+                    {
+                        query.SetResult(rootCell, 0, __instance.CurrentNavType);
+                        return false;
+                    }
+                    int worldIdx = __instance.GetMyWorldId();
+                    for (int i = 0; i<maxQueryRange; i++)
+                    {
+                        for (int j = 0; j<4; j++)
+                        {
+                            int curCell = Grid.OffsetCell(rootCell, dr[j][0]*i, dr[j][1]*i);
+                            for (int k = 0; k<i*2; k++)
+                            {
+                                curCell=funs[j](curCell);
+                                //判断是否在一个世界内
+                                if (!Grid.IsValidCellInWorld(curCell, worldIdx))
+                                {
+                                    break;
+                                }
+                                if (TeleportSuitConfig.CanTeloportTo(curCell)&&query.IsMatch(curCell, rootCell, i))
+                                {
+                                    NavType navType = NavType.NumNavTypes;
+                                    if (Grid.HasLadder[curCell])
+                                    {
+                                        navType = NavType.Ladder;
+                                    }
+                                    if (Grid.HasPole[curCell])
+                                    {
+                                        navType = NavType.Pole;
+                                    }
+                                    if (GameNavGrids.FloorValidator.IsWalkableCell(curCell, Grid.CellBelow(curCell), true))
+                                    {
+                                        navType = NavType.Floor;
+                                    }
+                                    query.SetResult(curCell, i, navType);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
                     return false;
                 }
                 return true;
@@ -285,7 +345,7 @@ namespace TeleportSuitMod
                 return true;
             }
         }
-
+        //todo:
         //取消选中穿着传送服的小人时绘制路径
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
         public static class Navigator_DrawPath_Patch
