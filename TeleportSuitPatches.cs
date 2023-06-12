@@ -230,18 +230,17 @@ namespace TeleportSuitMod
                     if (___reservedCell != NavigationReservations.InvalidReservation)
                     {
                         Equipment equipment = __instance.GetComponent<MinionIdentity>().GetEquipment();
-                        if (equipment!=null)
+
+                        Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
+                        if (assignable!=null)
                         {
-                            Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
-                            if (assignable!=null)
+                            TeleportSuitTank tank = assignable.GetComponent<TeleportSuitTank>();
+                            if (tank!=null&&tank.batteryCharge > 0)
                             {
-                                TeleportSuitTank tank = assignable.GetComponent<TeleportSuitTank>();
-                                if (tank!=null&&tank.batteryCharge > 0)
-                                {
-                                    tank.batteryCharge -=1f/TeleportSuitConfig.TELEPORTCOUNT;
-                                }
+                                tank.batteryCharge -=1f/TeleportSuitConfig.TELEPORTCOUNT;
                             }
                         }
+
 
                         __instance.transitionDriver.EndTransition();
                         __instance.smi.GoTo(__instance.smi.sm.normal.moving);

@@ -417,7 +417,7 @@ msgstr "增加或者移除传送限制区域"
 msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.TOOL_NAME_APPLYFOG"
 msgid "Add restrict area"
-msgstr "增加限制工具"
+msgstr "增加限制区域"
 
 #. TeleportSuitMod.TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.TOOL_NAME_REMOVEFOG
 msgctxt ""

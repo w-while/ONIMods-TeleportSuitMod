@@ -26,7 +26,7 @@ namespace TeleportSuitMod
         public static ComplexRecipe recipe;
         public static PathFinder.PotentialPath.Flags TeleportSuitFlags = (PathFinder.PotentialPath.Flags)32;//必须是2的幂且大于8
 
-        public static int TELEPORTCOUNT = 75;//满电可以传送多少次
+        public static int TELEPORTCOUNT = 100;//满电可以传送多少次
         public static int OXYGENCAPACITY = 75;
         public static int SCALDING = 1000;
         public static float RADIATION_SHIELDING = 0.66f;

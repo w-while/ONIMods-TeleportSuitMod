@@ -196,8 +196,6 @@ namespace TeleportSuitMod
 
             protected override void OnCompleteWork(Worker worker)
             {
-                Console.WriteLine("Unequip OnCompleteWork");
-
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
                 if (equipment.IsSlotOccupied(Db.Get().AssignableSlots.Suit))
                 {
