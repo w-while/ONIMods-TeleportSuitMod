@@ -13,4 +13,4 @@ And use SanchozzONIMods.Lib https://github.com/SanchozzDeponianin/ONIMods/tree/m
 SanchozzONIMods's LICENSE  
 https://github.com/SanchozzDeponianin/ONIMods/blob/master/LICENSE  
 
-MOD仍在开发中！
+MOD现已发布测试版本(beta)：https://steamcommunity.com/sharedfiles/filedetails/?id=2987670505  
