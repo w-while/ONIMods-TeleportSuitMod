@@ -1,4 +1,5 @@
 ﻿using PeterHan.PLib.Buildings;
+using TemplateClasses;
 using TUNING;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace TeleportSuitMod
 
         public const string ID = "TeleportSuitLocker";
         internal static PBuilding TeleportSuitLockerTemplate;
-        public static AssignableSlot TeleportSuitSlot;
+        public static AssignableSlot TeleportSuitAssignableSlot;
 
         public static PBuilding CreateBuilding()
         {
@@ -60,6 +61,8 @@ namespace TeleportSuitMod
         {
             go.AddOrGet<SuitLocker>().OutfitTags = new Tag[1] { TeleportSuitGameTags.TeleportSuit };
             go.AddOrGet<TeleportSuitLocker>();
+
+
             ConduitConsumer conduitConsumer = go.AddOrGet<ConduitConsumer>();
             conduitConsumer.conduitType = ConduitType.Gas;
             conduitConsumer.consumptionRate = 1f;
@@ -71,13 +74,17 @@ namespace TeleportSuitMod
             {
                 new Tag("TeleportSuitLocker"),
             };
+
+            //不受房间分配
+            go.AddTag(tag: GameTags.NotRoomAssignable);
             Ownable ownable = go.AddOrGet<Ownable>();
-            if (TeleportSuitSlot==null)
+            if (TeleportSuitAssignableSlot==null)
             {
-                TeleportSuitSlot=Db.Get().AssignableSlots.Add(new OwnableSlot(TeleportSuitLockerConfig.ID, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+                TeleportSuitAssignableSlot=Db.Get().AssignableSlots.Add(new OwnableSlot(TeleportSuitLockerConfig.ID, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             }
-            ownable.slotID = TeleportSuitSlot.Id;
+            ownable.slotID = TeleportSuitAssignableSlot.Id;
             ownable.canBePublic = true;
+
 
             go.AddOrGet<Storage>();
             Prioritizable.AddRef(go);

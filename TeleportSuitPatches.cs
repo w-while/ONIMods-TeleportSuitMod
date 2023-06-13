@@ -201,7 +201,6 @@ namespace TeleportSuitMod
         static int[][] dr = new int[4][] { new int[] { 1, 1 }, new int[] { 1, -1 }, new int[] { -1, -1, }, new int[] { -1, 1 } };
         static Func<int, int>[] funs = new Func<int, int>[4] { Grid.CellBelow, Grid.CellLeft, Grid.CellAbove, Grid.CellRight };
 
-        //todo:
         //修改穿着传送服的小人RunQuery的方式
         //具体为以小人为中心往外扩张查找
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
@@ -345,7 +344,6 @@ namespace TeleportSuitMod
                 return true;
             }
         }
-        //todo:
         //取消选中穿着传送服的小人时绘制路径
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
         public static class Navigator_DrawPath_Patch
