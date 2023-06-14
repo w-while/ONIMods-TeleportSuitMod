@@ -102,8 +102,10 @@ namespace TeleportSuitMod
             public static void Postfix(int cell, ref bool __result)
             {
                 //如果判定为无法常规到达，则开始判定是否能传送到达
-                if (__result==false&&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
-                    ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)&&value>0)
+                if (__result==false&&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null
+                    &&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
+                    ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)
+                    &&value>0)
                 {
                     __result=TeleportSuitConfig.CanTeloportTo(cell);
                 }
@@ -184,11 +186,18 @@ namespace TeleportSuitMod
                 {
                     if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue)
                     {
-                        worldId[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                        //线程安全
+                        lock (worldId)
+                        {
+                            worldId[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                        }
                     }
                     else
                     {
-                        worldId[__instance]=-1;
+                        lock (worldId)
+                        {
+                            worldId[__instance]=-1;
+                        }
                     }
 
                     return false;
@@ -558,6 +567,8 @@ namespace TeleportSuitMod
             internal static void Prefix()
             {
                 TeleportationOverlay.TeleportRestrict=null;
+                worldId.Clear();
+                TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
             }
         }
 
