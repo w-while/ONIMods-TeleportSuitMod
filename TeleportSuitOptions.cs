@@ -28,6 +28,10 @@ namespace TeleportSuitMod
                 return opts;
             }
         }
+        public TeleportSuitOptions()
+        {
+            ConfigVersion = CURRENT_CONFIG_VERSION;
+        }
         [JsonProperty]
         public int ConfigVersion { get; set; }
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE", "", null)]
