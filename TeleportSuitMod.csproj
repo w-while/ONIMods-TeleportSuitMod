@@ -1,119 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B88F8BCF-79AC-4400-8A10-A7BDEE47BAA9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>TeleportSuitMod</RootNamespace>
-    <AssemblyName>TeleportSuitMod</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>C:\Users\while\Documents\Klei\OxygenNotIncluded\mods\Dev\TeleportSuitMod\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PLib">
-      <HintPath>C:\Users\while\Desktop\oniMods\PLib.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
-    <Compile Include="PeterHan.BulkSettingsChange\BulkChangePatches.cs" />
-    <Compile Include="PeterHan.BulkSettingsChange\BulkChangeTool.cs" />
-    <Compile Include="PeterHan.BulkSettingsChange\BulkParameterMenu.cs" />
-    <Compile Include="PeterHan.BulkSettingsChange\BulkToolMode.cs" />
-    <Compile Include="PeterHan.BulkSettingsChange\SpriteRegistry.cs" />
-    <Compile Include="SanchozzONIMods.Lib\KAnimGroupManager.cs" />
-    <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
-    <Compile Include="TeleportationOverlay.cs" />
-    <Compile Include="TeleportRestrictToolSaveData.cs" />
-    <Compile Include="TeleportSuitConfig.cs" />
-    <Compile Include="TeleportSuitGameTags.cs" />
-    <Compile Include="TeleportSuitLocker.cs" />
-    <Compile Include="TeleportSuitLockerConfig.cs" />
-    <Compile Include="TeleportSuitMonitor.cs" />
-    <Compile Include="TeleportSuitPatches.cs" />
-    <Compile Include="TeleportSuitOptions.cs" />
-    <Compile Include="TeleportSuitStrings.cs" />
-    <Compile Include="TeleportSuitTank.cs" />
-    <Compile Include="TeleportSuitWorldCountManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".editorconfig" />
-    <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_anim.bytes" />
-    <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_build.bytes" />
-    <None Include="anim\assets\teleport_suit\teleport_suit_anim.bytes" />
-    <None Include="anim\assets\teleport_suit\teleport_suit_build.bytes" />
-    <None Include="anim\assets\teleport_suit_body\teleport_suit_body_anim.bytes" />
-    <None Include="anim\assets\teleport_suit_body\teleport_suit_body_build.bytes" />
-    <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_anim.bytes" />
-    <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_build.bytes" />
-    <None Include="Directory.Build.props" />
-    <None Include="Directory.Build.props.default" />
-    <None Include="Directory.Build.targets" />
-    <None Include="mod.yaml" />
-    <None Include="mod_info.yaml" />
-    <None Include="translations\curr_mods_templates.pot" />
-    <None Include="translations\zh.po" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
-    <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
-    <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
-    <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
-    <Content Include="PLib.dll" />
-    <EmbeddedResource Include="images\OverlayIcon.png" />
-    <EmbeddedResource Include="images\Placer.png" />
-    <EmbeddedResource Include="images\Toggle.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="PLib" Version="4.13.0" />
+	</ItemGroup>
+
 </Project>
