@@ -80,6 +80,16 @@ namespace TeleportSuitMod
                 }
             };
 
+            public Chore.Precondition TeleportSuitIsNotRedAlert = new Chore.Precondition
+            {
+                id = "TeleportSuitIsNotRedAlert",
+                description = DUPLICANTS.CHORES.PRECONDITIONS.IS_NOT_RED_ALERT,
+                fn = delegate (ref Chore.Precondition.Context context, object data)
+                {
+                    return !context.chore.gameObject.GetMyWorld().IsRedAlert();
+                }
+            };
+
             public static readonly Chore.Precondition CanTeleportSuitLockerDropOffSuit = new Chore.Precondition
             {
                 id = "CanTeleportSuitLockerDropOffSuit",
@@ -149,18 +159,27 @@ namespace TeleportSuitMod
                         ignore_building_assignment: false, add_to_daily_report: false);
                     urgentUnequipChore.AddPrecondition(DoesDupeHasTeleportSuitAndNeedCharging);
                     urgentUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
-                    //idleUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitIdle, this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.idle, 5, ignore_building_assignment: false, add_to_daily_report: false);
+
+                    //idleUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(Db.Get().ChoreTypes.ReturnSuitIdle,
+                    //this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true, null,
+                    //ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false, allow_in_context_menu: true,
+                    //allow_prioritization: false, PriorityScreen.PriorityClass.idle, 5,
+                    //ignore_building_assignment: false, add_to_daily_report: false);
                     //idleUnequipChore.AddPrecondition(DoesDupeHasTeleportSuit);
+
                     //idleUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
+
                     if (TeleportSuitOptions.Instance.ShouldDropDuringBreak)
                     {
                         breakTimeUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(breakTimeUnequipChoreType,
-                            this, null, run_until_complete: true, null, null, null, allow_in_red_alert: true,
+                            this, null, run_until_complete: true, null, null, null, allow_in_red_alert: false,
                             Db.Get().ScheduleBlockTypes.Hygiene, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false,
                             allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5,
                             ignore_building_assignment: false, add_to_daily_report: false);
                         breakTimeUnequipChore.AddPrecondition(DoesDupeHasTeleportSuit);
                         breakTimeUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
+                        //allow_in_red_alert这个属性是没用的，因为优先级是topPriority，详看源码，所以需要额外增加以下条件
+                        breakTimeUnequipChore.AddPrecondition(TeleportSuitIsNotRedAlert);
                     }
                 }
             }
@@ -245,11 +264,11 @@ namespace TeleportSuitMod
                 description = TeleportSuitStrings.DUPLICANTS.CHORES.PRECONDITIONS.DOES_DUPE_AT_EQUIP_TELEPORT_SUIT_SCHEDULE,
                 fn = delegate (ref Chore.Precondition.Context context, object data)
                 {
-                    if (context.consumerState.scheduleBlock?.GroupId!="Worktime")
+                    if (context.consumerState.scheduleBlock?.GroupId=="Worktime"||context.chore.gameObject.GetMyWorld().IsRedAlert())
                     {
-                        return false;
+                        return true;
                     }
-                    return true;
+                    return false;
                 }
             };
             public static readonly Chore.Precondition DoesDupeHasNoTeleportSuit = new Chore.Precondition
@@ -299,6 +318,7 @@ namespace TeleportSuitMod
                 }
                 if (equipChore == null)
                 {
+                    //注意equipChore和breakTimeUnequipChore决不能同时满足，否则小人会一直在检查站重复穿服脱服
                     TeleportSuitLocker component = GetComponent<TeleportSuitLocker>();
                     equipChore = new WorkChore<EquipTeleportSuitWorkable>(equipChoretype, this, null,
                         run_until_complete: true, null, null, null, allow_in_red_alert: true,
