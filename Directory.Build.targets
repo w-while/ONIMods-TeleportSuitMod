@@ -31,6 +31,13 @@
 			<OutputFolder>$(ProjectDir)\OutputFiles</OutputFolder>
 		</PropertyGroup>
 
+		<PropertyGroup>
+			<PLibFolder>$(TargetPath)\..\PLib.dll</PLibFolder>
+		</PropertyGroup>
+		<PropertyGroup Condition="Exists('$(OutputFolder)\PLib.dll')">
+			<PLibFolder>$(OutputFolder)\PLib.dll</PLibFolder>
+		</PropertyGroup>
+
 		<!--复制文件到MOD目录-->
 		<ItemGroup>
 			<AnimFiles Include="$(OutputFolder)\anim\**\*.*" />
@@ -38,7 +45,7 @@
 			<WorldGenFiles Include="$(OutputFolder)\worldgen\**\*.*" />
 			<WorldGenTemplates Include="$(OutputFolder)\templates\**\*.*" />
 			<YamlFiles Include="$(OutputFolder)\*.yaml" />
-			<PLibFiles Include="$(OutputFolder)\PLib.dll" />
+			<PLibFiles Include="$(PLibFolder)" />
 		</ItemGroup>
 
 		<!--InstallFolder是Mods路径下的Dev文件夹-->

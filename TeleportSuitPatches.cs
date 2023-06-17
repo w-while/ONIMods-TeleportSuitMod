@@ -125,6 +125,7 @@ namespace TeleportSuitMod
                     if (worldId.TryGetValue(__instance.PathProber, out int id)&&id!=-1)
                     {
                         if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
+                            &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null
                                 &&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId==id
                                 &&TeleportSuitConfig.CanTeloportTo(cell))
                         {
@@ -182,14 +183,17 @@ namespace TeleportSuitMod
         {
             public static bool Prefix(PathFinder.PotentialPath.Flags flags, PathProber __instance, int cell)
             {
-                if ((flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
+                if (Grid.IsValidCell(cell)&&(flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
                 {
                     if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue)
                     {
                         //线程安全
                         lock (worldId)
                         {
-                            worldId[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                            if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null)
+                            {
+                                worldId[__instance]= ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                            }
                         }
                     }
                     else
@@ -221,6 +225,10 @@ namespace TeleportSuitMod
                 {
                     query.ClearResult();
                     int rootCell = Grid.PosToCell(__instance);
+                    if (!Grid.IsValidCell(rootCell))
+                    {
+                        return false;
+                    }
                     if (query.IsMatch(rootCell, rootCell, 0))
                     {
                         query.SetResult(rootCell, 0, __instance.CurrentNavType);
@@ -278,6 +286,11 @@ namespace TeleportSuitMod
                     bool needTeleport = true;
                     int mycell = Grid.PosToCell(__instance);
                     int target_position_cell = Grid.PosToCell(__instance.target);
+                    if ((!Grid.IsValidCell(mycell))||(!Grid.IsValidCell(target_position_cell)))
+                    {
+                        __instance.Stop();
+                        return true;
+                    }
                     for (int i = 0; i<__instance.targetOffsets.Length; i++)
                     {
                         int cell = Grid.OffsetCell(target_position_cell, __instance.targetOffsets[i]);
@@ -323,6 +336,10 @@ namespace TeleportSuitMod
                         Action<object> action = null;
                         action = delegate (object data)
                         {
+                            if (__instance==null)
+                            {
+                                return;
+                            }
                             __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
                             Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
                             __instance.transform.SetPosition(position);
@@ -400,7 +417,7 @@ namespace TeleportSuitMod
             public static bool Prefix(SuitLocker.ReturnSuitWorkable __instance)
             {
                 SuitLocker component = __instance.GetComponent<SuitLocker>();
-                if (component.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
+                if (component!=null&&component.OutfitTags[0]==TeleportSuitGameTags.TeleportSuit)
                 {
                     component.returnSuitWorkable.CancelChore();
                     TeleportSuitLocker teleportSuitLocker = __instance.gameObject.GetComponent<TeleportSuitLocker>();
@@ -454,7 +471,7 @@ namespace TeleportSuitMod
             {
                 SuitLocker component = __instance.GetComponent<SuitLocker>();
 
-                if (component.OutfitTags[0].Name==TeleportSuitGameTags.TeleportSuit.Name)
+                if (component!=null&&component.OutfitTags[0].Name==TeleportSuitGameTags.TeleportSuit.Name)
                 {
                     TeleportSuitLocker teleportSuitLocker = component.gameObject.GetComponent<TeleportSuitLocker>();
                     if (teleportSuitLocker!=null)
@@ -567,8 +584,14 @@ namespace TeleportSuitMod
             internal static void Prefix()
             {
                 TeleportationOverlay.TeleportRestrict=null;
-                worldId.Clear();
-                TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
+                if (worldId!=null)
+                {
+                    worldId.Clear();
+                }
+                if (TeleportSuitWorldCountManager.Instance!=null&&TeleportSuitWorldCountManager.Instance.WorldCount!=null)
+                {
+                    TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
+                }
             }
         }
 

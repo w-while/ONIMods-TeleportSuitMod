@@ -48,9 +48,7 @@
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PLib">
-      <HintPath>C:\Users\while\Desktop\oniMods\PLib.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -104,16 +102,19 @@
     <None Include="translations\curr_mods_templates.pot" />
     <None Include="translations\zh.po" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
-    <Content Include="PLib.dll" />
     <EmbeddedResource Include="images\OverlayIcon.png" />
     <EmbeddedResource Include="images\Placer.png" />
     <EmbeddedResource Include="images\Toggle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PLib">
+      <Version>4.13.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
