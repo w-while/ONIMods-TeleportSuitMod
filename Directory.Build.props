@@ -5,6 +5,7 @@
 
 	<ItemDefinitionGroup>
 		<!--设置为False可以不把依赖复制到生成路径，匹配依赖属性中的CopyLocal复制本地-->
+		<!--Don't copy Reference files to local-->
 		<Reference Private="False" />
 	</ItemDefinitionGroup>
 	<PropertyGroup>
@@ -13,6 +14,9 @@
 	<!--为项目导入引用-->
 	<!--GameFolderActive 是游戏路径下的OxygenNotIncluded_Data\Managed文件夹-->
 	<!--有不想导入的引用可以直接删除行-->
+	<!--Add Reference-->
+	<!--GameFolderActive is path to OxygenNotIncluded_Data\Managed-->
+	<!--delete lines if dont need-->
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp" HintPath="$(GameFolderActive)/Assembly-CSharp.dll" />
 		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameFolderActive)/Assembly-CSharp-firstpass.dll" />
