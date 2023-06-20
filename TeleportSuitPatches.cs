@@ -22,11 +22,12 @@ namespace TeleportSuitMod
 {
     public class TeleportSuitPatches : KMod.UserMod2
     {
-        static FieldInfo SuitLockerFieldInfo = null;
+        static Harmony ModHarmony = null;
         private static readonly IDetouredField<TransitionDriver, Navigator.ActiveTransition> TRANSITION =
             PDetours.DetourField<TransitionDriver, Navigator.ActiveTransition>("transition");
         public override void OnLoad(Harmony harmony)
         {
+            ModHarmony = harmony;
             base.OnLoad(harmony);
             PUtil.InitLibrary();
             new PPatchManager(harmony).RegisterPatchClass(typeof(TeleportSuitPatches));
@@ -48,6 +49,73 @@ namespace TeleportSuitMod
             SanchozzONIMods.Lib.Utils.InitLocalization(typeof(TeleportSuitStrings));
             var icon = SpriteRegistry.GetToolIcon();
             Assets.Sprites.Add(icon.name, icon);
+        }
+        [PLibMethod(RunAt.AfterModsLoad)]
+        internal static void AfterModsLoad()
+        {
+            //todo: 适配fast track
+            Assembly[] lists = new Assembly[10];
+            foreach (var mod in Global.Instance.modManager.mods)
+            {
+                if (mod.staticID=="PeterHan.FastTrack")
+                {
+                    mod.loaded_mod_data.dlls.CopyTo(lists, 0);
+                    break;
+                }
+            }
+            if (lists[0]!=null)
+            {
+                Assembly assembly = lists[0];
+                if (assembly==null)
+                {
+                    return;
+                }
+                MethodInfo method1 = assembly.GetType("PeterHan.FastTrack.SensorPatches.FastGroupProber").GetMethod("IsReachable", new Type[] { typeof(int) });
+                MethodInfo method2 = assembly.GetType("PeterHan.FastTrack.SensorPatches.FastGroupProber").GetMethod("IsReachable", new Type[] { typeof(int), typeof(CellOffset[]) });
+                if (ModHarmony!=null&&method1!=null&&method2!=null)
+                {
+                    ModHarmony.Patch(original: method1, postfix: new HarmonyMethod(typeof(TeleportSuitPatches),
+                        nameof(TeleportSuitPatches.PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_single)));
+                    ModHarmony.Patch(original: method2, prefix: new HarmonyMethod(typeof(TeleportSuitPatches),
+                        nameof(TeleportSuitPatches.PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_multiple)));
+                }
+            }
+        }
+        public static void PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_single(int cell, ref bool __result)
+        {
+            if (__result==false)
+            {
+                __result=CanBeReachByMinionGroup(cell);
+            }
+        }
+        public static void PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_multiple(int cell, CellOffset[] offsets, ref bool __result)
+        {
+            int n = offsets.Length;
+            for (int i = 0; i<n; i++)
+            {
+                if (__result==false)
+                {
+                    int offs = Grid.OffsetCell(cell, offsets[i]);
+                    __result=CanBeReachByMinionGroup(offs);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        public static bool CanBeReachByMinionGroup(int cell)
+        {
+            if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null
+                &&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
+                ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)&&value>0)
+            {
+                return TeleportSuitConfig.CanTeloportTo(cell);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         //添加锻造台的配方
@@ -102,12 +170,9 @@ namespace TeleportSuitMod
             public static void Postfix(int cell, ref bool __result)
             {
                 //如果判定为无法常规到达，则开始判定是否能传送到达
-                if (__result==false&&ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null
-                    &&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
-                    ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)
-                    &&value>0)
+                if (__result==false)
                 {
-                    __result=TeleportSuitConfig.CanTeloportTo(cell);
+                    __result=CanBeReachByMinionGroup(cell);
                 }
             }
         }
