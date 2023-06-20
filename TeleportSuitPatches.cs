@@ -76,7 +76,7 @@ namespace TeleportSuitMod
                 {
                     ModHarmony.Patch(original: method1, postfix: new HarmonyMethod(typeof(TeleportSuitPatches),
                         nameof(TeleportSuitPatches.PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_single)));
-                    ModHarmony.Patch(original: method2, prefix: new HarmonyMethod(typeof(TeleportSuitPatches),
+                    ModHarmony.Patch(original: method2, postfix: new HarmonyMethod(typeof(TeleportSuitPatches),
                         nameof(TeleportSuitPatches.PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_multiple)));
                 }
             }
@@ -90,13 +90,20 @@ namespace TeleportSuitMod
         }
         public static void PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_multiple(int cell, CellOffset[] offsets, ref bool __result)
         {
+            if (__result==false)
+            {
+                __result=CanBeReachByMinionGroup(cell);
+            }
+            else
+            {
+                return;
+            }
             int n = offsets.Length;
             for (int i = 0; i<n; i++)
             {
                 if (__result==false)
                 {
-                    int offs = Grid.OffsetCell(cell, offsets[i]);
-                    __result=CanBeReachByMinionGroup(offs);
+                    __result=CanBeReachByMinionGroup(Grid.OffsetCell(cell, offsets[i]));
                 }
                 else
                 {
