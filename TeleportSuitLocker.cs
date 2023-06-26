@@ -16,6 +16,25 @@ namespace TeleportSuitMod
         public EquipTeleportSuitWorkable equipTeleportSuitWorkable;
         public class UnequipTeleportSuitWorkable : Workable
         {
+            public static readonly Chore.Precondition DoesDupeAtMinorUnEquipTeleportSuitSchedule = new Chore.Precondition
+            {
+                id = "DoesDupeAtMinorUnEquipTeleportSuitSchedule",
+                description = STRINGS.DUPLICANTS.CHORES.PRECONDITIONS.IS_SCHEDULED_TIME,
+                fn = delegate (ref Chore.Precondition.Context context, object data)
+                {
+                    if (TeleportSuitOptions.Instance.ShouldDropDuringBreak
+                    &&(context.consumerState.scheduleBlock?.GroupId=="Recreation"||context.consumerState.scheduleBlock?.GroupId=="Hygene"))
+                    {
+                        return true;
+                    }
+                    if (TeleportSuitOptions.Instance.ShouldDropDuringSleep
+                    &&(context.consumerState.scheduleBlock?.GroupId=="Sleep"))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            };
             public static readonly Chore.Precondition DoesDupeHasTeleportSuitAndNeedCharging = new Chore.Precondition
             {
                 id = "DoesDupeHasTeleportSuitAndNeedCharging",
@@ -111,7 +130,7 @@ namespace TeleportSuitMod
             private WorkChore<UnequipTeleportSuitWorkable> breakTimeUnequipChore;
 
             public static ChoreType urgentUnequipChoreType = null;
-            public static ChoreType breakTimeUnequipChoreType = null;
+            public static ChoreType minorUnequipChoreType = null;
 
             protected override void OnPrefabInit()
             {
@@ -140,7 +159,7 @@ namespace TeleportSuitMod
                     }
                     if (breakTimeUnequipChore==null)
                     {
-                        breakTimeUnequipChoreType = (ChoreType)typeof(ChoreTypes).GetMethod("Add", BindingFlags.Instance|BindingFlags.NonPublic).
+                        minorUnequipChoreType = (ChoreType)typeof(ChoreTypes).GetMethod("Add", BindingFlags.Instance|BindingFlags.NonPublic).
                             Invoke(Db.Get().ChoreTypes, new object[] {
                                 "ReturnTeleportSuitBreakTime", new string[0], "", new string[0],
                                 TeleportSuitStrings.DUPLICANTS.CHORES.RETURNTELEPORTSUITBREAKTIME.NAME.ToString(),
@@ -169,13 +188,14 @@ namespace TeleportSuitMod
 
                     //idleUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
 
-                    if (TeleportSuitOptions.Instance.ShouldDropDuringBreak)
+                    if (TeleportSuitOptions.Instance.ShouldDropDuringBreak||TeleportSuitOptions.Instance.ShouldDropDuringSleep)
                     {
-                        breakTimeUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(breakTimeUnequipChoreType,
-                            this, null, run_until_complete: true, null, null, null, allow_in_red_alert: false,
-                            Db.Get().ScheduleBlockTypes.Hygiene, ignore_schedule_block: false, only_when_operational: false, null, is_preemptable: false,
-                            allow_in_context_menu: true, allow_prioritization: false, PriorityScreen.PriorityClass.topPriority, 5,
+                        breakTimeUnequipChore = new WorkChore<UnequipTeleportSuitWorkable>(chore_type: minorUnequipChoreType,
+                            target: this, chore_provider: null, run_until_complete: true, on_complete: null, on_begin: null, on_end: null, allow_in_red_alert: false,
+                            schedule_block: null, ignore_schedule_block: true, only_when_operational: false, override_anims: null, is_preemptable: false,
+                            allow_in_context_menu: true, allow_prioritization: false, priority_class: PriorityScreen.PriorityClass.topPriority, priority_class_value: 5,
                             ignore_building_assignment: false, add_to_daily_report: false);
+                        breakTimeUnequipChore.AddPrecondition(DoesDupeAtMinorUnEquipTeleportSuitSchedule);
                         breakTimeUnequipChore.AddPrecondition(DoesDupeHasTeleportSuit);
                         breakTimeUnequipChore.AddPrecondition(CanTeleportSuitLockerDropOffSuit, component);
                         //allow_in_red_alert这个属性是没用的，因为优先级是topPriority，详看源码，所以需要额外增加以下条件

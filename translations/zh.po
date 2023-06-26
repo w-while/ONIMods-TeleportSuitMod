@@ -113,6 +113,11 @@ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr "复制人是否该在休息时间脱下传送服"
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
+msgid "Should Duplicants take off teleport suit during sleep time"
+msgstr "复制人是否该在睡觉时间脱下传送服"
+
 #. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
 msgid "Teleportation Overlay"
@@ -443,6 +448,13 @@ msgctxt ""
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr "复制人是否该在休息时间脱下传送服"
 
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"SHOULD_DROP_DURING_SLEEP_TITLE"
+msgid "Should Duplicants take off teleport suit during sleep time"
+msgstr "复制人是否该在睡觉时间脱下传送服"
+
 #. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON"
 msgid "Teleportation Overlay"
@@ -505,6 +517,12 @@ msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
 #~ "SHOULD_DROP_DURING_BREAK_TITLE"
 #~ msgid "Should Duplicants take off teleport suit during break time"
 #~ msgstr "复制人是否该在休息时间脱下传送服"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT."
+#~ "SHOULD_DROP_DURING_SLEEP_TITLE"
+#~ msgid "Should Duplicants take off teleport suit during sleep time"
+#~ msgstr "复制人是否该在睡觉时间脱下传送服"
 
 #~ msgctxt ""
 #~ "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTABLE.BUTTON"

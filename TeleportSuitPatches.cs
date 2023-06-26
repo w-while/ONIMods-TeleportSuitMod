@@ -57,7 +57,7 @@ namespace TeleportSuitMod
             Assembly[] lists = new Assembly[10];
             foreach (var mod in Global.Instance.modManager.mods)
             {
-                if (mod.staticID=="PeterHan.FastTrack")
+                if (mod.IsActive()&&mod.staticID=="PeterHan.FastTrack")
                 {
                     mod.loaded_mod_data.dlls.CopyTo(lists, 0);
                     break;

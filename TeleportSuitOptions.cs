@@ -7,7 +7,7 @@ namespace TeleportSuitMod
     [JsonObject(MemberSerialization.OptIn)]
     public class TeleportSuitOptions
     {
-        public const int CURRENT_CONFIG_VERSION = 1;
+        public const int CURRENT_CONFIG_VERSION = 2;
 
         private static TeleportSuitOptions instance;
         public static TeleportSuitOptions Instance
@@ -37,5 +37,8 @@ namespace TeleportSuitMod
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE", "", null)]
         [JsonProperty]
         public bool ShouldDropDuringBreak { get; set; } = true;
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE", "", null)]
+        [JsonProperty]
+        public bool ShouldDropDuringSleep { get; set; } = true;
     }
 }

@@ -69,7 +69,7 @@ namespace TeleportSuitMod
             {
                 TeleportationOverlay.TeleportRestrict=new bool[Grid.CellCount];
             }
-            if (!Grid.IsValidCell(cell))
+            if ((!Grid.IsValidCell(cell))||!(Grid.IsVisible(cell)))
             {
                 return false;
             }

@@ -69,6 +69,7 @@ namespace TeleportSuitMod
                 public static class TELEPORTSUITMOD
                 {
                     public static LocString SHOULD_DROP_DURING_BREAK_TITLE = "Should Duplicants take off teleport suit during break time";
+                    public static LocString SHOULD_DROP_DURING_SLEEP_TITLE = "Should Duplicants take off teleport suit during sleep time";
                 }
             }
             public static class OVERLAYS
