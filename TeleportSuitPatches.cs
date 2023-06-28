@@ -103,7 +103,12 @@ namespace TeleportSuitMod
             {
                 if (__result==false)
                 {
-                    __result=CanBeReachByMinionGroup(Grid.OffsetCell(cell, offsets[i]));
+                    int offs = Grid.OffsetCell(cell, offsets[i]);
+                    if (Grid.IsValidCell(offs))
+                    {
+                        __result=CanBeReachByMinionGroup(offs);
+
+                    }
                 }
                 else
                 {
@@ -113,6 +118,10 @@ namespace TeleportSuitMod
         }
         public static bool CanBeReachByMinionGroup(int cell)
         {
+            if (!Grid.IsValidCell(cell))
+            {
+                return false;
+            }
             if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell])!=null
                 &&TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
                 ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)&&value>0)
@@ -694,6 +703,36 @@ namespace TeleportSuitMod
                 techs.unlockedItemIDs.Add(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.TECH_ITEM_NAME);
                 techs.unlockedItemIDs.Add(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME);
 
+            }
+        }
+
+        [HarmonyPatch(typeof(ChorePreconditions), methodType: MethodType.Constructor, new Type[0])]
+        public static class ChorePreconditions_Constructor_Patch
+        {
+            public static void Postfix(ref Chore.Precondition ___CanMoveToCell)
+            {
+                ___CanMoveToCell.fn = delegate (ref Chore.Precondition.Context context, object data)
+                {
+                    if (context.consumerState.consumer == null)
+                    {
+                        return false;
+                    }
+                    int cell = (int)data;
+                    if (!Grid.IsValidCell(cell))
+                    {
+                        return false;
+                    }
+                    if ((context.consumerState.consumer.navigator.flags&TeleportSuitConfig.TeleportSuitFlags)!=0)
+                    {
+                        return true;
+                    }
+                    if (context.consumerState.consumer.GetNavigationCost(cell, out var cost))
+                    {
+                        context.cost += cost;
+                        return true;
+                    }
+                    return false;
+                };
             }
         }
     }
