@@ -288,6 +288,11 @@ namespace TeleportSuitMod
                     {
                         return true;
                     }
+                    if ((!TeleportSuitOptions.Instance.ShouldDropDuringBreak)
+                    &&(context.consumerState.scheduleBlock?.GroupId=="Recreation"||context.consumerState.scheduleBlock?.GroupId=="Hygene"))
+                    {
+                        return true;
+                    }
                     return false;
                 }
             };
@@ -342,7 +347,7 @@ namespace TeleportSuitMod
                     TeleportSuitLocker component = GetComponent<TeleportSuitLocker>();
                     equipChore = new WorkChore<EquipTeleportSuitWorkable>(equipChoretype, this, null,
                         run_until_complete: true, null, null, null, allow_in_red_alert: true,
-                        null, ignore_schedule_block: false, only_when_operational: true, null,
+                        null, ignore_schedule_block: true, only_when_operational: true, null,
                         is_preemptable: false, allow_in_context_menu: true, allow_prioritization: false,
                         PriorityScreen.PriorityClass.topPriority, 5, ignore_building_assignment: false, add_to_daily_report: false);
                     equipChore.AddPrecondition(DoesDupeAtEquipTeleportSuitSchedule);
