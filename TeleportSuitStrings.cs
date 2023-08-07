@@ -12,21 +12,21 @@ namespace TeleportSuitMod
         {
             get
             {
-                if (techString==null)
+                if (techString == null)
                 {
-                    techString=DlcManager.IsContentActive("EXPANSION1_ID") ? techStringDlc : techStringVanilla;
+                    techString = DlcManager.IsContentActive("EXPANSION1_ID") ? techStringDlc : techStringVanilla;
                 }
                 return techString;
             }
         }
-        public static LocString TELEPORTSUIT_BATTERY = string.Concat(EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME, " ({0})");
+        public static LocString TELEPORTSUIT_BATTERY = string.Concat(EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME , " ({0})");
         public static class EQUIPMENT
         {
             public static class PREFABS
             {
                 public class TELEPORT_SUIT
                 {
-                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit", TeleportSuitConfig.ID);
+                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit" , TeleportSuitConfig.ID);
 
                     public static LocString DESC = "Say goodbye to  commutes";
 
@@ -40,9 +40,9 @@ namespace TeleportSuitMod
 
                     public static LocString SUIT_OUT_OF_BATTERIES = "Teleport Suit Batteries Empty";
 
-                    public static LocString WORN_NAME = STRINGS.UI.FormatAsLink("Worn Teleport Suit", TeleportSuitConfig.ID);
+                    public static LocString WORN_NAME = STRINGS.UI.FormatAsLink("Worn Teleport Suit" , TeleportSuitConfig.ID);
 
-                    public static LocString WORN_DESC = "A worn out " + STRINGS.UI.FormatAsLink("Teleport Suit", TeleportSuitConfig.ID) + ".\n\nSuits can be repaired at an " + STRINGS.UI.FormatAsLink("Exosuit Forge", "SUITFABRICATOR") + "."
+                    public static LocString WORN_DESC = "A worn out " + STRINGS.UI.FormatAsLink("Teleport Suit" , TeleportSuitConfig.ID) + ".\n\nSuits can be repaired at an " + STRINGS.UI.FormatAsLink("Exosuit Forge" , "SUITFABRICATOR") + "."
 ;
                 }
             }
@@ -53,11 +53,11 @@ namespace TeleportSuitMod
             {
                 public class TELEPORTSUITLOCKER
                 {
-                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit Dock", "TELEPORTSUITLOCKER")
+                    public static LocString NAME = STRINGS.UI.FormatAsLink("Teleport Suit Dock" , "TELEPORTSUITLOCKER")
 ;
                     public static LocString DESC = "Teleport suit docks can refill teleport suits with air and empty them of waste."
 ;
-                    public static LocString EFFECT = "Stores"+TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME+" and refuels them with Oxygen and power\nEmpties suits of pollution\n" +
+                    public static LocString EFFECT = "Stores" + TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME + " and refuels them with Oxygen and power\nEmpties suits of pollution\n" +
                         "Checkpoints are not required, Duplicants wear teleport suits during work time and take them off during break time (Can be cancelled in mod settings)";
                 }
             }
@@ -70,6 +70,11 @@ namespace TeleportSuitMod
                 {
                     public static LocString SHOULD_DROP_DURING_BREAK_TITLE = "Should Duplicants take off teleport suit during break time";
                     public static LocString SHOULD_DROP_DURING_SLEEP_TITLE = "Should Duplicants take off teleport suit during sleep time";
+                    public static LocString TELEPORT_TIMES_FULL_CHARGE_TITLE = "The number of times of teleport after a full charge";
+                    public static LocString SUIT_OXYGEN_CAPACITY_TITTLE = "Oxygen capacity of teleport suit(kg)";
+                    public static LocString SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE = "Oxygen capacity of teleport suit dock(kg)";
+                    public static LocString SUIT_LOCKER_POWER_INPUT_TITTLE = "Power input of teleport suit dock(w)";
+                    public static LocString SUIT_BATTERY_CHARGE_TIME_TITTLE = "Time required for suit charging(s)";
                 }
             }
             public static class OVERLAYS
@@ -161,7 +166,7 @@ namespace TeleportSuitMod
 
                     public static LocString NAME = STRINGS.UI.FormatAsOverlay("Teleportion Overlay");
 
-                    public static LocString DESC = "Enables access to the " +STRINGS.UI.FormatAsOverlay("Teleportion Overlay") + ".";
+                    public static LocString DESC = "Enables access to the " + STRINGS.UI.FormatAsOverlay("Teleportion Overlay") + ".";
                 }
                 public static class TELEPORT_SUIT
                 {

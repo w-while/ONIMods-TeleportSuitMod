@@ -106,7 +106,7 @@ msgstr "传送限制工具"
 #. STRINGS.INPUT_BINDINGS.PLIB.NAME
 msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
 msgid "Mods"
-msgstr ""
+msgstr "模组"
 
 #. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
 msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
@@ -117,6 +117,32 @@ msgstr "复制人是否该在休息时间脱下传送服"
 msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
 msgid "Should Duplicants take off teleport suit during sleep time"
 msgstr "复制人是否该在睡觉时间脱下传送服"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
+msgid "Time required for suit charging(s)"
+msgstr "传送服充电需要时间（s）"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
+msgctxt ""
+"STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit dock(kg)"
+msgstr "存放柜氧气容量（kg）"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
+msgid "Power input of teleport suit dock(w)"
+msgstr "存放柜耗电速率（w）"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit(kg)"
+msgstr "传送服氧气容量（kg）"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
+msgid "The number of times of teleport after a full charge"
+msgstr "传送服充满电后可以传送的次数"
 
 #. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
@@ -454,6 +480,41 @@ msgctxt ""
 "SHOULD_DROP_DURING_SLEEP_TITLE"
 msgid "Should Duplicants take off teleport suit during sleep time"
 msgstr "复制人是否该在睡觉时间脱下传送服"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"SUIT_BATTERY_CHARGE_TIME_TITTLE"
+msgid "Time required for suit charging(s)"
+msgstr "传送服充电需要时间（s）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit dock(kg)"
+msgstr "存放柜氧气容量（kg）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"SUIT_LOCKER_POWER_INPUT_TITTLE"
+msgid "Power input of teleport suit dock(w)"
+msgstr "存放柜耗电速率（w）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"SUIT_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit(kg)"
+msgstr "传送服氧气容量（kg）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"TELEPORT_TIMES_FULL_CHARGE_TITLE"
+msgid "The number of times of teleport after a full charge"
+msgstr "传送服充满电后可以传送的次数"
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON"

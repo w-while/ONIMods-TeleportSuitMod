@@ -7,37 +7,34 @@ namespace TeleportSuitMod
 {
     public class TeleportSuitLockerConfig : IBuildingConfig
     {
-        public static int AdditionalEnergyUsage = 200;
-        public static int BaseEnergyUsage = 200;
-
         public const string ID = "TeleportSuitLocker";
         internal static PBuilding TeleportSuitLockerTemplate;
         public static AssignableSlot TeleportSuitAssignableSlot;
 
         public static PBuilding CreateBuilding()
         {
-            return TeleportSuitLockerTemplate = new PBuilding(ID, TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME)
+            return TeleportSuitLockerTemplate = new PBuilding(ID , TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME)
             {
                 //AddAfter = PressureDoorConfig.ID,
-                Animation = "teleport_suit_locker_kanim",
-                Category = "Equipment",
-                ConstructionTime = 30.0f,
-                Decor = BUILDINGS.DECOR.BONUS.TIER1,
-                Description = null,
-                EffectText = null,
-                Entombs = false,
-                Floods = true,
-                Width = 2,
-                Height = 4,
-                HP = 30,
+                Animation = "teleport_suit_locker_kanim" ,
+                Category = "Equipment" ,
+                ConstructionTime = 30.0f ,
+                Decor = BUILDINGS.DECOR.BONUS.TIER1 ,
+                Description = null ,
+                EffectText = null ,
+                Entombs = false ,
+                Floods = true ,
+                Width = 2 ,
+                Height = 4 ,
+                HP = 30 ,
                 Ingredients = {
                     new BuildIngredient(TUNING.MATERIALS.REFINED_METAL, tier: 2),
-                },
-                Placement = BuildLocationRule.OnFloor,
-                PowerInput = new PowerRequirement(BaseEnergyUsage, new CellOffset(0, 0)),
+                } ,
+                Placement = BuildLocationRule.OnFloor ,
+                PowerInput = new PowerRequirement(TeleportSuitOptions.Instance.suitLockerPowerInput , new CellOffset(0 , 0)) ,
 
-                Tech = TeleportSuitStrings.TechString,
-                Noise=NOISE_POLLUTION.NONE,
+                Tech = TeleportSuitStrings.TechString ,
+                Noise = NOISE_POLLUTION.NONE ,
             };
         }
 
@@ -46,18 +43,18 @@ namespace TeleportSuitMod
         {
             //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.BUILDINGS));
             BuildingDef obj = TeleportSuitLockerTemplate.CreateDef();
-            obj.BaseMeltingPoint=1600f;
+            obj.BaseMeltingPoint = 1600f;
             obj.PreventIdleTraversalPastBuilding = true;
             obj.InputConduitType = ConduitType.Gas;
-            obj.UtilityInputOffset = new CellOffset(0, 2);
+            obj.UtilityInputOffset = new CellOffset(0 , 2);
 
             //应该是是否启用
             //obj.Deprecated = !Sim.IsRadiationEnabled();
-            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs, "TeleportSuitLocker");
+            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs , "TeleportSuitLocker");
             return obj;
         }
 
-        public override void ConfigureBuildingTemplate(GameObject go, Tag prefab_tag)
+        public override void ConfigureBuildingTemplate(GameObject go , Tag prefab_tag)
         {
             go.AddOrGet<SuitLocker>().OutfitTags = new Tag[1] { TeleportSuitGameTags.TeleportSuit };
             go.AddOrGet<TeleportSuitLocker>();
@@ -69,7 +66,7 @@ namespace TeleportSuitMod
             conduitConsumer.capacityTag = ElementLoader.FindElementByHash(SimHashes.Oxygen).tag;
             conduitConsumer.wrongElementResult = ConduitConsumer.WrongElementResult.Dump;
             conduitConsumer.forceAlwaysSatisfied = true;
-            conduitConsumer.capacityKG = 100f;
+            conduitConsumer.capacityKG = TeleportSuitOptions.Instance.suitLockerOxygenCapacity;
             go.AddOrGet<AnimTileable>().tags = new Tag[1]
             {
                 new Tag("TeleportSuitLocker"),
@@ -78,9 +75,9 @@ namespace TeleportSuitMod
             //不受房间分配
             go.AddTag(tag: GameTags.NotRoomAssignable);
             Ownable ownable = go.AddOrGet<Ownable>();
-            if (TeleportSuitAssignableSlot==null)
+            if (TeleportSuitAssignableSlot == null)
             {
-                TeleportSuitAssignableSlot=Db.Get().AssignableSlots.Add(new OwnableSlot(TeleportSuitLockerConfig.ID, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+                TeleportSuitAssignableSlot = Db.Get().AssignableSlots.Add(new OwnableSlot(TeleportSuitLockerConfig.ID , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             }
             ownable.slotID = TeleportSuitAssignableSlot.Id;
             ownable.canBePublic = true;
