@@ -136,7 +136,7 @@ namespace TeleportSuitMod
             {
                 base.OnPrefabInit();
                 resetProgressOnStop = true;
-                workTime = 0.25f;
+                workTime = 2f;
                 synchronizeAnims = false;
             }
 
@@ -227,12 +227,6 @@ namespace TeleportSuitMod
             {
                 ShowProgressBar(show: false);
             }
-
-            protected override bool OnWorkTick(Worker worker , float dt)
-            {
-                return true;
-            }
-
             protected override void OnCompleteWork(Worker worker)
             {
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
@@ -369,12 +363,6 @@ namespace TeleportSuitMod
             {
                 ShowProgressBar(show: false);
             }
-
-            protected override bool OnWorkTick(Worker worker , float dt)
-            {
-                return true;
-            }
-
             protected override void OnCompleteWork(Worker worker)
             {
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
