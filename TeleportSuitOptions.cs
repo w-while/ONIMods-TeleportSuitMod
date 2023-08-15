@@ -78,6 +78,11 @@ namespace TeleportSuitMod
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE" , "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP" , null)]
         [JsonProperty]
         [Limit(0 , 30)]
-        public float unEquipTime { get; set; } = 3f;
+        public float unEquipTime { get; set; } = 1f;
+
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE" , "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP" , null)]
+        [JsonProperty]
+        [Limit(0 , 100)]
+        public float teleportSpeedMultiplier { get; set; } = 1f;
     }
 }

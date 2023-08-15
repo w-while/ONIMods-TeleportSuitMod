@@ -139,6 +139,21 @@ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
 msgid "Oxygen capacity of teleport suit(kg)"
 msgstr "传送服氧气容量（kg）"
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE"
+msgid "Speed multiplier of teleportation"
+msgstr "传送速度乘数修正"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
+msgid ""
+"It affects the dupes' teleportation speed.The higher the value, the faster "
+"the speed\n"
+"If this value is 0,dupes will teleport immediately"
+msgstr ""
+"影响传送速度，数值越高传送越快\n"
+"如果数值为零，立即传送"
+
 #. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
 msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
 msgid "The number of times of teleport after a full charge"
@@ -523,6 +538,25 @@ msgctxt ""
 "SUIT_OXYGEN_CAPACITY_TITTLE"
 msgid "Oxygen capacity of teleport suit(kg)"
 msgstr "传送服氧气容量（kg）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"TELEPORT_SPEED_MULTIPLIER_TITLE"
+msgid "Speed multiplier of teleportation"
+msgstr "传送速度乘数修正"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
+msgid ""
+"It affects the dupes' teleportation speed.The higher the value, the faster "
+"the speed\n"
+"If this value is 0,dupes will teleport immediately"
+msgstr ""
+"影响传送速度，数值越高传送越快\n"
+"如果数值为零，立即传送"
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
 msgctxt ""

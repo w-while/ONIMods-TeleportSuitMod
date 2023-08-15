@@ -404,16 +404,11 @@ namespace TeleportSuitMod
                             }
                         }
 
-
                         __instance.transitionDriver.EndTransition();
                         __instance.smi.GoTo(__instance.smi.sm.normal.moving);
                         Navigator.ActiveTransition transition = TRANSITION.Get(__instance.transitionDriver);
                         transition = new Navigator.ActiveTransition();
-                        KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
-                        reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim , 1f);
-                        //reactor_anim.Play("working_pre");
-                        reactor_anim.Queue("working_loop");
-                        reactor_anim.Queue("working_pst");
+
                         int reservedCell = ___reservedCell;
                         Action<object> action = null;
                         action = delegate (object data)
@@ -441,7 +436,23 @@ namespace TeleportSuitMod
                             __instance.Unsubscribe((int)GameHashes.AnimQueueComplete , action);
 
                         };
-                        __instance.Subscribe((int)GameHashes.AnimQueueComplete , action);
+
+                        float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
+                        if (PlaySpeedMultiplier != 0)
+                        {
+                            KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
+                            reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim , 1f);
+                            reactor_anim.PlaySpeedMultiplier = PlaySpeedMultiplier;
+                            //reactor_anim.Play("working_pre");
+                            reactor_anim.Queue("working_loop");
+                            reactor_anim.Queue("working_pst");
+                            __instance.Subscribe((int)GameHashes.AnimQueueComplete , action);
+
+                        }
+                        else
+                        {
+                            action(null);
+                        }
                     }
                     else
                     {
