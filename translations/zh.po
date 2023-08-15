@@ -144,6 +144,21 @@ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
 msgid "The number of times of teleport after a full charge"
 msgstr "传送服充满电后可以传送的次数"
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
+msgid "Time required for suit taking off(s)"
+msgstr "传送服脱下需要时间（s）"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
+msgid ""
+"If the time required to take off the suits is too short, it will cause burns "
+"when dupe take off the clothes from the high-temperature area back to the "
+"dock"
+msgstr ""
+"如果脱下传送服需要的时间过短，会导致复制人从高温区传送回存放柜脱下传送服时烫"
+"伤"
+
 #. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
 msgid "Teleportation Overlay"
@@ -515,6 +530,25 @@ msgctxt ""
 "TELEPORT_TIMES_FULL_CHARGE_TITLE"
 msgid "The number of times of teleport after a full charge"
 msgstr "传送服充满电后可以传送的次数"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"UNEQUIP_TIME_TITTLE"
+msgid "Time required for suit taking off(s)"
+msgstr "传送服脱下需要时间（s）"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"UNEQUIP_TIME_TOOLTIP"
+msgid ""
+"If the time required to take off the suits is too short, it will cause burns "
+"when dupe take off the clothes from the high-temperature area back to the "
+"dock"
+msgstr ""
+"如果脱下传送服需要的时间过短，会导致复制人从高温区传送回存放柜脱下传送服时烫"
+"伤"
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON"

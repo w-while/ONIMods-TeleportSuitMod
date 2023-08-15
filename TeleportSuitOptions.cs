@@ -74,5 +74,10 @@ namespace TeleportSuitMod
         [JsonProperty]
         [Limit(1 , 10000)]
         public float suitBatteryChargeTime { get; set; } = 60f;
+
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE" , "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP" , null)]
+        [JsonProperty]
+        [Limit(0 , 30)]
+        public float unEquipTime { get; set; } = 3f;
     }
 }

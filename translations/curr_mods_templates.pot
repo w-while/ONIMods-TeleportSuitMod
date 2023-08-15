@@ -78,6 +78,46 @@ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
 msgstr ""
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
+msgid "Should Duplicants take off teleport suit during sleep time"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
+msgid "Time required for suit charging(s)"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit dock(kg)"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
+msgid "Power input of teleport suit dock(w)"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit(kg)"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
+msgid "The number of times of teleport after a full charge"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
+msgid "Time required for suit taking off(s)"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
+msgid "If the time required to take off the suits is too short, it will cause burns when dupe take off the clothes from the high-temperature area back to the dock"
+msgstr ""
+
 #. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
 msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
 msgid "Teleportation Overlay"
@@ -301,6 +341,46 @@ msgstr ""
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
+msgid "Should Duplicants take off teleport suit during sleep time"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
+msgid "Time required for suit charging(s)"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit dock(kg)"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
+msgid "Power input of teleport suit dock(w)"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
+msgid "Oxygen capacity of teleport suit(kg)"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
+msgid "The number of times of teleport after a full charge"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
+msgid "Time required for suit taking off(s)"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
+msgid "If the time required to take off the suits is too short, it will cause burns when dupe take off the clothes from the high-temperature area back to the dock"
 msgstr ""
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.OVERLAYS.TELEPORTATION.BUTTON

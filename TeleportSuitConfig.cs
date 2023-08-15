@@ -62,17 +62,17 @@ namespace TeleportSuitMod
             }
             return (buildFlags & (Grid.BuildFlags.Solid | Grid.BuildFlags.CritterImpassable)) == 0;
         }
-        static public bool CanTeloportTo(int cell)
+        static public bool CanTeloportTo(int targetcell)
         {
             if (TeleportationOverlay.TeleportRestrict == null)
             {
                 TeleportationOverlay.TeleportRestrict = new bool[Grid.CellCount];
             }
-            if ((!Grid.IsValidCell(cell)) || !(Grid.IsVisible(cell)))
+            if ((!Grid.IsValidCell(targetcell)) || !(Grid.IsVisible(targetcell)))
             {
                 return false;
             }
-            if (TeleportationOverlay.TeleportRestrict[cell] == true)
+            if (TeleportationOverlay.TeleportRestrict[targetcell] == true)
             {
                 return false;
             }
@@ -80,7 +80,7 @@ namespace TeleportSuitMod
             bool flag4 = false;
             foreach (CellOffset offset in bounding_offsets)
             {
-                cell2 = Grid.OffsetCell(cell , offset);
+                cell2 = Grid.OffsetCell(targetcell , offset);
                 if (!Grid.IsWorldValidCell(cell2) || !IsCellPassable(cell2 , true))
                 {
                     return false;
@@ -91,7 +91,7 @@ namespace TeleportSuitMod
                     return false;
                 }
             }
-            if (GameNavGrids.FloorValidator.IsWalkableCell(cell , Grid.CellBelow(cell) , true) || Grid.HasLadder[cell] || Grid.HasPole[cell])
+            if (GameNavGrids.FloorValidator.IsWalkableCell(targetcell , Grid.CellBelow(targetcell) , true) || Grid.HasLadder[targetcell] || Grid.HasPole[targetcell])
             {
                 flag4 = true;
             }
@@ -99,10 +99,10 @@ namespace TeleportSuitMod
             bool value = false;
             bool flag = false;
 
-            int aboveCell = Grid.CellAbove(cell);
-            bool cellValid = Grid.IsValidCell(cell);
+            int aboveCell = Grid.CellAbove(targetcell);
+            bool cellValid = Grid.IsValidCell(targetcell);
             bool aboveCellValid = Grid.IsValidCell(aboveCell);
-            flag = (!flag4 && cellValid && Grid.Solid[cell] && !Grid.DupePassable[cell]) || (aboveCellValid && Grid.Solid[aboveCell] && !Grid.DupePassable[aboveCell]) || (cellValid && Grid.DupeImpassable[cell]) || (aboveCellValid && Grid.DupeImpassable[aboveCell]);
+            flag = (!flag4 && cellValid && Grid.Solid[targetcell] && !Grid.DupePassable[targetcell]) || (aboveCellValid && Grid.Solid[aboveCell] && !Grid.DupePassable[aboveCell]) || (cellValid && Grid.DupeImpassable[targetcell]) || (aboveCellValid && Grid.DupeImpassable[aboveCell]);
             value = !flag4 && !flag;
             if (flag || value)
             {

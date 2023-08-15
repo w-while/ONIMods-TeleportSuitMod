@@ -75,6 +75,9 @@ namespace TeleportSuitMod
                     public static LocString SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE = "Oxygen capacity of teleport suit dock(kg)";
                     public static LocString SUIT_LOCKER_POWER_INPUT_TITTLE = "Power input of teleport suit dock(w)";
                     public static LocString SUIT_BATTERY_CHARGE_TIME_TITTLE = "Time required for suit charging(s)";
+                    public static LocString UNEQUIP_TIME_TITTLE = "Time required for suit taking off(s)";
+                    public static LocString UNEQUIP_TIME_TOOLTIP = "If the time required to take off the suits is too short, it will cause burns when dupe take off the clothes from the high-temperature area back to the dock";
+
                 }
             }
             public static class OVERLAYS

@@ -124,7 +124,8 @@ namespace TeleportSuitMod
             }
             if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]) != null
                 && TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
-                ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId , out int value) && value > 0)
+                ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId , out int value)
+                && value > 0)
             {
                 return TeleportSuitConfig.CanTeloportTo(cell);
             }

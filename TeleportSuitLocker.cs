@@ -136,7 +136,7 @@ namespace TeleportSuitMod
             {
                 base.OnPrefabInit();
                 resetProgressOnStop = true;
-                workTime = 2f;
+                workTime = TeleportSuitOptions.Instance.unEquipTime;
                 synchronizeAnims = false;
             }
 
