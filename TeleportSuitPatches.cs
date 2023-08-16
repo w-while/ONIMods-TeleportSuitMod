@@ -393,7 +393,6 @@ namespace TeleportSuitMod
                     if (___reservedCell != NavigationReservations.InvalidReservation)
                     {
                         Equipment equipment = __instance.GetComponent<MinionIdentity>().GetEquipment();
-
                         Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
                         if (assignable != null)
                         {
@@ -410,9 +409,15 @@ namespace TeleportSuitMod
                         transition = new Navigator.ActiveTransition();
 
                         int reservedCell = ___reservedCell;
+                        KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
                         Action<object> action = null;
+
                         action = delegate (object data)
                         {
+                            if (reactor_anim != null)
+                            {
+                                reactor_anim.PlaySpeedMultiplier = 1f;
+                            }
                             if (__instance == null)
                             {
                                 return;
@@ -440,7 +445,6 @@ namespace TeleportSuitMod
                         float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
                         if (PlaySpeedMultiplier != 0)
                         {
-                            KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
                             reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim , 1f);
                             reactor_anim.PlaySpeedMultiplier = PlaySpeedMultiplier;
                             //reactor_anim.Play("working_pre");
