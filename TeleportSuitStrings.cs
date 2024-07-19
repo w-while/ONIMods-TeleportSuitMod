@@ -14,7 +14,7 @@ namespace TeleportSuitMod
             {
                 if (techString == null)
                 {
-                    techString = DlcManager.IsContentActive("EXPANSION1_ID") ? techStringDlc : techStringVanilla;
+                    techString = DlcManager.IsContentSubscribed("EXPANSION1_ID") ? techStringDlc : techStringVanilla;
                 }
                 return techString;
             }

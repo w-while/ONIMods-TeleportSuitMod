@@ -70,24 +70,24 @@ namespace TeleportSuitMod
 
         public static void CoolSuit(Instance smi, float dt)
         {
-            if (!smi.navigator)
-            {
-                return;
-            }
-            GameObject gameObject = smi.sm.owner.Get(smi);
-            if (!gameObject)
-            {
-                return;
-            }
-            ExternalTemperatureMonitor.Instance sMI = gameObject.GetSMI<ExternalTemperatureMonitor.Instance>();
-            if (sMI != null && sMI.AverageExternalTemperature >= smi.teleport_suit_tank.coolingOperationalTemperature)
-            {
-                smi.teleport_suit_tank.batteryCharge -= 1f / smi.teleport_suit_tank.batteryDuration * dt;
-                if (smi.teleport_suit_tank.IsEmpty())
-                {
-                    gameObject.AddTag(GameTags.SuitBatteryOut);
-                }
-            }
+            //if (!smi.navigator)
+            //{
+            //    return;
+            //}
+            //GameObject gameObject = smi.sm.owner.Get(smi);
+            //if (!gameObject)
+            //{
+            //    return;
+            //}
+            //ExternalTemperatureMonitor.Instance sMI = gameObject.GetSMI<ExternalTemperatureMonitor.Instance>();
+            //if (sMI != null && sMI.AverageExternalTemperature >= smi.teleport_suit_tank.coolingOperationalTemperature)
+            //{
+            //    smi.teleport_suit_tank.batteryCharge -= 1f / smi.teleport_suit_tank.batteryDuration * dt;
+            //    if (smi.teleport_suit_tank.IsEmpty())
+            //    {
+            //        gameObject.AddTag(GameTags.SuitBatteryOut);
+            //    }
+            //}
         }
     }
 }
