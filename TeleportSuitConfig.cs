@@ -118,10 +118,15 @@ namespace TeleportSuitMod
 
             //修改小人穿上服装之后的属性
             //list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, ATHLETICS, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //
             list.Add(new AttributeModifier(Db.Get().Attributes.ScaldingThreshold.Id , SCALDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //辐射抗性
             list.Add(new AttributeModifier(Db.Get().Attributes.RadiationResistance.Id , RADIATION_SHIELDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //力量
             list.Add(new AttributeModifier(Db.Get().Attributes.Strength.Id , STRENGTH , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //隔热
             list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.INSULATION , INSULATION , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            //烫伤阈值
             list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER , THERMAL_CONDUCTIVITY_BARRIER , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
 
             //技能减免

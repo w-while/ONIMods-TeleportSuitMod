@@ -41,17 +41,19 @@ namespace TeleportSuitMod
 
         public override BuildingDef CreateBuildingDef()
         {
-            //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.BUILDINGS));
-            BuildingDef obj = TeleportSuitLockerTemplate.CreateDef();
-            obj.BaseMeltingPoint = 1600f;
-            obj.PreventIdleTraversalPastBuilding = true;
-            obj.InputConduitType = ConduitType.Gas;
-            obj.UtilityInputOffset = new CellOffset(0 , 2);
+            BuildingDef buildingDef = BuildingTemplates.CreateBuildingDef(ID, 2, 4, "teleport_suit_locker_kanim", 30, 60f, BUILDINGS.CONSTRUCTION_MASS_KG.TIER3, MATERIALS.ALL_METALS, 1600f, BuildLocationRule.OnFloor, BUILDINGS.DECOR.PENALTY.TIER1, NOISE_POLLUTION.NONE, 1f);
+            buildingDef.InputConduitType = ConduitType.Gas;
+            buildingDef.UtilityInputOffset = new CellOffset(0, 2);
+            buildingDef.BaseMeltingPoint = 1600f;
+            buildingDef.PreventIdleTraversalPastBuilding = true;
+            buildingDef.RequiresPowerInput = true;
+            buildingDef.EnergyConsumptionWhenActive = 120f;
 
             //应该是是否启用
             //obj.Deprecated = !Sim.IsRadiationEnabled();
-            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs , "TeleportSuitLocker");
-            return obj;
+            GeneratedBuildings.RegisterWithOverlay(OverlayScreen.SuitIDs, ID);
+            buildingDef.AddSearchTerms(global::STRINGS.SEARCH_TERMS.ATMOSUIT);
+            return buildingDef;
         }
 
         public override void ConfigureBuildingTemplate(GameObject go , Tag prefab_tag)
@@ -69,7 +71,7 @@ namespace TeleportSuitMod
             conduitConsumer.capacityKG = TeleportSuitOptions.Instance.suitLockerOxygenCapacity;
             go.AddOrGet<AnimTileable>().tags = new Tag[1]
             {
-                new Tag("TeleportSuitLocker"),
+                new Tag(ID),
             };
 
             //不受房间分配
