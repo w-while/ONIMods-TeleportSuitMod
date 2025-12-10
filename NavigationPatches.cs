@@ -3,6 +3,7 @@ using PeterHan.PLib.Detours;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace TeleportSuitMod
     {
         private static readonly IDetouredField<TransitionDriver, Navigator.ActiveTransition> TRANSITION =
     PDetours.DetourField<TransitionDriver, Navigator.ActiveTransition>("transition");
-        //记录小人的地图信息
+        //记录小人的星球信息
         public static readonly Dictionary<Navigator, int> NavigatorWorldId = new Dictionary<Navigator, int>();
         //退出一个存档时要把需要保存的数据设置为空，否则可能会影响下一个存档
         [HarmonyPatch(typeof(LoadScreen), nameof(LoadScreen.ForceStopGame))]
@@ -30,16 +31,6 @@ namespace TeleportSuitMod
                 {
                     TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
                 }
-            }
-        }
-
-        //把限制传送区域的数据保存到存档中
-        [HarmonyPatch(typeof(SaveGame), "OnPrefabInit")]
-        public static class SaveGame_OnPrefabInit_Patch
-        {
-            internal static void Postfix(SaveGame __instance)
-            {
-                __instance.gameObject.AddOrGet<TeleportRestrictToolSaveData>();
             }
         }
 
@@ -368,6 +359,7 @@ namespace TeleportSuitMod
             {
                 return false;
             }
+            //是否找到对应cell的世界ID
             if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]) != null
                 && TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
                 ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)
@@ -380,46 +372,45 @@ namespace TeleportSuitMod
                 return false;
             }
         }
-
-        //取消选中穿着传送服的小人时绘制路径
-        [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
-        public static class Navigator_DrawPath_Patch
+        [HarmonyPatch(typeof(MoveToLocationTool), nameof(MoveToLocationTool.CanMoveTo), new Type[] { typeof(int) })]
+        public class MoveToLocationTool_CanMoveTo_patch
         {
-            public static bool Prefix(Navigator __instance)
+            public static bool Prefix(MoveToLocationTool __instance, int target_cell, ref bool __result)
             {
-                if (__instance.gameObject.activeInHierarchy && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
+                //Depes or Bonic 判断
+                FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
+                if (targetNavigatorField != null)
                 {
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        //修改显示路径
-        [HarmonyPatch(typeof(NavPathDrawer), "OnPostRender")]
-        public static class NavPathDrawer_OnPostRender_Patch
-        {
-            static bool preDraw = false;
-            public static bool Prefix(NavPathDrawer __instance)
-            {
-                Navigator nav = __instance.GetNavigator();
-                if (nav != null && (nav.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
-                {
-                    if (OverlayScreen.Instance.mode != TeleportationOverlay.ID)
+                    Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
+                    if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
                     {
-                        OverlayScreen.Instance.ToggleOverlay(TeleportationOverlay.ID);
+                        __result = CanBeReachByMinionGroup(target_cell);
+                        return false;
                     }
-                    preDraw = true;
-                    return false;
                 }
-                if (preDraw)
-                {
-                    preDraw = false;
-                    OverlayScreen.Instance.ToggleOverlay(OverlayModes.None.ID);
-                }
+                //如果是物体移动，那就走原逻辑
                 return true;
             }
         }
+        // 补丁代码
+        //[HarmonyPatch]
+        //public static class MoveToLocationTool_RefreshColor_Patch
+        //{
+        //    static MethodBase TargetMethod()
+        //    {
+        //        return AccessTools.Method(
+        //            typeof(MoveToLocationTool),
+        //            "RefreshColor"
+        //            );
+        //    }
+
+        //    [HarmonyPrefix]
+        //    public static bool Prefix(MoveToLocationTool __instance)
+        //    {
+        //        Console.WriteLine("[INFO] TeleportSuitMod  r:" + __instance.CanMoveTo(DebugHandler.GetMouseCell()));
+        //        return true;
+        //    }
+        //}
     }
 
 

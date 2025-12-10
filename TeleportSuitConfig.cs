@@ -1,5 +1,6 @@
 ﻿
 
+using FMOD;
 using Klei.AI;
 using System;
 using System.Collections.Generic;
@@ -91,20 +92,21 @@ namespace TeleportSuitMod
                     return false;
                 }
             }
+            //flag4 初次判断是落点是否有效，原系统方法
             if (GameNavGrids.FloorValidator.IsWalkableCell(targetcell , Grid.CellBelow(targetcell) , true) || Grid.HasLadder[targetcell] || Grid.HasPole[targetcell])
             {
                 flag4 = true;
             }
-
             bool value = false;
             bool flag = false;
 
             int aboveCell = Grid.CellAbove(targetcell);
             bool cellValid = Grid.IsValidCell(targetcell);
             bool aboveCellValid = Grid.IsValidCell(aboveCell);
+            //flag :flag4 失效后，落点的宽松判断
             flag = (!flag4 && cellValid && Grid.Solid[targetcell] && !Grid.DupePassable[targetcell]) || (aboveCellValid && Grid.Solid[aboveCell] && !Grid.DupePassable[aboveCell]) || (cellValid && Grid.DupeImpassable[targetcell]) || (aboveCellValid && Grid.DupeImpassable[aboveCell]);
-            value = !flag4 && !flag;
-            if (flag || value)
+            value = !flag4 && !flag;// 0 && ?
+            if (flag || value)//0 || 0
             {
                 return false;
             }

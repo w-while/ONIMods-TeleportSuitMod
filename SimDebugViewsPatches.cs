@@ -8,9 +8,10 @@ using UnityEngine;
 
 namespace TeleportSuitMod
 {
+    //限制&移动区域
     internal class SimDebugViewsPatches
     {
-        //调试试图，初始化中添加功能
+        
         [HarmonyPatch(typeof(SimDebugView), "OnPrefabInit")]
         public static class SimDebugView_OnPrefabInit_Patch
         {
@@ -32,7 +33,7 @@ namespace TeleportSuitMod
                 }
             }
         }
-
+        //生成图层
         [HarmonyPatch(typeof(OverlayLegend), "OnSpawn")]
         public static class OverlayLegend_OnSpawn_Patch
         {
@@ -44,6 +45,54 @@ namespace TeleportSuitMod
                 info.infoUnits = new List<OverlayLegend.OverlayInfoUnit>();
                 info.isProgrammaticallyPopulated = true;
                 ___overlayInfoList.Add(info);
+            }
+        }
+        //把限制传送区域的数据保存到存档中
+        [HarmonyPatch(typeof(SaveGame), "OnPrefabInit")]
+        public static class SaveGame_OnPrefabInit_Patch
+        {
+            internal static void Postfix(SaveGame __instance)
+            {
+                __instance.gameObject.AddOrGet<TeleportRestrictToolSaveData>();
+            }
+        }
+
+        //修改显示路径
+        [HarmonyPatch(typeof(NavPathDrawer), "OnPostRender")]
+        public static class NavPathDrawer_OnPostRender_Patch
+        {
+            static bool preDraw = false;
+            public static bool Prefix(NavPathDrawer __instance)
+            {
+                Navigator nav = __instance.GetNavigator();
+                if (nav != null && (nav.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
+                {
+                    if (OverlayScreen.Instance.mode != TeleportationOverlay.ID)
+                    {
+                        OverlayScreen.Instance.ToggleOverlay(TeleportationOverlay.ID);
+                    }
+                    preDraw = true;
+                    return false;
+                }
+                if (preDraw)
+                {
+                    preDraw = false;
+                    OverlayScreen.Instance.ToggleOverlay(OverlayModes.None.ID);
+                }
+                return true;
+            }
+        }
+        //取消选中穿着传送服的小人时绘制路径
+        [HarmonyPatch(typeof(Navigator), nameof(Navigator.DrawPath))]
+        public static class Navigator_DrawPath_Patch
+        {
+            public static bool Prefix(Navigator __instance)
+            {
+                if (__instance.gameObject.activeInHierarchy && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
+                {
+                    return false;
+                }
+                return true;
             }
         }
     }
