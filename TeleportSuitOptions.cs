@@ -42,6 +42,11 @@ namespace TeleportSuitMod
         {
             get; set;
         }
+        
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE", "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP", null)]
+        [JsonProperty]
+        public bool clusterTeleportByMoveTo { get; set; } = true;
+
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE" , "" , null)]
         [JsonProperty]
         public bool ShouldDropDuringBreak { get; set; } = true;
@@ -51,28 +56,28 @@ namespace TeleportSuitMod
 
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE" , "" , null)]
-        [Limit(1 , 10000)]
+        [Limit(1 , 999)]
         [JsonProperty]
         public int teleportTimesFullCharge { get; set; } = 100;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE" , "" , null)]
         [JsonProperty]
-        [Limit(1 , 10000)]
+        [Limit(1 , 999)]
         public int suitOxygenCapacity { get; set; } = 75;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE" , "" , null)]
         [JsonProperty]
-        [Limit(1 , 10000)]
+        [Limit(1 , 999)]
         public int suitLockerOxygenCapacity { get; set; } = 100;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE" , "" , null)]
         [JsonProperty]
-        [Limit(0 , 10000)]
+        [Limit(0 , 999)]
         public int suitLockerPowerInput { get; set; } = 200;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE" , "" , null)]
         [JsonProperty]
-        [Limit(1 , 10000)]
+        [Limit(1 , 999)]
         public float suitBatteryChargeTime { get; set; } = 60f;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE" , "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP" , null)]

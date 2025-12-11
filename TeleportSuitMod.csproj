@@ -63,6 +63,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClusterTeleport.cs" />
+    <Compile Include="ComponentRegister.cs" />
+    <Compile Include="NavigationPatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangePatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeTool.cs" />
@@ -71,6 +74,7 @@
     <Compile Include="PeterHan.BulkSettingsChange\SpriteRegistry.cs" />
     <Compile Include="SanchozzONIMods.Lib\KAnimGroupManager.cs" />
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
+    <Compile Include="SimDebugViewsPatches.cs" />
     <Compile Include="TeleportationOverlay.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
     <Compile Include="TeleportSuitConfig.cs" />
@@ -78,11 +82,12 @@
     <Compile Include="TeleportSuitLocker.cs" />
     <Compile Include="TeleportSuitLockerConfig.cs" />
     <Compile Include="TeleportSuitMonitor.cs" />
-    <Compile Include="TeleportSuitPatches.cs" />
+    <Compile Include="TeleportSuitMod.cs" />
     <Compile Include="TeleportSuitOptions.cs" />
     <Compile Include="TeleportSuitStrings.cs" />
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
+    <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -107,6 +112,7 @@
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
+    <Content Include="Issues.txt" />
     <EmbeddedResource Include="images\OverlayIcon.png" />
     <EmbeddedResource Include="images\Placer.png" />
     <EmbeddedResource Include="images\Toggle.png" />

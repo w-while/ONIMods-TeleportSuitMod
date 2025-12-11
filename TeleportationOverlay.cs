@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace TeleportSuitMod
 {
+    //可移动区域与限制区域图层
     public class TeleportationOverlay : OverlayModes.Mode
     {
         public static bool[] TeleportRestrict = null;
