@@ -16,6 +16,8 @@ namespace TeleportSuitMod
     PDetours.DetourField<TransitionDriver, Navigator.ActiveTransition>("transition");
         //记录小人的星球信息
         public static readonly Dictionary<Navigator, int> NavigatorWorldId = new Dictionary<Navigator, int>();
+
+        public bool ClusterMoveTO = false;
         //退出一个存档时要把需要保存的数据设置为空，否则可能会影响下一个存档
         [HarmonyPatch(typeof(LoadScreen), nameof(LoadScreen.ForceStopGame))]
         public static class LoadScreen_ForceStopGame_Patch
@@ -200,12 +202,16 @@ namespace TeleportSuitMod
                         __instance.Stop(arrived_at_destination: true, false);
                         return false;
                     }
+
+                    //计算目标格子
                     int cellPreferences = ___tactic.GetCellPreferences(target_position_cell, __instance.targetOffsets, __instance);
+                    //释放原预留格子，占用新目标格子（避免和其他小人冲突）
                     NavigationReservations.Instance.RemoveOccupancy(___reservedCell);
                     ___reservedCell = cellPreferences;
                     NavigationReservations.Instance.AddOccupancy(cellPreferences);
                     if (___reservedCell != NavigationReservations.InvalidReservation)
                     {
+                        //传送服消耗计算
                         Equipment equipment = __instance.GetComponent<MinionIdentity>().GetEquipment();
                         Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
                         if (assignable != null)
@@ -216,9 +222,11 @@ namespace TeleportSuitMod
                                 tank.batteryCharge -= 1f / TeleportSuitOptions.Instance.teleportTimesFullCharge;
                             }
                         }
-
+                        // 结束当前的移动过渡状态（避免传送时状态卡死）
                         __instance.transitionDriver.EndTransition();
+                        // 强制切换到“正常移动”状态（确保传送后状态正常）
                         __instance.smi.GoTo(__instance.smi.sm.normal.moving);
+                        // 初始化过渡动画（避免空引用）
                         Navigator.ActiveTransition transition = TRANSITION.Get(__instance.transitionDriver);
                         transition = new Navigator.ActiveTransition();
 
@@ -226,6 +234,7 @@ namespace TeleportSuitMod
                         KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
                         Action<object> action = null;
 
+                        //「强制修改小人坐标」+「重置导航状态」
                         action = delegate (object data)
                         {
                             if (reactor_anim != null)
@@ -236,22 +245,28 @@ namespace TeleportSuitMod
                             {
                                 return;
                             }
+                            // 移除传送动画覆盖
                             __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
+                            // ========== 核心：瞬移到目标格子 ==========
+                            // 计算目标格子的世界坐标（Bottom对齐，场景层25）
                             Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
+                            // 强制修改小人的世界坐标 → 实现“瞬移（传送）”
                             __instance.transform.SetPosition(position);
-                            if (Grid.HasLadder[reservedCell])
-                            {
+                            // ========== 重置导航状态（适配目标格子） ==========
+                            // 若目标格子有梯子 → 切换为爬梯子状态
+                            if (Grid.HasLadder[reservedCell]){
                                 __instance.CurrentNavType = NavType.Ladder;
                             }
-                            if (Grid.HasPole[reservedCell])
-                            {
+                            if (Grid.HasPole[reservedCell]){
                                 __instance.CurrentNavType = NavType.Pole;
                             }
-                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
-                            {
+                            // 若为可走地面 → 切换为步行状态
+                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true)){
                                 __instance.CurrentNavType = NavType.Floor;
                             }
+                            // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
+                            // 取消动画回调订阅（避免内存泄漏）
                             __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
 
                         };
@@ -259,11 +274,13 @@ namespace TeleportSuitMod
                         float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
                         if (PlaySpeedMultiplier != 0)
                         {
+                            // 播放传送动画（覆盖默认动画）
                             reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
                             reactor_anim.PlaySpeedMultiplier = PlaySpeedMultiplier;
                             //reactor_anim.Play("working_pre");
                             reactor_anim.Queue("working_loop");
                             reactor_anim.Queue("working_pst");
+                            // 动画播放完成后执行瞬移逻辑
                             __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
 
                         }
@@ -379,15 +396,18 @@ namespace TeleportSuitMod
             {
                 //Depes or Bonic 判断
                 FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
-                if (targetNavigatorField != null)
-                {
-                    Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
-                    if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
+                    if (targetNavigatorField != null)
                     {
-                        __result = CanBeReachByMinionGroup(target_cell);
-                        return false;
+                        Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
+                        if(ClusterTeleportConfig.IsClusterTeleportEnabled(targetNavigator)){
+                            if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
+                            {
+                                //__result = CanBeReachByMinionGroup(target_cell);
+                                __result = true;
+                                return false;
+                            }
+                        }
                     }
-                }
                 //如果是物体移动，那就走原逻辑
                 return true;
             }
@@ -411,6 +431,41 @@ namespace TeleportSuitMod
         //        return true;
         //    }
         //}
+        [HarmonyPatch]
+        public static class MoveToLocationTool_SetMoveToLocation_Patch
+        {
+            static MethodBase TargetMethod()
+            {
+                return AccessTools.Method(
+                    typeof(MoveToLocationTool),
+                    "SetMoveToLocation",
+                    new[] { typeof(int) }
+                    );
+            }
+
+            [HarmonyPrefix]
+            public static bool Prefix(MoveToLocationTool __instance,int target_cell)
+            {
+                FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
+                if (targetNavigatorField != null)
+                {
+                    Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
+                    if (ClusterTeleportConfig.IsClusterTeleportEnabled(targetNavigator)){
+                        if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
+                        {
+                            ClusterTeleportConfig.IsClusterWorldTargetValid(target_cell, out WorldContainer targetWorld, out Vector3 targetWorldPos);
+                            if (targetWorldPos != null && targetWorld != null)
+                            {
+                                ClusterTeleportConfig.ExecuteCrossWorldTeleport(targetNavigator, targetWorldPos, targetWorld);
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+        }
     }
 
 

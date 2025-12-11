@@ -108,6 +108,16 @@ msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
 msgid "Mods"
 msgstr "模组"
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLECLUSTER_TELEPORT_BY_MOVETO_TITLE"
+msgid "Teleport to other colony"
+msgstr "星际传送"
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
+msgid "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton"
+msgstr "注意：这个功能现在不是特别好。通过 ‘移动到’ 按钮，完成星际穿梭"
+
 #. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
 msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
 msgid "Should Duplicants take off teleport suit during break time"
@@ -446,7 +456,7 @@ msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT."
 "NAME"
 msgid "<style=\"KKeyword\">Teleport Suit</style> Pattern"
-msgstr "<style=\"KKeyword\">传送服</style>样式"
+msgstr "<style=\"KKeyword\">传送服</style>模型"
 
 #. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC
 msgctxt ""

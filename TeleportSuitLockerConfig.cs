@@ -11,32 +11,6 @@ namespace TeleportSuitMod
         internal static PBuilding TeleportSuitLockerTemplate;
         public static AssignableSlot TeleportSuitAssignableSlot;
 
-        public static PBuilding CreateBuilding()
-        {
-            return TeleportSuitLockerTemplate = new PBuilding(ID , TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME)
-            {
-                //AddAfter = PressureDoorConfig.ID,
-                Animation = "teleport_suit_locker_kanim" ,
-                Category = "Equipment" ,
-                ConstructionTime = 30.0f ,
-                Decor = BUILDINGS.DECOR.BONUS.TIER1 ,
-                Description = null ,
-                EffectText = null ,
-                Entombs = false ,
-                Floods = true ,
-                Width = 2 ,
-                Height = 4 ,
-                HP = 30 ,
-                Ingredients = {
-                    new BuildIngredient(TUNING.MATERIALS.REFINED_METAL, tier: 2),
-                } ,
-                Placement = BuildLocationRule.OnFloor ,
-                PowerInput = new PowerRequirement(TeleportSuitOptions.Instance.suitLockerPowerInput , new CellOffset(0 , 0)) ,
-
-                Tech = TeleportSuitStrings.TechString ,
-                Noise = NOISE_POLLUTION.NONE ,
-            };
-        }
 
 
         public override BuildingDef CreateBuildingDef()

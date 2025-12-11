@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TeleportSuitMod.PeterHan.BulkSettingsChange;
+using TeleportSuitMod.SanchozzONIMods.Lib;
 using static ComplexRecipe;
 
 namespace TeleportSuitMod
@@ -65,6 +66,21 @@ namespace TeleportSuitMod
 
 
     //添加科技
+
+    [HarmonyPatch(typeof(Db), "Initialize")]
+    internal class m
+    {
+        private static void Postfix()
+        {
+            Tech tech = Db.Get().Techs.TryGet(TeleportSuitStrings.TechString);
+            if (tech != null)
+            {
+                tech.unlockedItemIDs.Add(TeleportSuitLockerConfig.ID);
+            }
+            ModUtil.AddBuildingToPlanScreen(BUILD_CATEGORY.Equipment, TeleportSuitLockerConfig.ID, BUILD_SUBCATEGORY.equipment, SuitFabricatorConfig.ID, ModUtil.BuildingOrdering.After);
+        }
+    }
+
     [HarmonyPatch(typeof(TechItems), nameof(TechItems.Init))]
     public static class TechItems_Init_Patch
     {
@@ -91,27 +107,7 @@ namespace TeleportSuitMod
             techs.unlockedItemIDs.Add(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME);
 
         }
-        [HarmonyPatch(typeof(ChorePreconditions), methodType: MethodType.Constructor, new Type[0])]
-        public static class ChorePreconditions_Constructor_Patch
-        {
-            public static void Postfix(ref Chore.Precondition ___CanMoveToCell)
-            {
-                ___CanMoveToCell.fn = delegate (ref Chore.Precondition.Context context, object data)
-                {
-                    if (context.consumerState.consumer == null) return false;
-                    int cell = (int)data;
-                    if (!Grid.IsValidCell(cell)) return false;
-                    if ((context.consumerState.consumer.navigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0){
-                        return true;
-                    }
-                    if (context.consumerState.consumer.GetNavigationCost(cell, out var cost)){
-                        context.cost += cost;
-                        return true;
-                    }
-                    return false;
-                };
-            }
-        }
+
 
         [HarmonyPatch(typeof(OverlayScreen), "RegisterModes")]
         public static class OverlayScreen_RegisterModes_Patch

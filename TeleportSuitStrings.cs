@@ -79,6 +79,8 @@ namespace TeleportSuitMod
                     public static LocString UNEQUIP_TIME_TOOLTIP = "If the time required to take off the suits is too short, it will cause burns when dupe take off the clothes from the high-temperature area back to the dock";
                     public static LocString TELEPORT_SPEED_MULTIPLIER_TITLE = "Speed multiplier of teleportation";
                     public static LocString TELEPORT_SPEED_MULTIPLIER_TOOLTIP = "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately";
+                    public static LocString CLUSTER_TELEPORT_BY_MOVETO_TITLE = "Teleport to other colony";
+                    public static LocString CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP = "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton";
 
                 }
             }

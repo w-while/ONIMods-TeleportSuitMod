@@ -3,6 +3,16 @@ msgstr ""
 "Application: Oxygen Not Included"
 "POT Version: 2.0"
 
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE"
+msgid "Teleport to other colony"
+msgstr ""
+
+#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
+msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
+msgid "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton"
+msgstr ""
+
 #. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
 msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
 msgid "Teleport suit docks can refill teleport suits with air and empty them of waste."

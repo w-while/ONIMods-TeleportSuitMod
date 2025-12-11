@@ -101,6 +101,28 @@ namespace TeleportSuitMod
             }
         }
 
-
+        [HarmonyPatch(typeof(ChorePreconditions), methodType: MethodType.Constructor, new Type[0])]
+        public static class ChorePreconditions_Constructor_Patch
+        {
+            public static void Postfix(ref Chore.Precondition ___CanMoveToCell)
+            {
+                ___CanMoveToCell.fn = delegate (ref Chore.Precondition.Context context, object data)
+                {
+                    if (context.consumerState.consumer == null) return false;
+                    int cell = (int)data;
+                    if (!Grid.IsValidCell(cell)) return false;
+                    if ((context.consumerState.consumer.navigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
+                    {
+                        return true;
+                    }
+                    if (context.consumerState.consumer.GetNavigationCost(cell, out var cost))
+                    {
+                        context.cost += cost;
+                        return true;
+                    }
+                    return false;
+                };
+            }
+        }
     }
 }

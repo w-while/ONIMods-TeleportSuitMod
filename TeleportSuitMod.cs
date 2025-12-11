@@ -22,15 +22,16 @@ namespace TeleportSuitMod
             ModHarmony = harmony;
             base.OnLoad(harmony);
             PUtil.InitLibrary();
+
             new PPatchManager(harmony).RegisterPatchClass(typeof(TeleportSuitMod));
             new POptions().RegisterOptions(this, typeof(TeleportSuitOptions));
             new global::TeleportSuitMod.SanchozzONIMods.Lib.KAnimGroupManager().RegisterInteractAnims("anim_teleport_suit_teleporting_kanim");
-            PBuildingManager buildingManager = new PBuildingManager();
-            buildingManager.Register(TeleportSuitLockerConfig.CreateBuilding());
             new PLocalization().Register();
             new PVersionCheck().Register(this, new SteamVersionChecker());
             BulkChangePatches.BulkChangeAction = new PActionManager().CreateAction(TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_KEY,
                 TeleportSuitStrings.TELEPORT_RESTRICT_TOOL.ACTION_TITLE);
+
+
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
             gameObject.SetActive(true);
@@ -38,7 +39,7 @@ namespace TeleportSuitMod
         [PLibMethod(RunAt.BeforeDbInit)]
         internal static void BeforeDbInit()
         {
-            SanchozzONIMods.Lib.Utils.InitLocalization(typeof(TeleportSuitStrings));
+            SanchozzONIMods.Lib.Utils.InitLocalization(typeof(TeleportSuitStrings),true);
             var icon = SpriteRegistry.GetToolIcon();
             Assets.Sprites.Add(icon.name, icon);
         }
