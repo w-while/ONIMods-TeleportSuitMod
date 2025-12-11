@@ -3,176 +3,6 @@ msgstr ""
 "Application: Oxygen Not Included"
 "POT Version: 2.0"
 
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE"
-msgid "Teleport to other colony"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
-msgid "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton"
-msgstr ""
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
-msgid "Teleport suit docks can refill teleport suits with air and empty them of waste."
-msgstr ""
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT"
-msgid "Stores<link=\"TELEPORTSUIT\">Teleport Suit</link> and refuels them with Oxygen and power\nEmpties suits of pollution\nCheckpoints are not required, Duplicants wear teleport suits during work time and take them off during break time (Can be cancelled in mod settings)"
-msgstr ""
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME"
-msgid "<link=\"TELEPORTSUITLOCKER\">Teleport Suit Dock</link>"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME"
-msgid "Teleport Suit Battery"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC"
-msgid "Say goodbye to  commutes"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT"
-msgid "Allowing Duplicants to teleport，and provides the protection as <link=\"LEADSUIT\">Lead Suit</link>\n Each teleportation consumes power"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME"
-msgid "Teleport Suit"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
-msgid "<link=\"TELEPORTSUIT\">Teleport Suit</link>"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC"
-msgid "Allowing Duplicants to teleport，and provides the protection as <link=\"LEADSUIT\">Lead Suit</link>"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES"
-msgid "Teleport Suit Batteries Empty"
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC"
-msgid "A worn out <link=\"TELEPORTSUIT\">Teleport Suit</link>.\n\nSuits can be repaired at an <link=\"SUITFABRICATOR\">Exosuit Forge</link>."
-msgstr ""
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
-msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
-msgstr ""
-
-#. STRINGS.INPUT_BINDINGS.PLIB.278
-msgctxt "STRINGS.INPUT_BINDINGS.PLIB.278"
-msgid "Teleport Restrict Tool"
-msgstr ""
-
-#. STRINGS.INPUT_BINDINGS.PLIB.NAME
-msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
-msgid "Mods"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
-msgid "Should Duplicants take off teleport suit during break time"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
-msgid "Should Duplicants take off teleport suit during sleep time"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
-msgid "Time required for suit charging(s)"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
-msgid "Oxygen capacity of teleport suit dock(kg)"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
-msgid "Power input of teleport suit dock(w)"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
-msgid "Oxygen capacity of teleport suit(kg)"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE"
-msgid "Speed multiplier of teleportation"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
-msgid "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
-msgid "The number of times of teleport after a full charge"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
-msgid "Time required for suit taking off(s)"
-msgstr ""
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
-msgid "If the time required to take off the suits is too short, it will cause burns when dupe take off the clothes from the high-temperature area back to the dock"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
-msgid "Teleportation Overlay"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.NAME
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME"
-msgid "TELEPORTATION OVERLAY"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
-msgid "Teleportable Area"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
-msgid "Teleport Restricted Area"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
-msgid "<b>Teleportable Area</b>\nDuplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to these location"
-msgstr ""
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
-msgid "<b>Teleport Restricted Area</b>\nDuplicants are restricted from teleporting to these areas\nCan be added or removed using the <style=\"KKeyword\">Teleporting Restriction Tool</style> in the lower right corner"
-msgstr ""
-
-#. STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
-msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
-msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
-msgstr ""
-
 #. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
 msgctxt "TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
 msgid "Teleport suit docks can refill teleport suits with air and empty them of waste."
@@ -356,6 +186,16 @@ msgstr ""
 #. TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY
 msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY"
 msgid "Teleport Suit Battery ({0})"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE"
+msgid "Teleport to other colony"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
+msgid "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton"
 msgstr ""
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE

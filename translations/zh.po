@@ -11,226 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Application: Oxygen Not IncludedPOT Version: 2.0\n"
-"X-Generator: Poedit 3.3.1\n"
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
-msgid ""
-"Teleport suit docks can refill teleport suits with air and empty them of "
-"waste."
-msgstr "传送服存放柜可以为传送服补充资源，并清空传送服中的废物"
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT"
-msgid ""
-"Stores<link=\"TELEPORTSUIT\">Teleport Suit</link> and refuels them with "
-"Oxygen and power\n"
-"Empties suits of pollution\n"
-"Checkpoints are not required, Duplicants wear teleport suits during work "
-"time and take them off during break time (Can be cancelled in mod settings)"
-msgstr ""
-"存放<link=\"TELEPORTSUIT\">传送服</link>并为其补充氧气和电量\n"
-"清空传送服中的污染物\n"
-"不需要检查点，复制人会在工作时间穿上传送服并在休息时间脱下（可在模组设置中取"
-"消）"
-
-#. STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME
-msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME"
-msgid "<link=\"TELEPORTSUITLOCKER\">Teleport Suit Dock</link>"
-msgstr "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME"
-msgid "Teleport Suit Battery"
-msgstr "传送服电量"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC"
-msgid "Say goodbye to  commutes"
-msgstr "和通勤说拜拜"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT"
-msgid ""
-"Allowing Duplicants to teleport，and provides the protection as "
-"<link=\"LEADSUIT\">Lead Suit</link>\n"
-" Each teleportation consumes power"
-msgstr ""
-"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">铅服</link>相当的防护能力\n"
-"每次传送将消耗电量"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME"
-msgid "Teleport Suit"
-msgstr "传送服"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
-msgid "<link=\"TELEPORTSUIT\">Teleport Suit</link>"
-msgstr "<link=\"TELEPORTSUIT\">传送服</link>"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC"
-msgid ""
-"Allowing Duplicants to teleport，and provides the protection as "
-"<link=\"LEADSUIT\">Lead Suit</link>"
-msgstr ""
-"让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">铅服</link>相当的防护能力"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES"
-msgid "Teleport Suit Batteries Empty"
-msgstr "传送服电量为空"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC"
-msgid ""
-"A worn out <link=\"TELEPORTSUIT\">Teleport Suit</link>.\n"
-"\n"
-"Suits can be repaired at an <link=\"SUITFABRICATOR\">Exosuit Forge</link>."
-msgstr ""
-"一件破损的 <link=\"TELEPORTSUIT\">传送服</link>\n"
-"\n"
-"可以在<link=\"SUITFABRICATOR\">太空服锻造台</link>中修复"
-
-#. STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
-msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
-msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
-msgstr "<link=\"TELEPORTSUIT\">破损的传送服</link>"
-
-#. STRINGS.INPUT_BINDINGS.PLIB.278
-msgctxt "STRINGS.INPUT_BINDINGS.PLIB.278"
-msgid "Teleport Restrict Tool"
-msgstr "传送限制工具"
-
-#. STRINGS.INPUT_BINDINGS.PLIB.NAME
-msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
-msgid "Mods"
-msgstr "模组"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLECLUSTER_TELEPORT_BY_MOVETO_TITLE"
-msgid "Teleport to other colony"
-msgstr "星际传送"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
-msgid "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton"
-msgstr "注意：这个功能现在不是特别好。通过 ‘移动到’ 按钮，完成星际穿梭"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
-msgid "Should Duplicants take off teleport suit during break time"
-msgstr "复制人是否该在休息时间脱下传送服"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
-msgid "Should Duplicants take off teleport suit during sleep time"
-msgstr "复制人是否该在睡觉时间脱下传送服"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
-msgid "Time required for suit charging(s)"
-msgstr "传送服充电需要时间（s）"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE
-msgctxt ""
-"STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
-msgid "Oxygen capacity of teleport suit dock(kg)"
-msgstr "存放柜氧气容量（kg）"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
-msgid "Power input of teleport suit dock(w)"
-msgstr "存放柜耗电速率（w）"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
-msgid "Oxygen capacity of teleport suit(kg)"
-msgstr "传送服氧气容量（kg）"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE"
-msgid "Speed multiplier of teleportation"
-msgstr "传送速度乘数修正"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
-msgid ""
-"It affects the dupes' teleportation speed.The higher the value, the faster "
-"the speed\n"
-"If this value is 0,dupes will teleport immediately"
-msgstr ""
-"影响传送速度，数值越高传送越快\n"
-"如果数值为零，立即传送"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
-msgid "The number of times of teleport after a full charge"
-msgstr "传送服充满电后可以传送的次数"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
-msgid "Time required for suit taking off(s)"
-msgstr "传送服脱下需要时间（s）"
-
-#. STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP
-msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
-msgid ""
-"If the time required to take off the suits is too short, it will cause burns "
-"when dupe take off the clothes from the high-temperature area back to the "
-"dock"
-msgstr ""
-"如果脱下传送服需要的时间过短，会导致复制人从高温区传送回存放柜脱下传送服时烫"
-"伤"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
-msgid "Teleportation Overlay"
-msgstr "传送概览"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.NAME
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME"
-msgid "TELEPORTATION OVERLAY"
-msgstr "传送概览"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
-msgid "Teleportable Area"
-msgstr "可传送区域"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
-msgid "Teleport Restricted Area"
-msgstr "限制传送区域"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
-msgid ""
-"<b>Teleportable Area</b>\n"
-"Duplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport to "
-"these location"
-msgstr ""
-"<b>可传送区域</b>\n"
-"装备 <style=\"KKeyword\">传送服</style> 的复制人可以传送到这些区域"
-
-#. STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA
-msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
-msgid ""
-"<b>Teleport Restricted Area</b>\n"
-"Duplicants are restricted from teleporting to these areas\n"
-"Can be added or removed using the <style=\"KKeyword\">Teleporting "
-"Restriction Tool</style> in the lower right corner"
-msgstr ""
-"<b>限制传送区域</b>\n"
-"复制人传送到这些区域是被禁止的\n"
-"可以使用右下角的 <style=\"KKeyword\">传送限制工具</style> 来移除或者增加该区"
-"域"
-
-#. STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING
-msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
-msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
-msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
+"X-Generator: Poedit 3.2.2\n"
 
 #. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC
 msgctxt ""
@@ -257,9 +38,14 @@ msgstr ""
 "消）"
 
 #. TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME
+#, fuzzy
+#| msgctxt ""
+#| "TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER."
+#| "NAME"
+#| msgid "<link=\"TELEPORTSUITLOCKER\">Teleport Suit Dock</link>"
 msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME"
-msgid "<link=\"TELEPORTSUITLOCKER\">Teleport Suit Dock</link>"
+msgid "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
 msgstr "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
 
 #. TeleportSuitMod.TeleportSuitStrings.DUPLICANTS.CHORES.EQUIPTELEPORTSUIT.NAME
@@ -400,9 +186,13 @@ msgid "Teleport Suit"
 msgstr "传送服"
 
 #. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME
+#, fuzzy
+#| msgctxt ""
+#| "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
+#| msgid "<link=\"TELEPORTSUIT\">Teleport Suit</link>"
 msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
-msgid "<link=\"TELEPORTSUIT\">Teleport Suit</link>"
+msgid "<link=\"TELEPORTSUIT\">传送服</link>"
 msgstr "<link=\"TELEPORTSUIT\">传送服</link>"
 
 #. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC
@@ -435,10 +225,13 @@ msgstr ""
 "可以在<link=\"SUITFABRICATOR\">太空服锻造台</link>中修复"
 
 #. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
+#, fuzzy
+#| msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME"
+#| msgid "<link=\"TELEPORTSUIT\">Teleport Suit</link>"
 msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
-msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
-msgstr "<link=\"TELEPORTSUIT\">破损的传送服</link>"
+msgid "<link=\"TELEPORTSUIT\">传送服</link>"
+msgstr "<link=\"TELEPORTSUIT\">传送服</link>"
 
 #. TeleportSuitMod.TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC
 msgctxt ""
@@ -506,6 +299,20 @@ msgstr "传送限制工具"
 msgctxt "TeleportSuitMod.TeleportSuitStrings.TELEPORTSUIT_BATTERY"
 msgid "Teleport Suit Battery ({0})"
 msgstr "传送服电量 ({0})"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TITLE
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"CLUSTER_TELEPORT_BY_MOVETO_TITLE"
+msgid "星际传送"
+msgstr "星际传送"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP
+msgctxt ""
+"TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+"CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
+msgid "注意：这个功能现在不是特别好。通过 ‘移动到' 按钮，完成星际穿梭"
+msgstr "注意：这个功能现在不是特别好。通过 ‘移动到' 按钮，完成星际穿梭"
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE
 msgctxt ""
@@ -650,6 +457,205 @@ msgctxt ""
 "TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+#~ "CLUSTER_TELEPORT_BY_MOVETO_TITLE"
+#~ msgid "Teleport to other colony"
+#~ msgstr "星际传送"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD."
+#~ "CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP"
+#~ msgid ""
+#~ "Note:This Function is not good now.\n"
+#~ "You can go to other colony by the Moveto Buttton"
+#~ msgstr "注意：这个功能现在不是特别好。通过 ‘移动到’ 按钮，完成星际穿梭"
+
+#~ msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.DESC"
+#~ msgid ""
+#~ "Teleport suit docks can refill teleport suits with air and empty them of "
+#~ "waste."
+#~ msgstr "传送服存放柜可以为传送服补充资源，并清空传送服中的废物"
+
+#~ msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.EFFECT"
+#~ msgid ""
+#~ "Stores<link=\"TELEPORTSUIT\">Teleport Suit</link> and refuels them with "
+#~ "Oxygen and power\n"
+#~ "Empties suits of pollution\n"
+#~ "Checkpoints are not required, Duplicants wear teleport suits during work "
+#~ "time and take them off during break time (Can be cancelled in mod "
+#~ "settings)"
+#~ msgstr ""
+#~ "存放<link=\"TELEPORTSUIT\">传送服</link>并为其补充氧气和电量\n"
+#~ "清空传送服中的污染物\n"
+#~ "不需要检查点，复制人会在工作时间穿上传送服并在休息时间脱下（可在模组设置中"
+#~ "取消）"
+
+#~ msgctxt "STRINGS.BUILDINGS.PREFABS.TELEPORTSUITLOCKER.NAME"
+#~ msgid "<link=\"TELEPORTSUITLOCKER\">Teleport Suit Dock</link>"
+#~ msgstr "<link=\"TELEPORTSUITLOCKER\">传送服存放柜</link>"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.BATTERY_EFFECT_NAME"
+#~ msgid "Teleport Suit Battery"
+#~ msgstr "传送服电量"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.DESC"
+#~ msgid "Say goodbye to  commutes"
+#~ msgstr "和通勤说拜拜"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.EFFECT"
+#~ msgid ""
+#~ "Allowing Duplicants to teleport，and provides the protection as "
+#~ "<link=\"LEADSUIT\">Lead Suit</link>\n"
+#~ " Each teleportation consumes power"
+#~ msgstr ""
+#~ "让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">铅服</link>相当的防护能"
+#~ "力\n"
+#~ "每次传送将消耗电量"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.GENERICNAME"
+#~ msgid "Teleport Suit"
+#~ msgstr "传送服"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC"
+#~ msgid ""
+#~ "Allowing Duplicants to teleport，and provides the protection as "
+#~ "<link=\"LEADSUIT\">Lead Suit</link>"
+#~ msgstr ""
+#~ "让复制人可以瞬间传送，并提供和<link=\"LEADSUIT\">铅服</link>相当的防护能力"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES"
+#~ msgid "Teleport Suit Batteries Empty"
+#~ msgstr "传送服电量为空"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_DESC"
+#~ msgid ""
+#~ "A worn out <link=\"TELEPORTSUIT\">Teleport Suit</link>.\n"
+#~ "\n"
+#~ "Suits can be repaired at an <link=\"SUITFABRICATOR\">Exosuit Forge</link>."
+#~ msgstr ""
+#~ "一件破损的 <link=\"TELEPORTSUIT\">传送服</link>\n"
+#~ "\n"
+#~ "可以在<link=\"SUITFABRICATOR\">太空服锻造台</link>中修复"
+
+#~ msgctxt "STRINGS.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
+#~ msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
+#~ msgstr "<link=\"TELEPORTSUIT\">破损的传送服</link>"
+
+#~ msgctxt "STRINGS.INPUT_BINDINGS.PLIB.278"
+#~ msgid "Teleport Restrict Tool"
+#~ msgstr "传送限制工具"
+
+#~ msgctxt "STRINGS.INPUT_BINDINGS.PLIB.NAME"
+#~ msgid "Mods"
+#~ msgstr "模组"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_BREAK_TITLE"
+#~ msgid "Should Duplicants take off teleport suit during break time"
+#~ msgstr "复制人是否该在休息时间脱下传送服"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SHOULD_DROP_DURING_SLEEP_TITLE"
+#~ msgid "Should Duplicants take off teleport suit during sleep time"
+#~ msgstr "复制人是否该在睡觉时间脱下传送服"
+
+#~ msgctxt ""
+#~ "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_BATTERY_CHARGE_TIME_TITTLE"
+#~ msgid "Time required for suit charging(s)"
+#~ msgstr "传送服充电需要时间（s）"
+
+#~ msgctxt ""
+#~ "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_OXYGEN_CAPACITY_TITTLE"
+#~ msgid "Oxygen capacity of teleport suit dock(kg)"
+#~ msgstr "存放柜氧气容量（kg）"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_LOCKER_POWER_INPUT_TITTLE"
+#~ msgid "Power input of teleport suit dock(w)"
+#~ msgstr "存放柜耗电速率（w）"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.SUIT_OXYGEN_CAPACITY_TITTLE"
+#~ msgid "Oxygen capacity of teleport suit(kg)"
+#~ msgstr "传送服氧气容量（kg）"
+
+#~ msgctxt ""
+#~ "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TITLE"
+#~ msgid "Speed multiplier of teleportation"
+#~ msgstr "传送速度乘数修正"
+
+#~ msgctxt ""
+#~ "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
+#~ msgid ""
+#~ "It affects the dupes' teleportation speed.The higher the value, the "
+#~ "faster the speed\n"
+#~ "If this value is 0,dupes will teleport immediately"
+#~ msgstr ""
+#~ "影响传送速度，数值越高传送越快\n"
+#~ "如果数值为零，立即传送"
+
+#~ msgctxt ""
+#~ "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
+#~ msgid "The number of times of teleport after a full charge"
+#~ msgstr "传送服充满电后可以传送的次数"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TITTLE"
+#~ msgid "Time required for suit taking off(s)"
+#~ msgstr "传送服脱下需要时间（s）"
+
+#~ msgctxt "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.UNEQUIP_TIME_TOOLTIP"
+#~ msgid ""
+#~ "If the time required to take off the suits is too short, it will cause "
+#~ "burns when dupe take off the clothes from the high-temperature area back "
+#~ "to the dock"
+#~ msgstr ""
+#~ "如果脱下传送服需要的时间过短，会导致复制人从高温区传送回存放柜脱下传送服时"
+#~ "烫伤"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.BUTTON"
+#~ msgid "Teleportation Overlay"
+#~ msgstr "传送概览"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.NAME"
+#~ msgid "TELEPORTATION OVERLAY"
+#~ msgstr "传送概览"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTABLEAREA"
+#~ msgid "Teleportable Area"
+#~ msgstr "可传送区域"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.TELEPORTRESTRICTEDAREA"
+#~ msgid "Teleport Restricted Area"
+#~ msgstr "限制传送区域"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTABLEAREA"
+#~ msgid ""
+#~ "<b>Teleportable Area</b>\n"
+#~ "Duplicants wearing <style=\"KKeyword\">Teleport Suit</style> can teleport "
+#~ "to these location"
+#~ msgstr ""
+#~ "<b>可传送区域</b>\n"
+#~ "装备 <style=\"KKeyword\">传送服</style> 的复制人可以传送到这些区域"
+
+#~ msgctxt "STRINGS.UI.OVERLAYS.TELEPORTATION.ToolTip.TELEPORTRESTRICTEDAREA"
+#~ msgid ""
+#~ "<b>Teleport Restricted Area</b>\n"
+#~ "Duplicants are restricted from teleporting to these areas\n"
+#~ "Can be added or removed using the <style=\"KKeyword\">Teleporting "
+#~ "Restriction Tool</style> in the lower right corner"
+#~ msgstr ""
+#~ "<b>限制传送区域</b>\n"
+#~ "复制人传送到这些区域是被禁止的\n"
+#~ "可以使用右下角的 <style=\"KKeyword\">传送限制工具</style> 来移除或者增加该"
+#~ "区域"
+
+#~ msgctxt "STRINGS.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
+#~ msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
+#~ msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
+
+#~ msgctxt ""
+#~ "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT."
+#~ "WORN_NAME"
+#~ msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
+#~ msgstr "<link=\"TELEPORTSUIT\">破损的传送服</link>"
 
 #~ msgctxt ""
 #~ "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUIT."
