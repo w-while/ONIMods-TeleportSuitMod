@@ -223,11 +223,11 @@ namespace TeleportSuitMod
                 }
             }
 
-            protected override void OnStartWork(WorkerBase worker)
+            protected override void OnStartWork(Worker worker)
             {
                 ShowProgressBar(show: false);
             }
-            protected override void OnCompleteWork(WorkerBase worker)
+            protected override void OnCompleteWork(Worker worker)
             {
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
                 if (equipment.IsSlotOccupied(Db.Get().AssignableSlots.Suit))
@@ -248,7 +248,7 @@ namespace TeleportSuitMod
                 }
             }
 
-            public override HashedString[] GetWorkAnims(WorkerBase worker)
+            public override HashedString[] GetWorkAnims(Worker worker)
             {
                 return new HashedString[1]
                 {
@@ -359,11 +359,11 @@ namespace TeleportSuitMod
                 }
             }
 
-            protected override void OnStartWork(WorkerBase worker)
+            protected override void OnStartWork(Worker worker)
             {
                 ShowProgressBar(show: false);
             }
-            protected override void OnCompleteWork(WorkerBase worker)
+            protected override void OnCompleteWork(Worker worker)
             {
                 Equipment equipment = worker.GetComponent<MinionIdentity>().GetEquipment();
                 if (equipment == null)
@@ -378,7 +378,7 @@ namespace TeleportSuitMod
                 }
             }
 
-            public override HashedString[] GetWorkAnims(WorkerBase worker)
+            public override HashedString[] GetWorkAnims(Worker worker)
             {
                 return new HashedString[1]
                 {

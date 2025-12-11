@@ -181,9 +181,8 @@ namespace TeleportSuitMod
         }
 
         //修改整个殖民地能否到达某个方块，会影响世界的库存等等
-        [HarmonyPatch(typeof(MinionGroupProber) , "IsReachable")]
-        [HarmonyPatch(new Type[] { typeof(int) })]//IsReachable函数有重载，需要确定参数类型
-        public static class MinionGroupProber_IsReachablePatch
+        [HarmonyPatch(typeof(MinionGroupProber) , "IsReachable_AssumeLock")]
+        public static class MinionGroupProber_IsReachable_AssumeLock_Patch
         {
             public static void Postfix(int cell , ref bool __result)
             {
@@ -702,11 +701,12 @@ namespace TeleportSuitMod
                 Db.Get().TechItems.AddTechItem(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.TECH_ITEM_NAME ,
                     TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.NAME ,
                     TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORT_SUIT.DESC ,
-                    (string anim , bool centered) => Def.GetUISprite(TeleportSuitConfig.ID.ToTag()).first);
+                    (string anim , bool centered) => Def.GetUISprite(TeleportSuitConfig.ID.ToTag()).first ,
+                    DlcManager.AVAILABLE_ALL_VERSIONS);
                 Db.Get().TechItems.AddTechItem(TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.TECH_ITEM_NAME ,
                     TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.NAME ,
                     TeleportSuitStrings.RESEARCH.OTHER_TECH_ITEMS.TELEPORTATION_OVERLAY.DESC ,
-                    (string anim , bool centered) => SpriteRegistry.GetOverlayIcon());
+                    (string anim , bool centered) => SpriteRegistry.GetOverlayIcon() , DlcManager.AVAILABLE_ALL_VERSIONS);
             }
         }
 
