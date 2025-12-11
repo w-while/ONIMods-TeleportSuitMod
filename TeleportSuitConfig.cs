@@ -5,6 +5,7 @@ using Klei.AI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static STRINGS.DUPLICANTS.MODIFIERS;
 
 namespace TeleportSuitMod
 {
@@ -30,9 +31,10 @@ namespace TeleportSuitMod
         public static int OXYGENCAPACITY = 75;
         public static int SCALDING = 1000;
         public static float RADIATION_SHIELDING = 0.66f;
-        public static int STRENGTH = 10;
-        public static int INSULATION = 50;
+        public static float STRENGTH = 10f;
+        public static float INSULATION = 50f;
         public static float THERMAL_CONDUCTIVITY_BARRIER = 0.3f;
+        public static float ATHLETICS = -8;
 
         //private AttributeModifier expertAthleticsModifier;
 
@@ -117,27 +119,29 @@ namespace TeleportSuitMod
             //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.EQUIPMENT));
 
             List<AttributeModifier> list = new List<AttributeModifier>();
-
+            
             //修改小人穿上服装之后的属性
+            //运动-8
             //list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, ATHLETICS, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
             //
-            list.Add(new AttributeModifier(Db.Get().Attributes.ScaldingThreshold.Id , SCALDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            list.Add(new AttributeModifier(Db.Get().Attributes.ScaldingThreshold.Id , (float) SCALDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
+            //list.Add(new AttributeModifier(Db.Get().Attributes.ScoldingThreshold.Id, (float)TUNING.EQUIPMENT.SUITS.LEADSUIT_SCOLDING, STRINGS.EQUIPMENT.PREFABS.LEAD_SUIT.NAME, false, false, true));
             //辐射抗性
-            list.Add(new AttributeModifier(Db.Get().Attributes.RadiationResistance.Id , RADIATION_SHIELDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            list.Add(new AttributeModifier(Db.Get().Attributes.RadiationResistance.Id , RADIATION_SHIELDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
             //力量
-            list.Add(new AttributeModifier(Db.Get().Attributes.Strength.Id , STRENGTH , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            list.Add(new AttributeModifier(Db.Get().Attributes.Strength.Id , STRENGTH , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
             //隔热
-            list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.INSULATION , INSULATION , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.INSULATION , INSULATION , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
             //烫伤阈值
-            list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER , THERMAL_CONDUCTIVITY_BARRIER , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
+            list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER , THERMAL_CONDUCTIVITY_BARRIER , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
 
             //技能减免
             //expertAthleticsModifier = new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, -ATHLETICS, Db.Get().Skills.Suits1.Name);
 
             EquipmentDef equipmentDef = EquipmentTemplates.CreateEquipmentDef(TeleportSuitConfig.ID , TUNING.EQUIPMENT.SUITS.SLOT ,
-                SimHashes.Dirt , TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS , "teleport_suit_kanim" ,
+                SimHashes.Dirt, (float) TUNING.EQUIPMENT.SUITS.ATMOSUIT_MASS , "teleport_suit_kanim" ,
                 "" , "teleport_suit_body_kanim" , 6 , list , null ,
-                IsBody: true , EntityTemplates.CollisionShape.CIRCLE , 0.325f , 0.325f , new Tag[2]
+                IsBody: true , EntityTemplates.CollisionShape.CIRCLE , 0.325f , 0.325f , new Tag[]
             {
                 GameTags.Suit,
                 GameTags.Clothes
@@ -145,9 +149,14 @@ namespace TeleportSuitMod
             equipmentDef.wornID = TeleportSuitConfig.WORN_ID;
             equipmentDef.RecipeDescription = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC;
             //免疫debuff
-            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("SoakingWet"));
-            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("WetFeet"));
-            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("PoppedEarDrums"));
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("SoakingWet"));//全身湿透
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("WetFeet"));//双脚湿透
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("BionicWaterStress"));//渗水
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("ColdAir"));//
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("WarmAir"));//炎热环境
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("PoppedEarDrums"));//耳膜破裂
+            equipmentDef.EffectImmunites.Add(Db.Get().effects.Get("RecentlySlippedTracker"));
+            
 
             //穿上衣服的回调
             equipmentDef.OnEquipCallBack = delegate (Equippable eq)
