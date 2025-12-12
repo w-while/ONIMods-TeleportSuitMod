@@ -63,7 +63,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClusterTeleport.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="NavigationPatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
@@ -76,6 +75,8 @@
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
     <Compile Include="SimDebugViewsPatches.cs" />
     <Compile Include="TeleportationOverlay.cs" />
+    <Compile Include="TeleportChore.cs" />
+    <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
     <Compile Include="TeleportSuitConfig.cs" />
     <Compile Include="TeleportSuitGameTags.cs" />
