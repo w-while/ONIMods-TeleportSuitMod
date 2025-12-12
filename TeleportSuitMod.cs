@@ -19,6 +19,12 @@ namespace TeleportSuitMod
 
         public override void OnLoad(Harmony harmony)
         {
+            // 1. 开发调试：开启所有日志
+            LogUtils.EnableAllLogs();
+
+            // 2. 生产环境：仅显示错误日志
+            LogUtils.SetLogLevel(LogUtils.LogLevel.Debug);
+
             ModHarmony = harmony;
             base.OnLoad(harmony);
             PUtil.InitLibrary();

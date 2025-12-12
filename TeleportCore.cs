@@ -74,6 +74,12 @@ namespace TeleportSuitMod
         /// </summary>
         public static bool ExecuteTeleportForce(Navigator navigator, int targetCell, ref int reservedCell)
         {
+            // 先校验传送权限
+            if (!RocketCabinRestriction.CheckTeleportPermission(navigator, targetCell))
+            {
+                Debug.LogWarning($"[TeleprotSuit] Recalled Passengers MUST Stay inner ：{navigator.name}");
+                return false;
+            }
             // 基础校验
             if (navigator == null || !Grid.IsValidCell(targetCell) || !navigator.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags))
                 return false;
@@ -192,6 +198,13 @@ namespace TeleportSuitMod
         /// </summary>
         public static void ExecuteCrossWorldTeleport(Navigator navigator, Vector3 targetWorldPos, WorldContainer targetWorld)
         {
+            int targetCell = Grid.PosToCell(targetWorldPos);
+            // 先校验传送权限
+            if (!RocketCabinRestriction.CheckTeleportPermission(navigator, targetCell, targetWorld))
+            {
+                Debug.LogWarning($"[TeleprotSuit] Recalled Passengers MUST Stay inner ：{navigator.name}");
+                return;
+            }
             if (navigator == null || targetWorld == null) return;
 
 
