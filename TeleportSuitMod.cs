@@ -16,14 +16,19 @@ namespace TeleportSuitMod
     public class TeleportSuitMod : KMod.UserMod2
     {
         static Harmony ModHarmony = null;
-
+        private CabinStateSyncManager _syncManager;
         public override void OnLoad(Harmony harmony)
         {
-            // 1. 开发调试：开启所有日志
-            LogUtils.EnableAllLogs();
+            // 生产环境：关闭调试日志，仅保留错误
+            //LogUtils.EnableAllLogs(true);
+            //LogUtils.SetLogLevel(LogLevel.Error);
 
-            // 2. 生产环境：仅显示错误日志
-            LogUtils.SetLogLevel(LogUtils.LogLevel.Debug);
+            // 开发环境：开启所有日志
+            LogUtils.EnableAllLogs(true);
+            LogUtils.SetLogLevel(LogLevel.Debug);
+
+            // 紧急调试：强制打印（不受配置影响）
+            LogUtils.ForceLog("Init", "Mod初始化完成，日志级别：" + LogLevel.Debug);
 
             ModHarmony = harmony;
             base.OnLoad(harmony);
@@ -41,6 +46,14 @@ namespace TeleportSuitMod
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
             gameObject.SetActive(true);
+
+            //太空舱事件监控
+            CabinStateSyncManager.InitializeGlobalManager();
+
+            // 调用CabinStayReactable内部封装的初始化方法
+            CabinStayReactable.InitializeCabinReactableSystem();
+
+            LogUtils.LogDebug("TeleportSuitModEntry", "传送服模组加载完成，舱内响应系统将在游戏就绪后激活");
         }
         [PLibMethod(RunAt.BeforeDbInit)]
         internal static void BeforeDbInit()

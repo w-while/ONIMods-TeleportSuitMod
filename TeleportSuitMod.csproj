@@ -48,6 +48,7 @@
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.dll</HintPath>
@@ -63,9 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CabinStateSyncManager.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="LogUtils.cs" />
     <Compile Include="NavigationPatches.cs" />
+    <Compile Include="PassengerModulePatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangePatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeTool.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
     <Compile Include="SimDebugViewsPatches.cs" />
     <Compile Include="TeleportationOverlay.cs" />
+    <Compile Include="TeleportCabinConst.cs" />
     <Compile Include="TeleportChore.cs" />
     <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
@@ -90,6 +94,7 @@
     <Compile Include="TeleportSuitStrings.cs" />
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
+    <Compile Include="CabinStayReactable.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -114,73 +114,39 @@ namespace TeleportSuitMod
 
 
         //修改穿着传送服的小人RunQuery的方式
-        //具体为以小人为中心往外扩张查找
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
         public static class Navigator_RunQuery_Patch
         {
-            // 传送寻路最大查询范围
-            static int maxQueryRange = 50;
-            // 寻路扩张方向（正交）
-            static int[][] dr = new int[4][] { new int[] { 1, 0 }, new int[] { 0, 1 }, new int[] { -1, 0 }, new int[] { 0, -1 } };
-            // 方向对应的格子偏移函数
-            static Func<int, int>[] funs = new Func<int, int>[4] { Grid.CellRight, Grid.CellAbove, Grid.CellLeft, Grid.CellBelow };
-
+            // 彻底简化：只保留“最近的可传送格子”或“目标格子是否可传送”
+            static int maxCheckDistance = 30; // 进一步缩小范围（传送不需要远距寻路）
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
             {
-                // 1. 仅对穿传送服的小人生效
                 if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
                     return true;
 
-                // 2. 基础校验：当前格子无效
                 int rootCell = Grid.PosToCell(__instance);
                 if (!Grid.IsValidCell(rootCell))
                     return false;
 
-                // 3. 安全解析目标格子
+                // 安全解析目标格子（只关注最终目标，不遍历所有格子）
                 int targetCell = GetQueryTargetCellSafe(query, __instance);
                 if (!Grid.IsValidCell(targetCell))
                     return true;
 
-                // 4. 距离判断：近距离走原生逻辑
-                int distance = TeleportCore.GetManhattanDistance(rootCell, targetCell);
-                if (distance <= TeleportCore.ShortRangeThreshold)
-                    return true;
-
-                // 5. 远距离：执行传送寻路拦截
-                query.ClearResult();
-                if (query.IsMatch(rootCell, rootCell, 0))
+                // 核心简化：直接判断目标格子是否可传送，不遍历周边
+                if (TeleportSuitConfig.CanTeloportTo(targetCell))
                 {
-                    query.SetResult(rootCell, 0, __instance.CurrentNavType);
-                    return false;
-                }
-
-                // 遍历扩张格子，寻找可传送目标
-                int worldIdx = __instance.GetMyWorldId();
-                for (int i = 1; i < maxQueryRange; i++)
-                {
-                    for (int j = 0; j < 4; j++)
+                    int distance = TeleportCore.GetManhattanDistance(rootCell, targetCell);
+                    if (distance <= maxCheckDistance)
                     {
-                        int curCell = Grid.OffsetCell(rootCell, dr[j][0] * i, dr[j][1] * i);
-                        if (!Grid.IsValidCellInWorld(curCell, worldIdx))
-                            continue;
-
-                        for (int k = 0; k < i * 2; k++)
-                        {
-                            curCell = funs[j](curCell);
-                            if (!Grid.IsValidCell(curCell) || !Grid.IsValidCellInWorld(curCell, worldIdx))
-                                break;
-
-                            // 校验可传送+匹配查询条件
-                            if (TeleportSuitConfig.CanTeloportTo(curCell) && query.IsMatch(curCell, rootCell, i))
-                            {
-                                NavType navType = TeleportCore.GetNavTypeForCell(curCell);
-                                query.SetResult(curCell, i, navType);
-                                return false;
-                            }
-                        }
+                        NavType navType = TeleportCore.GetNavTypeForCell(targetCell);
+                        query.SetResult(targetCell, distance, navType);
+                        return false; // 找到目标，直接返回，不继续遍历
                     }
                 }
 
+                // 目标不可传送时，返回自身格子（告知AI“无有效传送目标”）
+                query.SetResult(rootCell, 0, __instance.CurrentNavType);
                 return false;
             }
 
@@ -242,47 +208,6 @@ namespace TeleportSuitMod
             #endregion
         }
 
-        //穿上传送服之后禁用寻路并传送小人
-        [HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
-        public static class Navigator_AdvancePath_Patch
-        {
-            // 防止重复触发传送的标记
-            private static readonly HashSet<int> TeleportingMinions = new HashSet<int>();
-
-            public static bool Prefix(Navigator __instance, ref int ___reservedCell)
-            {
-                // 前置校验：无目标/未穿传送服/当前格子=预留格子
-                if (__instance.target == null
-                    || !__instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags)
-                    || Grid.PosToCell(__instance) == ___reservedCell)
-                {
-                    return true;
-                }
-
-                int minionId = __instance.GetInstanceID();
-                // 标记正在传送，避免重复触发
-                if (TeleportingMinions.Contains(minionId)) return false;
-                TeleportingMinions.Add(minionId);
-
-                try
-                {
-                    int targetCell = Grid.PosToCell(__instance.target);
-                    // 调用核心传送逻辑（强制传送）
-                    if (TeleportCore.ExecuteTeleport(__instance, targetCell, ref ___reservedCell, true))
-                    {
-                        return false; // 跳过原生逻辑
-                    }
-                }
-                finally
-                {
-                    // 移除传送标记（无论成功失败）
-                    TeleportingMinions.Remove(minionId);
-                }
-
-                // 未触发传送，走原生逻辑
-                return true;
-            }
-        }
 
         //穿上传送服之后禁用寻路并传送小人
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
@@ -292,9 +217,25 @@ namespace TeleportSuitMod
             {
                 if (__instance.target != null && __instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags) && Grid.PosToCell(__instance) != ___reservedCell)
                 {
+                    int target_position_cell = Grid.PosToCell(__instance.target);
+
+                    //===== 新增：太空舱拦截逻辑（最优先判断）=====
+                    if (__instance.TryGetComponent<MinionIdentity>(out var minion))
+                    {
+                        if (Grid.IsValidCell(target_position_cell))
+                        {
+                            int targetWorldId = Grid.WorldIdx[target_position_cell];
+                            // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
+                            if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
+                            {
+                                __instance.Stop();
+                                return false;
+                            }
+                        }
+                    }
                     bool needTeleport = true;
                     int mycell = Grid.PosToCell(__instance);
-                    int target_position_cell = Grid.PosToCell(__instance.target);
+                    
                     if ((!Grid.IsValidCell(mycell)) || (!Grid.IsValidCell(target_position_cell)))
                     {
                         __instance.Stop();
