@@ -12,6 +12,7 @@ namespace TeleportSuitMod
     public class CabinStateSyncManager : KMonoBehaviour
     {
         private static String ModuleName = "CabinStateSyncManager";
+        private TeleportSuitTank teleportSuitTank;
         // 单例实例（确保全局唯一）
         private static CabinStateSyncManager _instance;
 
@@ -34,29 +35,17 @@ namespace TeleportSuitMod
                                  ?? typeof(Chore).GetField("m_Transform", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        /// <summary>
-        /// 对外暴露的唯一初始化入口（OnLoad中仅需调用此方法）
-        /// </summary>
-        public static void InitializeGlobalManager()
+        protected override void OnSpawn()
         {
-            if (_instance != null) return;
-
-            // 1. 优先挂载到Game.Instance（全局单例）
-            if (Game.Instance != null && Game.Instance.gameObject != null)
+            base.OnSpawn();
+            // 获取所属的传送服组件
+            teleportSuitTank = GetComponent<TeleportSuitTank>();
+            if (teleportSuitTank == null)
             {
-                _instance = Game.Instance.gameObject.GetComponent<CabinStateSyncManager>();
-                if (_instance == null)
-                {
-                    _instance = Game.Instance.gameObject.AddComponent<CabinStateSyncManager>();
-                }
-                _instance.InitCoreLogic();
+                LogUtils.LogError(ModuleName, "未找到TeleportSuitTank组件");
                 return;
             }
-
-            // 2. 延迟初始化（Game.Instance未就绪时）
-            _instance = new GameObject("CabinStateSyncManager_DelayInit")
-                .AddComponent<CabinStateSyncManager>();
-            _instance.StartCoroutine(_instance.DelayInitCoroutine());
+            InitCoreLogic();
         }
 
         /// <summary>
@@ -67,9 +56,10 @@ namespace TeleportSuitMod
             if (Game.Instance != null)
             {
                 Game.Instance.Subscribe((int)GameHashes.EndChore, OnRocketEnterChoreCompleted);
-                // 注册游戏退出清理逻辑
+                LogUtils.LogDebug(ModuleName, $"组件状态：gameObject激活={gameObject.activeSelf}，组件启用={enabled}");
                 RegisterGameQuitCleanup();
-                LogUtils.LogDebug(ModuleName,"舱内状态同步管理器：核心逻辑初始化完成，已订阅EndChore事件");
+                LogUtils.LogDebug(ModuleName, "舱内状态同步管理器：已绑定到传送服并初始化");
+
             }
         }
 
@@ -150,6 +140,7 @@ namespace TeleportSuitMod
         // EndChore事件回调（核心业务逻辑）
         private void OnRocketEnterChoreCompleted(object data)
         {
+            LogUtils.LogDebug(ModuleName, "OnRocketEnterChoreCompleted");
             if (data == null) return;
             Chore completedChore = data as Chore;
             if (completedChore == null) return;
@@ -169,9 +160,18 @@ namespace TeleportSuitMod
             PassengerRocketModule cabinModule = GetPassengerModuleFromWorld(targetWorld);
             if (cabinModule == null) return;
 
+            // 检查小人是否穿着当前传送服
+            if ((bool)(minion.GetComponent<Equipment>()?.HasTag(TeleportSuitGameTags.TeleportSuit)))
+            {
+                // 执行传送服特定的舱内同步逻辑
+                LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]穿着传送服进入舱内，同步状态");
+                // 可以在这里添加传送服的特殊处理逻辑
+            }
+
             // 核心操作：设置坐标 + 触发ActiveWorldChanged事件
             Vector3 cabinPos = Grid.CellToPos(targetCell);
             minion.transform.position = cabinPos;
+            LogUtils.LogDebug(ModuleName, "ActiveWorldChanged事件触发 Trigger");
             minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)targetWorldId);
 
             LogUtils.LogDebug(ModuleName,$"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");

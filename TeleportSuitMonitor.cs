@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using Klei.AI;
+﻿using Klei.AI;
 using STRINGS;
+using System.Collections.Generic;
+using System.Reflection;
 using TUNING;
 using UnityEngine;
 
@@ -43,31 +44,83 @@ namespace TeleportSuitMod
         {
             default_state = wearingSuit;
             Target(owner);
-            wearingSuit.DefaultState(wearingSuit.hasBattery);
-            wearingSuit.hasBattery.Update(CoolSuit).TagTransition(GameTags.SuitBatteryOut, wearingSuit.noBattery);
-            wearingSuit.noBattery.Enter(delegate (Instance smi)
+
+            wearingSuit
+                .DefaultState(wearingSuit.hasBattery)
+                // 添加状态更新逻辑（替代重写UpdateStates）
+                .Update("TeleportSuitUpdate", UpdateTeleportSuitState, UpdateRate.SIM_1000ms);
+
+            wearingSuit.hasBattery
+                .TagTransition(GameTags.SuitBatteryOut, wearingSuit.noBattery);
+
+            wearingSuit.noBattery
+                .Enter(OnNoBattery)
+                .Exit(OnHasBattery)
+                .TagTransition(GameTags.SuitBatteryOut, wearingSuit.hasBattery, on_remove: true);
+        }
+        // 新增：状态更新方法，处理舱内/舱外逻辑
+        private void UpdateTeleportSuitState(Instance smi, float dt)
+        {
+            if (smi.teleport_suit_tank == null || smi.navigator == null) return;
+
+            // 判断是否在舱内世界
+            bool isInCabin = IsInCabinWorld(smi);
+
+            // 根据舱内状态调整电池消耗
+            float consumptionRate = isInCabin ? 0.5f : 1f; // 舱内消耗减半
+            smi.teleport_suit_tank.batteryCharge -= consumptionRate / smi.teleport_suit_tank.batteryDuration * dt;
+
+            // 电池耗尽逻辑
+            if (smi.teleport_suit_tank.IsEmpty() && !smi.navigator.gameObject.HasTag(GameTags.SuitBatteryOut))
             {
-                Attributes attributes2 = smi.sm.owner.Get(smi).GetAttributes();
-                if (attributes2 != null)
-                {
-                    foreach (AttributeModifier noBatteryModifier in smi.noBatteryModifiers)
-                    {
-                        attributes2.Add(noBatteryModifier);
-                    }
-                }
-            }).Exit(delegate (Instance smi)
-            {
-                Attributes attributes = smi.sm.owner.Get(smi).GetAttributes();
-                if (attributes != null)
-                {
-                    foreach (AttributeModifier noBatteryModifier2 in smi.noBatteryModifiers)
-                    {
-                        attributes.Remove(noBatteryModifier2);
-                    }
-                }
-            }).TagTransition(GameTags.SuitBatteryOut, wearingSuit.hasBattery, on_remove: true);
+                smi.navigator.gameObject.AddTag(GameTags.SuitBatteryOut);
+            }
         }
 
+        // 判断是否在舱内世界（复用CabinStayReactable的逻辑）
+        private bool IsInCabinWorld(Instance smi)
+        {
+            int currentCell = Grid.PosToCell(smi.navigator.transform.position);
+            if (!Grid.IsValidCell(currentCell)) return false;
+
+            int worldId = Grid.WorldIdx[currentCell];
+            WorldContainer world = ClusterManager.Instance.GetWorld(worldId);
+            if (world == null) return false;
+
+            // 优先使用IsModuleInterior属性判断
+            var isModuleProp = typeof(WorldContainer).GetProperty("IsModuleInterior", BindingFlags.Public | BindingFlags.Instance);
+            if (isModuleProp != null)
+            {
+                return (bool)isModuleProp.GetValue(world);
+            }
+
+            // 兜底判断
+            return world.name.Contains("Rocket") || world.name.Contains("Module");
+        }
+
+        // 电池耗尽时的处理
+        private void OnNoBattery(Instance smi)
+        {
+            var attributes = smi.sm.owner.Get(smi).GetAttributes();
+            if (attributes == null) return;
+
+            foreach (var modifier in smi.noBatteryModifiers)
+            {
+                attributes.Add(modifier);
+            }
+        }
+
+        // 恢复电池时的处理
+        private void OnHasBattery(Instance smi)
+        {
+            var attributes = smi.sm.owner.Get(smi).GetAttributes();
+            if (attributes == null) return;
+
+            foreach (var modifier in smi.noBatteryModifiers)
+            {
+                attributes.Remove(modifier);
+            }
+        }
         public static void CoolSuit(Instance smi, float dt)
         {
             //if (!smi.navigator)

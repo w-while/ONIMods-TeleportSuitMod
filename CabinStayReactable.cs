@@ -11,6 +11,8 @@ namespace TeleportSuitMod
     /// </summary>
     public class CabinStayReactable : KMonoBehaviour
     {
+        private TeleportSuitTank teleportSuitTank;
+        private static readonly string ModuleName = "CabinStayReactable";
         private MinionIdentity _minion;
         private int _targetCabinWorldId = -1;
         private bool _isActive = false;
@@ -65,11 +67,50 @@ namespace TeleportSuitMod
             LogUtils.LogDebug("CabinStayReactable", $"小人[{_minion?.GetProperName()}]舱内响应组件已销毁");
         }
         #endregion
+        protected override void OnSpawn()
+        {
+            base.OnSpawn();
+            // 获取传送服组件
+            teleportSuitTank = GetComponent<TeleportSuitTank>();
+            if (teleportSuitTank == null)
+            {
+                LogUtils.LogError("CabinStayReactable", "未找到TeleportSuitTank组件");
+                Destroy(this);
+                return;
+            }
 
+            // 获取穿着者信息
+            var equipable = GetComponent<Equippable>();
+            if (equipable != null && equipable.assignee != null)
+            {
+                _minion = GetWearingMinion();
+                if (_minion != null)
+                {
+                    _minion.Subscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
+                    LogUtils.LogDebug("CabinStayReactable", $"传送服绑定小人[{_minion.GetProperName()}]");
+                }
+            }
+        }
+        // 在CabinStateSyncManager或CabinStayReactable中获取穿着者
+        private MinionIdentity GetWearingMinion()
+        {
+            var equipable = GetComponent<Equippable>();
+            if (equipable == null || equipable.assignee == null)
+                return null;
+
+            // 方式1：通过AssignableProxy获取目标对象
+            if (equipable.assignee is MinionAssignablesProxy proxy)
+            {
+                return proxy.GetTargetGameObject()?.GetComponent<MinionIdentity>();
+            }
+
+            return null;
+        }
         #region 核心事件响应
         private void OnMinionWorldChanged(object data)
         {
-            if (data == null || _minion == null) return;
+            LogUtils.LogDebug(ModuleName, "ActiveWorldChanged事件触发 OnMinionWorldChanged");
+            if (data == null || _minion == null || teleportSuitTank == null) return;
 
             try
             {
@@ -80,6 +121,12 @@ namespace TeleportSuitMod
                 if (newWorld != null && IsRocketCabinWorld(newWorld))
                 {
                     _isCabinStay = true;
+                    // 检查传送服状态，如果电池耗尽则可能限制某些功能
+                    if (teleportSuitTank.IsEmpty())
+                    {
+                        LogUtils.LogDebug("CabinStayReactable", "传送服电池耗尽，限制舱内操作");
+                    }
+                    LogUtils.LogDebug(ModuleName, "开始清理旧世界任务");
                     Activate();
                 }
                 else
@@ -93,6 +140,7 @@ namespace TeleportSuitMod
                 LogUtils.LogError("CabinStayReactable", $"世界变更处理失败: {ex.Message}");
             }
         }
+
 
         private bool IsRocketCabinWorld(WorldContainer world)
         {
@@ -420,6 +468,7 @@ namespace TeleportSuitMod
                     LogUtils.LogError("CabinReactableRegistrar", $"初始化失败: {ex.Message}");
                 }
             }
+
 
             private static void OnMinionSpawned(object data)
             {

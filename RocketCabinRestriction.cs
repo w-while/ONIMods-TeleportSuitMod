@@ -271,14 +271,8 @@ namespace TeleportSuitMod
         {
             try
             {
-                if (Instance == null || !Instance._isInitialized)
+                if (Instance == null || !Instance._isInitialized || minion == null)
                 {
-                    return false;
-                }
-
-                if (minion == null)
-                {
-                    LogUtils.LogWarning("RocketCabinRestriction", "QuickCheckBlockTeleport：minionName为空");
                     return false;
                 }
 
@@ -303,7 +297,7 @@ namespace TeleportSuitMod
                 CabinState cabinState = null;
                 if (Instance._cabinStateCache != null && Instance._cabinStateCache.TryGetValue(cabinWorldId, out cabinState))
                 {
-                    LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：舱{cabinWorldId}的IsSummoning={cabinState.IsSummoning}");
+                    //LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：舱{cabinWorldId}的IsSummoning={cabinState.IsSummoning}");
                     if (!cabinState.IsSummoning)
                     {
                         LogUtils.LogDebug("RocketCabinRestriction", "QuickCheckBlockTeleport：舱未召集，返回false");

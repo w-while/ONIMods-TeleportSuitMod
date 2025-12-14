@@ -218,13 +218,15 @@ namespace TeleportSuitMod
                 if (__instance.target != null && __instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags) && Grid.PosToCell(__instance) != ___reservedCell)
                 {
                     int target_position_cell = Grid.PosToCell(__instance.target);
+                    int targetWorldId = Grid.WorldIdx[target_position_cell];
+                    int mycell = Grid.PosToCell(__instance);
+                    LogUtils.LogDebug("NaviP",$"TWID:{targetWorldId} T:{target_position_cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}" );
 
                     //===== 新增：太空舱拦截逻辑（最优先判断）=====
-                    if (__instance.TryGetComponent<MinionIdentity>(out var minion))
+                    if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
                     {
                         if (Grid.IsValidCell(target_position_cell))
                         {
-                            int targetWorldId = Grid.WorldIdx[target_position_cell];
                             // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
                             if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
                             {
@@ -234,8 +236,6 @@ namespace TeleportSuitMod
                         }
                     }
                     bool needTeleport = true;
-                    int mycell = Grid.PosToCell(__instance);
-                    
                     if ((!Grid.IsValidCell(mycell)) || (!Grid.IsValidCell(target_position_cell)))
                     {
                         __instance.Stop();
