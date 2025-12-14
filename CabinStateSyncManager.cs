@@ -11,6 +11,7 @@ namespace TeleportSuitMod
     /// </summary>
     public class CabinStateSyncManager : KMonoBehaviour
     {
+        private static String ModuleName = "CabinStateSyncManager";
         // 单例实例（确保全局唯一）
         private static CabinStateSyncManager _instance;
 
@@ -68,7 +69,7 @@ namespace TeleportSuitMod
                 Game.Instance.Subscribe((int)GameHashes.EndChore, OnRocketEnterChoreCompleted);
                 // 注册游戏退出清理逻辑
                 RegisterGameQuitCleanup();
-                Debug.Log("舱内状态同步管理器：核心逻辑初始化完成，已订阅EndChore事件");
+                LogUtils.LogDebug(ModuleName,"舱内状态同步管理器：核心逻辑初始化完成，已订阅EndChore事件");
             }
         }
 
@@ -141,7 +142,7 @@ namespace TeleportSuitMod
             if (Game.Instance != null)
             {
                 Game.Instance.Unsubscribe((int)GameHashes.EndChore, OnRocketEnterChoreCompleted);
-                Debug.Log("舱内状态同步管理器：核心逻辑已清理，取消EndChore事件订阅");
+                LogUtils.LogDebug(ModuleName,"舱内状态同步管理器：核心逻辑已清理，取消EndChore事件订阅");
             }
             _instance = null;
         }
@@ -173,7 +174,7 @@ namespace TeleportSuitMod
             minion.transform.position = cabinPos;
             minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)targetWorldId);
 
-            Debug.Log($"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
+            LogUtils.LogDebug(ModuleName,$"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
         }
 
         #region 内部辅助方法（无需外部调用）

@@ -53,7 +53,7 @@ namespace TeleportSuitMod
             // 调用CabinStayReactable内部封装的初始化方法
             CabinStayReactable.InitializeCabinReactableSystem();
 
-            LogUtils.LogDebug("TeleportSuitModEntry", "传送服模组加载完成，舱内响应系统将在游戏就绪后激活");
+            LogUtils.LogDebug("TeleportSuitMod", "传送服模组加载完成，舱内响应系统将在游戏就绪后激活");
         }
         [PLibMethod(RunAt.BeforeDbInit)]
         internal static void BeforeDbInit()
