@@ -1,15 +1,18 @@
-﻿using UnityEngine;
+﻿using HarmonyLib;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using HarmonyLib;
+using UnityEngine;
+using static STRINGS.UI.UISIDESCREENS.AUTOPLUMBERSIDESCREEN.BUTTONS;
 
 namespace TeleportSuitMod
 {
     /// <summary>
     /// 舱内停留响应组件，处理小人进入火箭舱内世界后的行为逻辑
     /// </summary>
-    public class CabinStayReactable : ModReactableComponent
+    public class CabinStayReactable : ModComponent
     {
         protected override string ModuleName => "CabinStayReactable";
         private MinionIdentity _minion;
@@ -68,7 +71,7 @@ namespace TeleportSuitMod
                 LogDebug($"已推送自身实例给 TeleportSuitTank（自身ID：{this.GetInstanceID()}）");
 
                 // 1. 从 TeleportSuitTank 共享穿戴者（复用已有状态，避免重复查找）
-                _minion = _teleportSuitTank._ownerMinion;
+                _minion =  _teleportSuitTank._ownerMinion;
                 if (_minion == null)
                 {
                     LogDebug( "当前无穿戴者，延迟重试初始化");
@@ -135,12 +138,14 @@ namespace TeleportSuitMod
         #region 核心事件响应
         private void OnMinionWorldChanged(object data)
         {
+            
             LogDebug("ActiveWorldChanged事件触发 OnMinionWorldChanged");
             if (data == null || _minion == null || _teleportSuitTank == null) return;
 
             try
             {
-                int newWorldId = Convert.ToInt32(data);
+                CabinTriggerData triggerData = data as CabinTriggerData;
+                int newWorldId = Convert.ToInt32(triggerData.WorldID);
                 _targetCabinWorldId = newWorldId;
 
                 WorldContainer newWorld = ClusterManager.Instance.GetWorld(newWorldId);
@@ -152,9 +157,19 @@ namespace TeleportSuitMod
                     {
                         LogDebug( "传送服电池耗尽，限制舱内操作");
                     }
+                    int cell = triggerData.Cabin.GetComponent<NavTeleporter>().GetCell();
+                    int num = triggerData.Cabin.GetComponent<ClustercraftExteriorDoor>().TargetCell();
+                    //LogDebug($"Cell {cell} WorldID: {Grid.WorldIdx[cell]} Num {num} WID: {Grid.WorldIdx[num]}");
                     LogDebug("开始清理旧世界任务");
-                    Activate();
-                    LogDebug( $"世界变更，联动通知 TeleportSuitTank（世界ID：{newWorld.id}）");
+                    RocketPassengerMonitor.Instance smi = _minion.GetSMI<RocketPassengerMonitor.Instance>();
+                    smi.sm.targetCell.Set(num, smi, false);
+                    smi.ClearMoveTarget(num);
+                    Component interiorDoor = triggerData.Cabin.GetComponent<ClustercraftExteriorDoor>().GetInteriorDoor();
+                    AccessControl component = triggerData.Cabin.GetComponent<AccessControl>();
+                    AccessControl component2 = interiorDoor.GetComponent<AccessControl>();
+                    component.SetPermission(_minion.assignableProxy.Get(), AccessControl.Permission.Both);
+                    component2.SetPermission(_minion.assignableProxy.Get(), AccessControl.Permission.Neither);
+                    LogDebug( $"世界变更，联动通知 TeleportSuitTank（世界ID：{newWorld.GetMyWorldId()}）");
                     // 联动：触发 TeleportSuitTank 的公开方法或事件
                     //_teleportSuitTank.HandleWorldChanged(_minion, newWorld.id);
                 }
@@ -210,31 +225,6 @@ namespace TeleportSuitMod
                    (world.name.Contains("Rocket") || world.name.Contains("Module"));
         }
         #endregion
-
-        #region 核心响应逻辑
-        private void Activate()
-        {
-            if (_isActive || _minion == null) return;
-            _isActive = true;
-
-            try
-            {
-                LogDebug("CleanupOldWorldTasks");
-                CleanupOldWorldTasks();
-                LogDebug("SetCabinStayTarget");
-                SetCabinStayTarget();
-                LogDebug("SyncMinionWorldState");
-                SyncMinionWorldState();
-
-                LogDebug($"小人[{_minion.GetProperName()}]舱内响应激活 | 世界ID：{_targetCabinWorldId}");
-            }
-            catch (Exception ex)
-            {
-                LogUtils.LogError("CabinStayReactable", $"激活失败: {ex.Message}");
-                _isActive = false;
-            }
-        }
-
         private void Cancel(string reason)
         {
             if (!_isActive) return;
@@ -255,105 +245,6 @@ namespace TeleportSuitMod
                 _isCabinStay = false;
             }
         }
-        #endregion
-
-        #region 适配方法
-        private void CleanupOldWorldTasks()
-        {
-            if (_minion == null) return;
-
-            MinionBrain brain = _minion.GetComponent<MinionBrain>();
-            if (brain == null) return;
-
-            // 取消当前任务
-            if (_minionBrainCurrentChoreField.Value != null)
-            {
-                object currentChore = _minionBrainCurrentChoreField.Value.GetValue(brain);
-                if (currentChore != null && _choreCancelMethod.Value != null)
-                {
-                    _choreCancelMethod.Value.Invoke(currentChore, new object[] { "进入舱内世界，取消原任务" });
-                    LogDebug( $"小人[{_minion.GetProperName()}]取消当前任务");
-                }
-            }
-
-            // 设置Idle状态
-            _minionBrainSetIdleMethod.Value?.Invoke(brain, null);
-
-            // 清空任务队列
-            try
-            {
-                FieldInfo choreQueueField = brain.GetType().GetField("choreQueue", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (choreQueueField != null)
-                {
-                    object choreQueue = choreQueueField.GetValue(brain);
-                    choreQueue?.GetType().GetMethod("Clear")?.Invoke(choreQueue, null);
-                    LogDebug( $"小人[{_minion.GetProperName()}]清空任务队列");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogDebug( $"清空任务队列失败: {ex.Message}");
-            }
-        }
-
-        private void SetCabinStayTarget()
-        {
-            if (_minion == null) return;
-
-            try
-            {
-                Type rocketPassengerMonitorType = Type.GetType("RocketPassengerMonitor, Assembly-CSharp");
-                if (rocketPassengerMonitorType == null)
-                {
-                    LogDebug( "未找到RocketPassengerMonitor类型");
-                    return;
-                }
-
-                if (_stateMachineGetSMIMethod.Value == null)
-                {
-                    LogDebug( "未找到GetSMI方法");
-                    return;
-                }
-
-                object smi = _stateMachineGetSMIMethod.Value
-                    .MakeGenericMethod(rocketPassengerMonitorType)
-                    .Invoke(_minion, null);
-
-                if (smi == null)
-                {
-                    LogDebug( "获取RocketPassengerMonitor实例失败");
-                    return;
-                }
-
-                int cabinCell = Grid.PosToCell(_minion.transform.position);
-                MethodInfo setMoveTargetMethod = rocketPassengerMonitorType.GetMethod("SetMoveTarget", new[] { typeof(int) });
-                setMoveTargetMethod?.Invoke(smi, new object[] { cabinCell });
-            }
-            catch (Exception ex)
-            {
-                LogError($"设置舱内目标失败: {ex.Message}");
-            }
-        }
-
-        private void SyncMinionWorldState()
-        {
-            if (_minion == null) return;
-
-            WorldContainer cabinWorld = ClusterManager.Instance.GetWorld(_targetCabinWorldId);
-            if (cabinWorld == null) return;
-
-            // 挂载到舱内世界容器
-            _minion.transform.SetParent(cabinWorld.transform);
-
-            // 验证位置是否在舱内世界
-            Vector3 minionPos = _minion.transform.position;
-            if (!IsPositionInWorld(minionPos, cabinWorld))
-            {
-                Vector3 cabinPos = GetValidCabinPosition(cabinWorld);
-                _minion.transform.position = cabinPos;
-            }
-        }
-
         private void ResetNavigator()
         {
             if (_minion == null) return;
@@ -373,11 +264,11 @@ namespace TeleportSuitMod
             }
             catch (Exception ex)
             {
-                LogDebug( $"重置导航路径失败: {ex.Message}");
+                LogDebug($"重置导航路径失败: {ex.Message}");
             }
         }
 
-        private bool IsPositionInWorld(Vector3 pos, WorldContainer world)
+        private bool IsPositionInWorld(UnityEngine.Vector3 pos, WorldContainer world)
         {
             int cell = Grid.PosToCell(pos);
             if (_gridWorldIdxProp.Value != null)
@@ -390,7 +281,7 @@ namespace TeleportSuitMod
                 }
                 catch (Exception ex)
                 {
-                    LogDebug( $"位置验证失败: {ex.Message}");
+                    LogDebug($"位置验证失败: {ex.Message}");
                 }
             }
             return false;
@@ -408,13 +299,14 @@ namespace TeleportSuitMod
             }
             catch (Exception ex)
             {
-                LogDebug( $"获取随机位置失败: {ex.Message}");
+                LogDebug($"获取随机位置失败: {ex.Message}");
             }
 
             // 兜底位置
             return cabinWorld.transform.position + new Vector3(1, 1, 0);
         }
-        #endregion
 
-    }
+
+
+}
 }

@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace TeleportSuitMod
 {
+    public class CabinTriggerData
+    {
+        public int WorldID { get; set; }
+        public PassengerRocketModule Cabin { get; set; }
+    }
     [DisallowMultipleComponent]
     [SerializationConfig(MemberSerialization.OptIn)]
     public class TeleportSuitTank : ModComponent, IGameObjectEffectDescriptor
@@ -160,6 +165,7 @@ namespace TeleportSuitMod
             if (InitializeMinion())
             {
                 SubscribeMinionEvents();
+                LogDebug($"OnEquipped :{_ownerMinion.GetProperName()}@WID_{_ownerMinion.GetMyWorldId()}");
                 _cabinReactable?.SyncWearer(_ownerMinion);
             }
 
@@ -191,6 +197,7 @@ namespace TeleportSuitMod
                 _teleportSuitMonitor.StopSM("Removed teleportsuit tank");
                 _teleportSuitMonitor = null;
             }
+            LogDebug($"OnUnequipped :{_ownerMinion.GetProperName()}@WID_{_ownerMinion.GetMyWorldId()}");
             _cabinReactable?.SyncWearer(null);
         }
         private MinionIdentity GetWearerMinion()
@@ -282,7 +289,10 @@ namespace TeleportSuitMod
             // 核心操作：设置坐标 + 触发ActiveWorldChanged事件
 
             LogDebug( "ActiveWorldChanged事件触发 Trigger");
-            minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)targetWorldId);
+            CabinTriggerData data = new CabinTriggerData();
+            data.WorldID = targetWorldId;
+            data.Cabin = cabinModule;
+            minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)data);
 
             LogDebug( $"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
         }

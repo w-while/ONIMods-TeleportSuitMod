@@ -67,6 +67,24 @@ namespace TeleportSuitMod
                                 && ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId == id
                                 && TeleportSuitConfig.CanTeloportTo(cell))
                         {
+
+                            //int target_position_cell = Grid.PosToCell(__instance.target);
+                            int targetWorldId = Grid.WorldIdx[cell];
+                            int mycell = Grid.PosToCell(__instance);
+                            //LogUtils.LogDebug("NaviP", $"TWID:{targetWorldId} T:{cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}");
+
+                            //===== 新增：太空舱拦截逻辑（最优先判断）=====
+                            if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
+                            {
+                                if (Grid.IsValidCell(cell))
+                                {
+                                    // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
+                                    if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
                             __result = 1;
                         }
                     }
@@ -83,6 +101,8 @@ namespace TeleportSuitMod
         {
             public static bool Prefix(Navigator __instance, bool forceUpdate = false)
             {
+                if (__instance == null) return true;
+
                 int cell = Grid.PosToCell(__instance.gameObject.transform.position);
                 if (Grid.IsValidCell(cell) && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
                 {
@@ -431,25 +451,6 @@ namespace TeleportSuitMod
                 return true;
             }
         }
-        // 补丁代码
-        //[HarmonyPatch]
-        //public static class MoveToLocationTool_RefreshColor_Patch
-        //{
-        //    static MethodBase TargetMethod()
-        //    {
-        //        return AccessTools.Method(
-        //            typeof(MoveToLocationTool),
-        //            "RefreshColor"
-        //            );
-        //    }
-
-        //    [HarmonyPrefix]
-        //    public static bool Prefix(MoveToLocationTool __instance)
-        //    {
-        //        Console.WriteLine("[INFO] TeleportSuitMod  r:" + __instance.CanMoveTo(DebugHandler.GetMouseCell()));
-        //        return true;
-        //    }
-        //}
 
     [HarmonyPatch]
     public static class MoveToLocationTool_SetMoveToLocation_Patch

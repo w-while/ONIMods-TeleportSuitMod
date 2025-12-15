@@ -20,7 +20,7 @@ namespace TeleportSuitMod
         protected void LogObject(object obj) => LogUtils.LogObject(obj, ModuleName);
         #endregion
     }
-    public abstract class ModReactableComponent : KMonoBehaviour
+    public abstract class ModLogComponent
     {
         // 每个组件必须定义唯一模块名（日志标识）
         protected abstract string ModuleName { get; }
