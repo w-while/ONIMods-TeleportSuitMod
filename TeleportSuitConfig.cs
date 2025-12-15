@@ -243,14 +243,8 @@ namespace TeleportSuitMod
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
 
-            // 新增：注册舱内状态同步组件
-            go.AddComponent<CabinStateSyncManager>();
-
             // 新增：注册舱内停留响应组件
             go.AddComponent<CabinStayReactable>();
-
-            // 初始化舱内响应系统
-            CabinStayReactable.InitializeCabinReactableSystem();
         }
 
         public string[] GetDlcIds()

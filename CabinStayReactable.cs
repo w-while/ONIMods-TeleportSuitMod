@@ -9,14 +9,17 @@ namespace TeleportSuitMod
     /// <summary>
     /// 舱内停留响应组件，处理小人进入火箭舱内世界后的行为逻辑
     /// </summary>
-    public class CabinStayReactable : KMonoBehaviour
+    public class CabinStayReactable : ModReactableComponent
     {
-        private TeleportSuitTank teleportSuitTank;
-        private static readonly string ModuleName = "CabinStayReactable";
+        protected override string ModuleName => "CabinStayReactable";
         private MinionIdentity _minion;
         private int _targetCabinWorldId = -1;
         private bool _isActive = false;
         private bool _isCabinStay = false;
+
+
+        private TeleportSuitTank _teleportSuitTank; // 联动核心：获取同体的 TeleportSuitTank
+        private bool _isSubscribed;
 
         // 反射缓存（使用惰性初始化提升性能）
         private static Lazy<FieldInfo> _minionBrainCurrentChoreField = new Lazy<FieldInfo>(() =>
@@ -40,77 +43,100 @@ namespace TeleportSuitMod
         private static Lazy<PropertyInfo> _gridWorldIdxProp = new Lazy<PropertyInfo>(() =>
             typeof(Grid).GetProperty("WorldIdx", BindingFlags.Public | BindingFlags.Static));
 
+
+
         #region 生命周期
-        private void Awake()
-        {
-            _minion = GetComponent<MinionIdentity>();
-            if (_minion == null)
-            {
-                LogUtils.LogWarning("CabinStayReactable", "未找到MinionIdentity组件，销毁响应");
-                Destroy(this);
-                return;
-            }
-
-            _minion.Subscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
-            LogUtils.LogDebug("CabinStayReactable", $"小人[{_minion.GetProperName()}]已订阅世界变更事件");
-        }
-
-        private void OnDestroy()
-        {
-            if (_minion != null)
-            {
-                _minion.Unsubscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
-                Cancel("组件销毁");
-            }
-            _isActive = false;
-            _isCabinStay = false;
-            LogUtils.LogDebug("CabinStayReactable", $"小人[{_minion?.GetProperName()}]舱内响应组件已销毁");
-        }
-        #endregion
         protected override void OnSpawn()
         {
+            LogDebug("OnSpawn");
             base.OnSpawn();
-            // 获取传送服组件
-            teleportSuitTank = GetComponent<TeleportSuitTank>();
-            if (teleportSuitTank == null)
+
+            // 延迟0.1秒（确保 TeleportSuitTank 已完成自身初始化），然后推送实例
+            GameScheduler.Instance.Schedule("PushInstanceToTank", 0.1f, (obj)=>
             {
-                LogUtils.LogError("CabinStayReactable", "未找到TeleportSuitTank组件");
-                Destroy(this);
+                // 获取同体的 TeleportSuitTank（此时对方已初始化）
+                _teleportSuitTank = GetComponent<TeleportSuitTank>();
+                if (_teleportSuitTank == null)
+                {
+                    LogUtils.LogError(ModuleName, "未找到 TeleportSuitTank，无法推送实例");
+                    Destroy(this);
+                    return;
+                }
+
+                // 推送自身实例给对方
+                _teleportSuitTank.AcceptCabinReactableInstance(this);
+                LogDebug($"已推送自身实例给 TeleportSuitTank（自身ID：{this.GetInstanceID()}）");
+
+                // 1. 从 TeleportSuitTank 共享穿戴者（复用已有状态，避免重复查找）
+                _minion = _teleportSuitTank._ownerMinion;
+                if (_minion == null)
+                {
+                    LogDebug( "当前无穿戴者，延迟重试初始化");
+                    // 延迟重试（适配 TeleportSuitTank 穿戴者初始化稍晚的情况）
+                    GameScheduler.Instance.Schedule("RetryInit", 0.2f, RetryInit);
+                    return;
+                }
+
+                // 初始化核心：获取同体的 TeleportSuitTank（共享状态，无需重复获取小人/装备）
+                _teleportSuitTank = GetComponent<TeleportSuitTank>();
+                if (_teleportSuitTank == null)
+                {
+                    LogDebug( "未找到 TeleportSuitTank 组件，初始化失败");
+                    Destroy(this);
+                    return;
+                }
+
+                // 2. 订阅 ActiveWorldChanged 事件（核心初始化逻辑）
+                SubscribeWorldChangedEvent();
+                LogDebug( $"初始化完成，已联动 TeleportSuitTank（穿戴者：{_minion.GetProperName()}）");
+            });
+        }
+
+        // 延迟重试初始化（适配时序差异）
+        private void RetryInit(object data)
+        {
+            if (_teleportSuitTank == null) return;
+            _minion = _teleportSuitTank._ownerMinion;
+            _teleportSuitTank.AcceptCabinReactableInstance(this);
+            if (_minion == null)
+            {
+                LogWarning("重试后仍无穿戴者，初始化失败");
+                CleanUp();
                 return;
             }
-
-            // 获取穿着者信息
-            var equipable = GetComponent<Equippable>();
-            if (equipable != null && equipable.assignee != null)
-            {
-                _minion = GetWearingMinion();
-                if (_minion != null)
-                {
-                    _minion.Subscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
-                    LogUtils.LogDebug("CabinStayReactable", $"传送服绑定小人[{_minion.GetProperName()}]");
-                }
-            }
+            SubscribeWorldChangedEvent();
+            LogDebug( "重试初始化成功");
         }
-        // 在CabinStateSyncManager或CabinStayReactable中获取穿着者
-        private MinionIdentity GetWearingMinion()
+        protected override void OnCleanUp()
         {
-            var equipable = GetComponent<Equippable>();
-            if (equipable == null || equipable.assignee == null)
-                return null;
-
-            // 方式1：通过AssignableProxy获取目标对象
-            if (equipable.assignee is MinionAssignablesProxy proxy)
-            {
-                return proxy.GetTargetGameObject()?.GetComponent<MinionIdentity>();
-            }
-
-            return null;
+            CleanUp();
+            base.OnCleanUp();
         }
+        #endregion
+        private void CleanUp()
+        {
+            if (_isSubscribed && _minion != null)
+            {
+                _minion.Unsubscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
+                _isSubscribed = false;
+            }
+            Destroy(this);
+        }
+        public void SubscribeWorldChangedEvent()
+        {
+
+            if (_minion == null || _isSubscribed) return;
+            _minion.Subscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
+            LogDebug( $"小人[{_minion.GetProperName()}]已订阅世界变更事件");
+            _isSubscribed = true;
+
+        }
+
         #region 核心事件响应
         private void OnMinionWorldChanged(object data)
         {
-            LogUtils.LogDebug(ModuleName, "ActiveWorldChanged事件触发 OnMinionWorldChanged");
-            if (data == null || _minion == null || teleportSuitTank == null) return;
+            LogDebug("ActiveWorldChanged事件触发 OnMinionWorldChanged");
+            if (data == null || _minion == null || _teleportSuitTank == null) return;
 
             try
             {
@@ -122,12 +148,15 @@ namespace TeleportSuitMod
                 {
                     _isCabinStay = true;
                     // 检查传送服状态，如果电池耗尽则可能限制某些功能
-                    if (teleportSuitTank.IsEmpty())
+                    if (_teleportSuitTank.IsEmpty())
                     {
-                        LogUtils.LogDebug("CabinStayReactable", "传送服电池耗尽，限制舱内操作");
+                        LogDebug( "传送服电池耗尽，限制舱内操作");
                     }
-                    LogUtils.LogDebug(ModuleName, "开始清理旧世界任务");
+                    LogDebug("开始清理旧世界任务");
                     Activate();
+                    LogDebug( $"世界变更，联动通知 TeleportSuitTank（世界ID：{newWorld.id}）");
+                    // 联动：触发 TeleportSuitTank 的公开方法或事件
+                    //_teleportSuitTank.HandleWorldChanged(_minion, newWorld.id);
                 }
                 else
                 {
@@ -141,7 +170,33 @@ namespace TeleportSuitMod
             }
         }
 
+        // 穿戴者变化时，从 TeleportSuitTank 同步更新（联动核心方法）
+        // CabinStayReactable.cs 强化状态同步
+        public void SyncWearer(MinionIdentity newMinion)
+        {
+            // 清理旧状态
+            if (_minion != null)
+            {
+                if (_isSubscribed)
+                {
+                    _minion.Unsubscribe((int)GameHashes.ActiveWorldChanged, OnMinionWorldChanged);
+                    _isSubscribed = false;
+                }
+                // 取消旧穿戴者的舱内状态
+                if (_isActive)
+                {
+                    Cancel("穿戴者切换");
+                }
+            }
 
+            // 同步新状态
+            _minion = newMinion;
+            if (_minion != null)
+            {
+                SubscribeWorldChangedEvent();
+                LogDebug($"已同步新穿戴者：{_minion.GetProperName()}");
+            }
+        }
         private bool IsRocketCabinWorld(WorldContainer world)
         {
             // 优先使用属性判断
@@ -164,12 +219,14 @@ namespace TeleportSuitMod
 
             try
             {
+                LogDebug("CleanupOldWorldTasks");
                 CleanupOldWorldTasks();
+                LogDebug("SetCabinStayTarget");
                 SetCabinStayTarget();
+                LogDebug("SyncMinionWorldState");
                 SyncMinionWorldState();
 
-                LogUtils.LogDebug("CabinStayReactable",
-                    $"小人[{_minion.GetProperName()}]舱内响应激活 | 世界ID：{_targetCabinWorldId}");
+                LogDebug($"小人[{_minion.GetProperName()}]舱内响应激活 | 世界ID：{_targetCabinWorldId}");
             }
             catch (Exception ex)
             {
@@ -186,7 +243,7 @@ namespace TeleportSuitMod
             try
             {
                 ResetNavigator();
-                LogUtils.LogDebug("CabinStayReactable",
+                LogDebug(
                     $"小人[{_minion.GetProperName()}]舱内响应取消：{reason}");
             }
             catch (Exception ex)
@@ -215,7 +272,7 @@ namespace TeleportSuitMod
                 if (currentChore != null && _choreCancelMethod.Value != null)
                 {
                     _choreCancelMethod.Value.Invoke(currentChore, new object[] { "进入舱内世界，取消原任务" });
-                    LogUtils.LogDebug("CabinStayReactable", $"小人[{_minion.GetProperName()}]取消当前任务");
+                    LogDebug( $"小人[{_minion.GetProperName()}]取消当前任务");
                 }
             }
 
@@ -230,12 +287,12 @@ namespace TeleportSuitMod
                 {
                     object choreQueue = choreQueueField.GetValue(brain);
                     choreQueue?.GetType().GetMethod("Clear")?.Invoke(choreQueue, null);
-                    LogUtils.LogDebug("CabinStayReactable", $"小人[{_minion.GetProperName()}]清空任务队列");
+                    LogDebug( $"小人[{_minion.GetProperName()}]清空任务队列");
                 }
             }
             catch (Exception ex)
             {
-                LogUtils.LogWarning("CabinStayReactable", $"清空任务队列失败: {ex.Message}");
+                LogDebug( $"清空任务队列失败: {ex.Message}");
             }
         }
 
@@ -248,13 +305,13 @@ namespace TeleportSuitMod
                 Type rocketPassengerMonitorType = Type.GetType("RocketPassengerMonitor, Assembly-CSharp");
                 if (rocketPassengerMonitorType == null)
                 {
-                    LogUtils.LogWarning("CabinStayReactable", "未找到RocketPassengerMonitor类型");
+                    LogDebug( "未找到RocketPassengerMonitor类型");
                     return;
                 }
 
                 if (_stateMachineGetSMIMethod.Value == null)
                 {
-                    LogUtils.LogWarning("CabinStayReactable", "未找到GetSMI方法");
+                    LogDebug( "未找到GetSMI方法");
                     return;
                 }
 
@@ -264,7 +321,7 @@ namespace TeleportSuitMod
 
                 if (smi == null)
                 {
-                    LogUtils.LogWarning("CabinStayReactable", "获取RocketPassengerMonitor实例失败");
+                    LogDebug( "获取RocketPassengerMonitor实例失败");
                     return;
                 }
 
@@ -274,7 +331,7 @@ namespace TeleportSuitMod
             }
             catch (Exception ex)
             {
-                LogUtils.LogError("CabinStayReactable", $"设置舱内目标失败: {ex.Message}");
+                LogError($"设置舱内目标失败: {ex.Message}");
             }
         }
 
@@ -316,7 +373,7 @@ namespace TeleportSuitMod
             }
             catch (Exception ex)
             {
-                LogUtils.LogWarning("CabinStayReactable", $"重置导航路径失败: {ex.Message}");
+                LogDebug( $"重置导航路径失败: {ex.Message}");
             }
         }
 
@@ -333,7 +390,7 @@ namespace TeleportSuitMod
                 }
                 catch (Exception ex)
                 {
-                    LogUtils.LogWarning("CabinStayReactable", $"位置验证失败: {ex.Message}");
+                    LogDebug( $"位置验证失败: {ex.Message}");
                 }
             }
             return false;
@@ -351,7 +408,7 @@ namespace TeleportSuitMod
             }
             catch (Exception ex)
             {
-                LogUtils.LogWarning("CabinStayReactable", $"获取随机位置失败: {ex.Message}");
+                LogDebug( $"获取随机位置失败: {ex.Message}");
             }
 
             // 兜底位置
@@ -359,157 +416,5 @@ namespace TeleportSuitMod
         }
         #endregion
 
-        #region 全局初始化封装
-        /// <summary>
-        /// 初始化舱内响应系统（封装到CabinStayReactable内部）
-        /// </summary>
-        public static void InitializeCabinReactableSystem()
-        {
-            try
-            {
-                // 注册游戏退出时的清理逻辑
-                Application.quitting += CabinReactableRegistrar.Cleanup;
-
-                // 手动创建延迟初始化对象（替代PUtil.RegisterPostload）
-                GameObject delayObj = new GameObject("CabinReactable_DelayInit");
-                delayObj.hideFlags = HideFlags.HideAndDontSave; // 隐藏临时对象
-                DelayInitComponent delayComp = delayObj.AddComponent<DelayInitComponent>();
-                // 修复：移除Action委托，直接传递初始化标记
-                delayComp.StartDelayInit();
-
-                LogUtils.LogDebug("CabinStayReactable", "舱内响应系统初始化任务已注册，将在游戏就绪后执行");
-            }
-            catch (Exception ex)
-            {
-                LogUtils.LogError("CabinStayReactable", $"注册舱内响应系统失败: {ex.Message}");
-            }
-        }
-        #endregion
-
-        #region 内部延迟初始化组件（替代PUtil.RegisterPostload）
-        private class DelayInitComponent : KMonoBehaviour
-        {
-            private int _maxWaitFrames = 120; // 最大等待2秒
-
-            // 修复：移除Action参数，直接在内部调用初始化方法
-            public void StartDelayInit()
-            {
-                StartCoroutine(DelayInitCoroutine());
-            }
-
-            private IEnumerator DelayInitCoroutine()
-            {
-                int waitFrames = 0;
-                while (Game.Instance == null && waitFrames < _maxWaitFrames)
-                {
-                    waitFrames++;
-                    yield return null; // 等待1帧
-                }
-
-                // 执行初始化（直接调用，无委托）
-                if (Game.Instance != null)
-                {
-                    CabinReactableRegistrar.Initialize();
-                    LogUtils.LogDebug("CabinStayReactable", "舱内响应系统已激活");
-                }
-                else
-                {
-                    LogUtils.LogWarning("CabinStayReactable", "游戏实例尚未就绪，无法初始化舱内响应系统");
-                }
-
-                // 销毁临时对象
-                Destroy(gameObject);
-            }
-        }
-        #endregion
-
-        #region 内部注册器类
-        /// <summary>
-        /// 舱内响应组件注册器，负责组件的自动注册与清理
-        /// </summary>
-        private static class CabinReactableRegistrar
-        {
-            private static bool _isInitialized = false;
-
-            /// <summary>
-            /// 初始化注册器，为所有小人添加响应组件
-            /// </summary>
-            public static void Initialize()
-            {
-                if (_isInitialized) return;
-
-                try
-                {
-                    // 检查Game实例是否存在
-                    if (Game.Instance == null)
-                    {
-                        LogUtils.LogError("CabinReactableRegistrar", "Initialize failed: Game.Instance is null");
-                        return;
-                    }
-
-                    // 为现有小人添加组件
-                    foreach (var minion in UnityEngine.Object.FindObjectsOfType<MinionIdentity>())
-                    {
-                        if (minion != null && minion.GetComponent<CabinStayReactable>() == null)
-                        {
-                            minion.gameObject.AddComponent<CabinStayReactable>();
-                            LogUtils.LogDebug("CabinReactableRegistrar",
-                                $"为小人[{minion.GetProperName()}]手动注册舱内停留响应");
-                        }
-                    }
-
-                    // 监听新小人生成
-                    Game.Instance.Subscribe((int)GameHashes.MinionSpawned, OnMinionSpawned);
-                    _isInitialized = true;
-                    LogUtils.LogDebug("CabinReactableRegistrar", "舱内响应注册器初始化完成");
-                }
-                catch (Exception ex)
-                {
-                    LogUtils.LogError("CabinReactableRegistrar", $"初始化失败: {ex.Message}");
-                }
-            }
-
-
-            private static void OnMinionSpawned(object data)
-            {
-                try
-                {
-                    // 双重空值检查
-                    if (data is MinionIdentity newMinion && newMinion != null &&
-                        newMinion.GetComponent<CabinStayReactable>() == null)
-                    {
-                        newMinion.gameObject.AddComponent<CabinStayReactable>();
-                        LogUtils.LogDebug("CabinReactableRegistrar",
-                            $"为新小人[{newMinion.GetProperName()}]注册舱内停留响应");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogUtils.LogError("CabinReactableRegistrar", $"处理新小人生成失败: {ex.Message}");
-                }
-            }
-
-            /// <summary>
-            /// 清理注册器资源
-            /// </summary>
-            public static void Cleanup()
-            {
-                if (!_isInitialized) return;
-
-                try
-                {
-                    // 取消订阅时检查Game实例是否存在
-                    if (Game.Instance != null)
-                        Game.Instance.Unsubscribe((int)GameHashes.MinionSpawned, OnMinionSpawned);
-                    _isInitialized = false;
-                    LogUtils.LogDebug("CabinReactableRegistrar", "舱内响应注册器已清理");
-                }
-                catch (Exception ex)
-                {
-                    LogUtils.LogError("CabinReactableRegistrar", $"清理失败: {ex.Message}");
-                }
-            }
-        }
-        #endregion
     }
 }

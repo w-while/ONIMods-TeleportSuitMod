@@ -64,9 +64,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CabinStateSyncManager.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="LogUtils.cs" />
+    <Compile Include="ModComponent.cs" />
     <Compile Include="NavigationPatches.cs" />
     <Compile Include="PassengerModulePatches.cs" />
     <Compile Include="PeterHan.BulkSettingsChange\BulkChangeHover.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
     <Compile Include="CabinStayReactable.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>

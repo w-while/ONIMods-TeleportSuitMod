@@ -16,19 +16,19 @@ namespace TeleportSuitMod
     public class TeleportSuitMod : KMod.UserMod2
     {
         static Harmony ModHarmony = null;
-        private CabinStateSyncManager _syncManager;
         public override void OnLoad(Harmony harmony)
         {
-            // 生产环境：关闭调试日志，仅保留错误
-            //LogUtils.EnableAllLogs(true);
-            //LogUtils.SetLogLevel(LogLevel.Error);
+            // 开发环境：输出所有日志
+            LogUtils.SetGlobalLogLevel(LogLevel.Debug);
 
-            // 开发环境：开启所有日志
-            LogUtils.EnableAllLogs(true);
-            LogUtils.SetLogLevel(LogLevel.Debug);
+            // 发布环境：仅输出错误日志
+            // LogUtils.SetGlobalLogLevel(LogLevel.Error);
 
+            // 自定义模组前缀
+            LogUtils.ModPrefix = "[MyTeleportSuit]";
+            // 关闭错误日志的调用栈（减少日志长度）
+            LogUtils.EnableErrorStackTrace = false;
             // 紧急调试：强制打印（不受配置影响）
-            LogUtils.ForceLog("Init", "Mod初始化完成，日志级别：" + LogLevel.Debug);
 
             ModHarmony = harmony;
             base.OnLoad(harmony);

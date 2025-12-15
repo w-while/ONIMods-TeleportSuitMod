@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.AccessControl;
 using KSerialization;
 using STRINGS;
 using UnityEngine;
@@ -7,8 +8,11 @@ namespace TeleportSuitMod
 {
     [DisallowMultipleComponent]
     [SerializationConfig(MemberSerialization.OptIn)]
-    public class TeleportSuitTank : KMonoBehaviour, IGameObjectEffectDescriptor
+    public class TeleportSuitTank : ModComponent, IGameObjectEffectDescriptor
     {
+
+        protected override string ModuleName => "TeleportSuitTank";
+
         [Serialize]
         public float batteryCharge = 1f;
 
@@ -20,13 +24,18 @@ namespace TeleportSuitMod
 
         public Tag coolantTag;
 
-        private TeleportSuitMonitor.Instance teleportSuitMonitor;
+        private TeleportSuitMonitor.Instance _teleportSuitMonitor;
 
-        private MinionIdentity ownerMinion;
-        private bool isEventSubscribed; // 订阅状态标记，避免重复订阅
+        // 存储所有小人的 ID-实例映射
+        private Dictionary<int, MinionIdentity> _allMinions = new Dictionary<int, MinionIdentity>();
+
+        public MinionIdentity _ownerMinion;
+        private bool _isEventSubscribed; // 订阅状态标记，避免重复订阅
+        private CabinStayReactable _cabinReactable;
         [MyCmpReq] private SuitTank suitTank;
         [MyCmpReq] private Equippable equippable;
 
+        // 核心：Klei引擎标准事件委托
         private static readonly EventSystem.IntraObjectHandler<TeleportSuitTank> OnEquippedDelegate = new EventSystem.IntraObjectHandler<TeleportSuitTank>(delegate (TeleportSuitTank component, object data)
         {
             component.OnEquipped(data);
@@ -40,43 +49,62 @@ namespace TeleportSuitMod
         protected override void OnPrefabInit()
         {
             base.OnPrefabInit();
-            Subscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
-            Subscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);
+            _isEventSubscribed = false;
 
-            isEventSubscribed = false;
-            // 订阅读档完成事件（全局），用于恢复订阅
+            if (equippable == null)
+            {
+                LogError( "缺少Equippable组件，功能将不可用");
+                return; // 提前退出，避免后续空引用
+            }
+            SubscribeToEquipEvents();
             Game.Instance.Subscribe((int)GameHashes.Loaded, OnGameLoaded);
         }
 
         protected override void OnSpawn()
         {
             base.OnSpawn();
-            // 绑定装备穿戴/卸载事件
-            if (equippable != null)
-            {
-                equippable.OnEquipped += OnEquipped;
-                equippable.OnUnequipped += OnUnequipped;
-            }
 
-            // 检查当前是否已穿戴（读档后恢复订阅）
-            CheckAndRestoreSubscription();
+            CollectAllMinions();
+            if (equippable.isEquipped)
+            {
+                //初始化小人状态、订阅小人事件与CabinStayReactbale准备同步
+                CheckEquippableState();
+                if (InitializeMinion())
+                {
+                    SubscribeMinionEvents();
+                }
+            }
         }
         protected override void OnCleanUp()
         {
-            // 取消装备事件绑定
-            if (equippable != null)
-            {
-                equippable.OnEquipped -= OnEquipped;
-                equippable.OnUnequipped -= OnUnequipped;
-            }
             // 取消小人事件订阅
             UnsubscribeMinionEvents();
             // 取消全局读档事件
             Game.Instance.Unsubscribe((int)GameHashes.Loaded, OnGameLoaded);
 
-            ownerMinion = null;
-            isEventSubscribed = false;
+            _ownerMinion = null;
+            _isEventSubscribed = false;
             base.OnCleanUp();
+        }
+        // 核心：注册装备事件映射
+        private void SubscribeToEquipEvents()
+        {
+            if (equippable == null) return;
+
+            // 移除重复注册（避免多次OnPrefabInit导致重复）
+            UnsubscribeFromEquipEvents();
+
+            // 注册穿戴事件（Klei引擎标准方式）
+            Subscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
+            Subscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);
+        }
+        // 取消装备事件映射
+        private void UnsubscribeFromEquipEvents()
+        {
+            if (equippable == null) return;
+
+            Unsubscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
+            Unsubscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);
         }
         public float PercentFull()
         {
@@ -105,33 +133,52 @@ namespace TeleportSuitMod
             list.Add(new Descriptor(text, text));
             return list;
         }
+        private void CheckEquippableState()
+        {
+            if (this.equippable == null)
+            {
+                LogDebug("传送服 Equippable 组件为空！");
+                return;
+            }
 
+            LogDebug( $"传送服状态：assignee={this.equippable.assignee != null},, 父节点={this.equippable.transform.parent?.name}");
+        }
         private void OnEquipped(object data)
         {
+            //电池与氧气储量检查
             Equipment equipment = (Equipment)data;
             NameDisplayScreen.Instance.SetSuitBatteryDisplay(equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject(), PercentFull, bVisible: true);
-            teleportSuitMonitor = new TeleportSuitMonitor.Instance(this, equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject());
-            teleportSuitMonitor.StartSM();
+            _teleportSuitMonitor = new TeleportSuitMonitor.Instance(this, equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject());
+            _teleportSuitMonitor.StartSM();
             if (NeedsRecharging())
             {
                 equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject().AddTag(GameTags.SuitBatteryLow);
             }
 
-            // 获取穿戴的小人
-            ownerMinion = GetMinionFromEquippable((Equippable)data);
-            if (ownerMinion == null)
+            //初始化小人状态、订阅小人事件与CabinStayReactbale准备同步
+            CheckEquippableState();
+            if (InitializeMinion())
             {
-                LogUtils.LogWarning("TeleportSuitTank", "穿戴传送服时未找到小人对象");
-                return;
+                SubscribeMinionEvents();
+                _cabinReactable?.SyncWearer(_ownerMinion);
             }
 
-            // 订阅小人事件
-            SubscribeMinionEvents();
-            LogUtils.LogDebug("TeleportSuitTank", $"小人[{ownerMinion.GetProperName()}]穿戴传送服，已订阅EndChore事件");
         }
-
+        private bool InitializeMinion()
+        {
+            _ownerMinion = GetWearerMinion();
+            if (_ownerMinion != null)
+            {
+                LogDebug($"成功找到小人[{_ownerMinion.GetProperName()}]（父节点：{this.equippable.transform.parent.name}）");
+                return true;
+            }
+            return false;
+        }
         private void OnUnequipped(object data)
         {
+            // 先清理旧订阅（防止重复订阅/漏取消）
+            UnsubscribeMinionEvents();
+
             Equipment equipment = (Equipment)data;
             if (!equipment.destroyed)
             {
@@ -139,53 +186,65 @@ namespace TeleportSuitMod
                 equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject().RemoveTag(GameTags.SuitBatteryOut);
                 NameDisplayScreen.Instance.SetSuitBatteryDisplay(equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject(), null, bVisible: false);
             }
-            if (teleportSuitMonitor != null)
+            if (_teleportSuitMonitor != null)
             {
-                teleportSuitMonitor.StopSM("Removed teleportsuit tank");
-                teleportSuitMonitor = null;
+                _teleportSuitMonitor.StopSM("Removed teleportsuit tank");
+                _teleportSuitMonitor = null;
             }
+            _cabinReactable?.SyncWearer(null);
+        }
+        private MinionIdentity GetWearerMinion()
+        {
+            MinionIdentity m = null; 
+            // 方式1：从父节点获取
+            if (transform.parent != null)
+            {
+                m = transform.parent.GetComponent<MinionIdentity>();
+            }
+
+            // 方式2：从Equippable获取
+            if (m == null && equippable?.assignee != null)
+            {
+                m = Utils.GetMinionFromEquippable(equippable);
+            }
+
+            // 兜底：返回null（原逻辑存在空引用风险）
+            if(m != null)
+            {
+
+                return GetMinionById(m.GetInstanceID());
+            }
+            return null;
         }
         // 全局读档完成事件 - 恢复订阅
         private void OnGameLoaded(object data)
         {
-            LogUtils.LogDebug("TeleportSuitTank", "游戏存档加载完成，检查并恢复传送服事件订阅");
-            CheckAndRestoreSubscription();
-        }
-        // 检查并恢复订阅（读档/组件激活时）
-        private void CheckAndRestoreSubscription()
-        {
-            // 若已订阅则跳过
-            if (isEventSubscribed) return;
-
-            // 检查当前是否已穿戴
-            if (equippable?.assignee != null)
+            LogDebug( "游戏存档加载完成，检查并恢复传送服事件订阅");
+            if (InitializeMinion())
             {
-                ownerMinion = GetMinionFromEquippable(equippable);
-                if (ownerMinion != null)
-                {
-                    SubscribeMinionEvents();
-                    LogUtils.LogDebug("TeleportSuitTank", $"读档后恢复小人[{ownerMinion.GetProperName()}]的事件订阅");
-                }
+                SubscribeMinionEvents();
+                LogDebug( $"读档后恢复小人[{_ownerMinion.GetProperName()}]的事件订阅");
             }
         }
 
         // 订阅小人的EndChore事件
         private void SubscribeMinionEvents()
         {
-            if (ownerMinion == null || isEventSubscribed) return;
+            if (_ownerMinion == null || _isEventSubscribed) return;
 
             // 订阅小人的EndChore事件（核心业务事件）
-            ownerMinion.Subscribe((int)GameHashes.EndChore, OnMinionChoreCompleted);
-            isEventSubscribed = true;
+            _ownerMinion.Subscribe((int)GameHashes.EndChore, OnMinionChoreCompleted);
+            LogDebug($"订阅小人[{_ownerMinion.GetProperName()}] EndChore 事件完成");
+            _isEventSubscribed = true;
         }
 
         // 取消小人事件订阅
         private void UnsubscribeMinionEvents()
         {
-            if (ownerMinion == null || !isEventSubscribed) return;
+            if (_ownerMinion == null || !_isEventSubscribed) return;
 
-            ownerMinion.Unsubscribe((int)GameHashes.EndChore, OnMinionChoreCompleted);
-            isEventSubscribed = false;
+            _ownerMinion.Unsubscribe((int)GameHashes.EndChore, OnMinionChoreCompleted);
+            _isEventSubscribed = false;
         }
 
         // 小人任务完成回调（核心业务逻辑）
@@ -197,36 +256,73 @@ namespace TeleportSuitMod
             // 仅处理登舱任务（可根据业务调整筛选逻辑）
             if (IsRocketEnterChore(completedChore))
             {
-                LogUtils.LogDebug("TeleportSuitTank", $"小人[{ownerMinion.GetProperName()}]完成登舱任务，执行舱内同步逻辑");
                 // 调用CabinStateSyncManager的核心逻辑
-                var cabinSync = GetComponent<CabinStateSyncManager>();
-                cabinSync?.HandleRocketEnterChore(ownerMinion, completedChore);
+                HandleRocketEnterChore(_ownerMinion);
             }
-        }
-
-        // 辅助：从Equippable获取小人对象
-        private MinionIdentity GetMinionFromEquippable(Equippable eq)
-        {
-            if (eq?.assignee == null) return null;
-
-            // 方式1：通过AssignableProxy获取
-            if (eq.assignee is MinionAssignablesProxy proxy)
-            {
-                return proxy.GetTargetGameObject()?.GetComponent<MinionIdentity>();
-            }
-
-            // 方式2：直接从游戏对象获取
-            return eq.assignee.gameObject.GetComponent<MinionIdentity>();
         }
 
         // 辅助：判断是否为登舱任务（可根据实际业务调整）
         private bool IsRocketEnterChore(Chore chore)
         {
             // 示例逻辑：根据任务名称/类型判断
-            return chore.name.Contains("RocketEnter") ||
+            return chore.choreType == Db.Get().ChoreTypes.RocketEnterExit ||
                    chore.GetType().Name.Contains("Rocket") ||
-                   chore.driver?.GetComponent<MinionIdentity>() == ownerMinion;
+                   chore.driver?.GetComponent<MinionIdentity>() == _ownerMinion;
+        }
+        // 小人登舱任务回调（核心业务逻辑）
+        public void HandleRocketEnterChore(MinionIdentity minion)
+        {
+            WorldContainer targetWorld = minion.GetMyWorld();
+            int targetWorldId = minion.GetMyWorldId();
+
+            PassengerRocketModule cabinModule = Utils.GetPassengerModuleFromWorld(targetWorld);
+            if (cabinModule == null) return;
+
+            // 执行传送服特定的舱内同步逻辑
+            // 核心操作：设置坐标 + 触发ActiveWorldChanged事件
+
+            LogDebug( "ActiveWorldChanged事件触发 Trigger");
+            minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)targetWorldId);
+
+            LogDebug( $"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
+        }
+        // 核心：公开方法，供 CabinStayReactable 推送自身实例
+        public void AcceptCabinReactableInstance(CabinStayReactable instance)
+        {
+            if (instance == null)
+            {
+                LogWarning("接收的 CabinStayReactable 实例为空");
+                return;
+            }
+
+            // 存储实例 + 初始化双向联动
+            _cabinReactable = instance;
+            LogDebug( $"被动接收 CabinStayReactable 实例（ID：{instance.GetInstanceID()}）");
+            if (_ownerMinion != null)
+            {
+                _cabinReactable.SyncWearer(_ownerMinion);
+            }
+            //备用初始化双飞同步信息
+            //_cabinReactable.OnWorldChanged += OnCabinWorldChanged;
+        }
+        // 初始化时收集
+        public void CollectAllMinions()
+        {
+            foreach (MinionIdentity minion in Components.LiveMinionIdentities)
+            {
+                if (!_allMinions.ContainsKey(minion.GetInstanceID()))
+                {
+                    _allMinions.Add(minion.GetInstanceID(), minion);
+                }
+            }
+        }
+        // 根据 ID 获取唯一小人
+        public MinionIdentity GetMinionById(int instanceId)
+        {
+            _allMinions.TryGetValue(instanceId, out MinionIdentity minion);
+            return minion;
         }
 
     }
+
 }

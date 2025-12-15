@@ -220,7 +220,7 @@ namespace TeleportSuitMod
                     int target_position_cell = Grid.PosToCell(__instance.target);
                     int targetWorldId = Grid.WorldIdx[target_position_cell];
                     int mycell = Grid.PosToCell(__instance);
-                    LogUtils.LogDebug("NaviP",$"TWID:{targetWorldId} T:{target_position_cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}" );
+                    //LogUtils.LogDebug("NaviP",$"TWID:{targetWorldId} T:{target_position_cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}" );
 
                     //===== 新增：太空舱拦截逻辑（最优先判断）=====
                     if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
