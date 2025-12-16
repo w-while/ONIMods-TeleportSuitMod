@@ -47,9 +47,7 @@ namespace TeleportSuitMod
                             int cabinWorldId = worldContainer.id;
                             if (RocketCabinRestriction.Instance != null)
                             {
-                                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]召集成员：{isSummoning}");
                                 RocketCabinRestriction.Instance.UpdateCabinSummonState(passengerModule,cabinWorldId, isSummoning);
-                                LogUtils.LogDebug(ModuleName, $"标记舱[{cabinWorldId}]分派人员");
                                 RocketCabinRestriction.MarkCrewForCabin(passengerModule);
                             }
                         }
@@ -118,11 +116,9 @@ namespace TeleportSuitMod
                 // 标记舱内船员
                 if (isrequested)
                 {
-
                     if (RocketCabinRestriction.Instance != null)
                         try
                         {
-                            LogUtils.LogDebug(ModuleName, $"执行标记舱[{__instance.name}]分派成员");
                             RocketCabinRestriction.MarkCrewForCabin(__instance);
                         }
                         catch (Exception e)

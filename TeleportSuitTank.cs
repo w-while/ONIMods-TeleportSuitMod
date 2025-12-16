@@ -73,7 +73,6 @@ namespace TeleportSuitMod
             if (equippable.isEquipped)
             {
                 //初始化小人状态、订阅小人事件与CabinStayReactbale准备同步
-                CheckEquippableState();
                 if (InitializeMinion())
                 {
                     SubscribeMinionEvents();
@@ -138,16 +137,6 @@ namespace TeleportSuitMod
             list.Add(new Descriptor(text, text));
             return list;
         }
-        private void CheckEquippableState()
-        {
-            if (this.equippable == null)
-            {
-                LogDebug("传送服 Equippable 组件为空！");
-                return;
-            }
-
-            LogDebug( $"传送服状态：assignee={this.equippable.assignee != null},, 父节点={this.equippable.transform.parent?.name}");
-        }
         private void OnEquipped(object data)
         {
             //电池与氧气储量检查
@@ -161,7 +150,6 @@ namespace TeleportSuitMod
             }
 
             //初始化小人状态、订阅小人事件与CabinStayReactbale准备同步
-            CheckEquippableState();
             if (InitializeMinion())
             {
                 SubscribeMinionEvents();
@@ -172,11 +160,7 @@ namespace TeleportSuitMod
         private bool InitializeMinion()
         {
             _ownerMinion = GetWearerMinion();
-            if (_ownerMinion != null)
-            {
-                LogDebug($"成功找到小人[{_ownerMinion.GetProperName()}]（父节点：{this.equippable.transform.parent.name}）");
-                return true;
-            }
+            if (_ownerMinion != null) return true;
             return false;
         }
         private void OnUnequipped(object data)
@@ -284,11 +268,9 @@ namespace TeleportSuitMod
             // 执行传送服特定的舱内同步逻辑
             // 核心操作：设置坐标 + 触发ActiveWorldChanged事件
 
-            LogDebug( "设置小人权限");
             bool isRestrict = RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId);
             sycMinionStat(cabinModule, isRestrict);
 
-            LogDebug( $"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
         }
         // 初始化时收集
         public void CollectAllMinions()
@@ -320,13 +302,11 @@ namespace TeleportSuitMod
             AccessControl component2 = interiorDoor.GetComponent<AccessControl>();
 
             if (isRestrict) {
-                LogDebug($"设置舱门权限 Restrict: {isRestrict}");
                 component.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
                 component2.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Neither);
             }
             else
             {
-                LogDebug($"设置舱门权限 Restrict: {isRestrict}");
                 component.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
                 component2.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
             }

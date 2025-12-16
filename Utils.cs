@@ -60,12 +60,10 @@ namespace TeleportSuitMod
 
                 if (currentEquip.gameObject.HasTag(TeleportSuitGameTags.TeleportSuit))
                 {
-                    Debug.Log($"TeleportSuitTank: 找到已穿戴的传送服，插槽类型={slotInstance.slot.Name}");
                     return currentEquip;
                 }
             }
 
-            Debug.LogWarning("TeleportSuitTank: 未在小人的装备插槽中找到传送服");
             return null;
         }
         /// <summary>

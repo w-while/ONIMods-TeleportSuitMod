@@ -67,6 +67,7 @@ namespace TeleportSuitMod
                                 && ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId == id
                                 && TeleportSuitConfig.CanTeloportTo(cell))
                         {
+                            //int target_position_cell = Grid.PosToCell(__instance.target);
                             int targetWorldId = Grid.WorldIdx[cell];
                             int mycell = Grid.PosToCell(__instance);
                             //LogUtils.LogDebug("NaviP", $"TWID:{targetWorldId} T:{cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}");
