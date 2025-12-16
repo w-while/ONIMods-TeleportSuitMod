@@ -67,8 +67,6 @@ namespace TeleportSuitMod
                                 && ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId == id
                                 && TeleportSuitConfig.CanTeloportTo(cell))
                         {
-
-                            //int target_position_cell = Grid.PosToCell(__instance.target);
                             int targetWorldId = Grid.WorldIdx[cell];
                             int mycell = Grid.PosToCell(__instance);
                             //LogUtils.LogDebug("NaviP", $"TWID:{targetWorldId} T:{cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}");
@@ -76,13 +74,10 @@ namespace TeleportSuitMod
                             //===== 新增：太空舱拦截逻辑（最优先判断）=====
                             if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
                             {
-                                if (Grid.IsValidCell(cell))
+                                // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
+                                if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
                                 {
-                                    // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
-                                    if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
-                                    {
-                                        return false;
-                                    }
+                                    return false;
                                 }
                             }
                             __result = 1;

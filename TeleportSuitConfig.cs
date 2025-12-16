@@ -35,6 +35,7 @@ namespace TeleportSuitMod
         public static float INSULATION = 50f;
         public static float THERMAL_CONDUCTIVITY_BARRIER = 0.3f;
         public static float ATHLETICS = -8;
+        public static readonly string ModuleName = "TeleportSuitConfig";
 
         //private AttributeModifier expertAthleticsModifier;
 
@@ -243,11 +244,9 @@ namespace TeleportSuitMod
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
 
-            // 新增：注册舱内停留响应组件
-            go.AddComponent<CabinStayReactable>();
         }
 
-        public string[] GetDlcIds()
+    public string[] GetDlcIds()
         {
             //应该是让dlc和原版都可以使用
             return DlcManager.AVAILABLE_ALL_VERSIONS;

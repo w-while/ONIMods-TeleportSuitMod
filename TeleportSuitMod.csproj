@@ -106,7 +106,6 @@
     <Compile Include="TeleportSuitStrings.cs" />
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
-    <Compile Include="CabinStayReactable.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>

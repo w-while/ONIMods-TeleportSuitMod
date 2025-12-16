@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Security.AccessControl;
-using KSerialization;
+﻿using KSerialization;
 using STRINGS;
+using System;
+using System.Collections.Generic;
+using System.Security.AccessControl;
 using UnityEngine;
 
 namespace TeleportSuitMod
@@ -36,7 +37,6 @@ namespace TeleportSuitMod
 
         public MinionIdentity _ownerMinion;
         private bool _isEventSubscribed; // 订阅状态标记，避免重复订阅
-        private CabinStayReactable _cabinReactable;
         [MyCmpReq] private SuitTank suitTank;
         [MyCmpReq] private Equippable equippable;
 
@@ -166,7 +166,6 @@ namespace TeleportSuitMod
             {
                 SubscribeMinionEvents();
                 LogDebug($"OnEquipped :{_ownerMinion.GetProperName()}@WID_{_ownerMinion.GetMyWorldId()}");
-                _cabinReactable?.SyncWearer(_ownerMinion);
             }
 
         }
@@ -197,8 +196,6 @@ namespace TeleportSuitMod
                 _teleportSuitMonitor.StopSM("Removed teleportsuit tank");
                 _teleportSuitMonitor = null;
             }
-            LogDebug($"OnUnequipped :{_ownerMinion.GetProperName()}@WID_{_ownerMinion.GetMyWorldId()}");
-            _cabinReactable?.SyncWearer(null);
         }
         private MinionIdentity GetWearerMinion()
         {
@@ -226,7 +223,6 @@ namespace TeleportSuitMod
         // 全局读档完成事件 - 恢复订阅
         private void OnGameLoaded(object data)
         {
-            LogDebug( "游戏存档加载完成，检查并恢复传送服事件订阅");
             if (InitializeMinion())
             {
                 SubscribeMinionEvents();
@@ -288,32 +284,11 @@ namespace TeleportSuitMod
             // 执行传送服特定的舱内同步逻辑
             // 核心操作：设置坐标 + 触发ActiveWorldChanged事件
 
-            LogDebug( "ActiveWorldChanged事件触发 Trigger");
-            CabinTriggerData data = new CabinTriggerData();
-            data.WorldID = targetWorldId;
-            data.Cabin = cabinModule;
-            minion.Trigger((int)GameHashes.ActiveWorldChanged, (object)data);
+            LogDebug( "设置小人权限");
+            bool isRestrict = RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId);
+            sycMinionStat(cabinModule, isRestrict);
 
             LogDebug( $"小人[{minion.GetProperName()}]登舱任务完成，同步舱内状态（世界ID：{targetWorldId}）");
-        }
-        // 核心：公开方法，供 CabinStayReactable 推送自身实例
-        public void AcceptCabinReactableInstance(CabinStayReactable instance)
-        {
-            if (instance == null)
-            {
-                LogWarning("接收的 CabinStayReactable 实例为空");
-                return;
-            }
-
-            // 存储实例 + 初始化双向联动
-            _cabinReactable = instance;
-            LogDebug( $"被动接收 CabinStayReactable 实例（ID：{instance.GetInstanceID()}）");
-            if (_ownerMinion != null)
-            {
-                _cabinReactable.SyncWearer(_ownerMinion);
-            }
-            //备用初始化双飞同步信息
-            //_cabinReactable.OnWorldChanged += OnCabinWorldChanged;
         }
         // 初始化时收集
         public void CollectAllMinions()
@@ -331,6 +306,30 @@ namespace TeleportSuitMod
         {
             _allMinions.TryGetValue(instanceId, out MinionIdentity minion);
             return minion;
+        }
+
+        public void sycMinionStat(PassengerRocketModule Cabin,bool isRestrict)
+        {
+            int cell = Cabin.GetComponent<NavTeleporter>().GetCell();
+            int num = Cabin.GetComponent<ClustercraftExteriorDoor>().TargetCell();
+            RocketPassengerMonitor.Instance smi = _ownerMinion.GetSMI<RocketPassengerMonitor.Instance>();
+            smi.sm.targetCell.Set(num, smi, false);
+            smi.ClearMoveTarget(num);
+            Component interiorDoor = Cabin.GetComponent<ClustercraftExteriorDoor>().GetInteriorDoor();
+            AccessControl component = Cabin.GetComponent<AccessControl>();
+            AccessControl component2 = interiorDoor.GetComponent<AccessControl>();
+
+            if (isRestrict) {
+                LogDebug($"设置舱门权限 Restrict: {isRestrict}");
+                component.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
+                component2.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Neither);
+            }
+            else
+            {
+                LogDebug($"设置舱门权限 Restrict: {isRestrict}");
+                component.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
+                component2.SetPermission(_ownerMinion.assignableProxy.Get(), AccessControl.Permission.Both);
+            }
         }
 
     }

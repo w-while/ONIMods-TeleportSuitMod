@@ -34,11 +34,11 @@ namespace TeleportSuitMod
                     if (craftModuleInterface != null)
                     {
                         passengerModule = craftModuleInterface.GetPassengerModule();
-                        bool isRequest = false;
+                        bool isSummoning = false;
 
                         if (passengerModule.PassengersRequested == PassengerRocketModule.RequestCrewState.Release)
                         {
-                            isRequest = true;
+                            isSummoning = true;
                         }
                         // 同步舱召集状态到RocketCabinRestriction
                         var worldContainer = passengerModule.GetComponent<ClustercraftExteriorDoor>().GetTargetWorld();
@@ -47,9 +47,9 @@ namespace TeleportSuitMod
                             int cabinWorldId = worldContainer.id;
                             if (RocketCabinRestriction.Instance != null)
                             {
-                                LogUtils.LogDebug(ModuleName, $"太空员舱召集成员：{isRequest}");
-                                RocketCabinRestriction.Instance.UpdateCabinSummonState(cabinWorldId, !isRequest);
-                                LogUtils.LogDebug(ModuleName, $"MarkCrewForCabin:舱：{__instance.name} ProperName: {__instance.GetProperName()}");
+                                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]召集成员：{isSummoning}");
+                                RocketCabinRestriction.Instance.UpdateCabinSummonState(passengerModule,cabinWorldId, isSummoning);
+                                LogUtils.LogDebug(ModuleName, $"标记舱[{cabinWorldId}]分派人员");
                                 RocketCabinRestriction.MarkCrewForCabin(passengerModule);
                             }
                         }
@@ -122,9 +122,8 @@ namespace TeleportSuitMod
                     if (RocketCabinRestriction.Instance != null)
                         try
                         {
-                            LogUtils.LogDebug(ModuleName, $"MarkCrewForCabin:舱：{__instance.name} ProperName: {__instance.GetProperName()}");
+                            LogUtils.LogDebug(ModuleName, $"执行标记舱[{__instance.name}]分派成员");
                             RocketCabinRestriction.MarkCrewForCabin(__instance);
-                            LogUtils.LogDebug(ModuleName, "End MarkCrewForCabin");
                         }
                         catch (Exception e)
                         {

@@ -45,29 +45,24 @@ namespace TeleportSuitMod
         /// <returns>传送服的 Equippable 实例（未找到返回 null）</returns>
         public static Equippable GetEquippedTeleportSuit(Equipment equipment)
         {
-            // 空值防护
             if (equipment == null)
             {
                 Debug.LogWarning("TeleportSuitTank: Equipment 实例为 null，无法获取传送服");
                 return null;
             }
 
-            // 1. 遍历所有装备插槽（核心：使用游戏源码中的 Slots 属性）
             foreach (AssignableSlotInstance slotInstance in equipment.Slots)
             {
                 if (!slotInstance.IsAssigned()) continue;
 
-                // 2. 将插槽中分配的物品转换为 Equippable（装备组件）
                 Equippable currentEquip = slotInstance.assignable as Equippable;
                 if (currentEquip == null) continue;
 
-                // 3. 方式1：通过传送服标签精准匹配（推荐，避免匹配其他服装）
                 if (currentEquip.gameObject.HasTag(TeleportSuitGameTags.TeleportSuit))
                 {
                     Debug.Log($"TeleportSuitTank: 找到已穿戴的传送服，插槽类型={slotInstance.slot.Name}");
                     return currentEquip;
                 }
-
             }
 
             Debug.LogWarning("TeleportSuitTank: 未在小人的装备插槽中找到传送服");
@@ -219,13 +214,30 @@ namespace TeleportSuitMod
         // 根据 ID 获取唯一小人,某些特殊情况下时候，比如：获取到了ID但是其他组件不全的情况
         public static MinionIdentity restoreMinionByInstanceID(int instanceId)
         {
-            foreach (MinionIdentity m in Resources.FindObjectsOfTypeAll<MinionIdentity>())
+            // 遍历所有活跃的MinionIdentity（过滤销毁/未激活对象）
+            foreach (MinionIdentity m in UnityEngine.Object.FindObjectsOfType<MinionIdentity>())
             {
-                if(m.GetInstanceID() == instanceId)
+                // 关键校验：实例ID匹配 + GameObject有效 + 活跃状态
+                if (m.GetInstanceID() == instanceId
+                    && m.gameObject != null
+                    && m.gameObject.activeInHierarchy)
                 {
+                    LogUtils.LogDebug(ModuleName, $"通过InstanceID[{instanceId}]找到有效小人：{m.name}");
                     return m;
                 }
             }
+
+            // 兜底：尝试从非活跃对象中查找（仅日志提示）
+            foreach (MinionIdentity m in Resources.FindObjectsOfTypeAll<MinionIdentity>())
+            {
+                if (m.GetInstanceID() == instanceId)
+                {
+                    LogUtils.LogWarning(ModuleName, $"找到InstanceID[{instanceId}]的小人，但对象已失效：{m.name}");
+                    return null; // 失效对象直接返回null，避免后续调用异常
+                }
+            }
+
+            LogUtils.LogWarning(ModuleName, $"未找到InstanceID[{instanceId}]的小人");
             return null;
         }
         public static MinionIdentity GetMinionFromEquippable(Equippable eq)
@@ -239,6 +251,36 @@ namespace TeleportSuitMod
             }
 
             return null;
+        }
+        /// <summary>
+        /// 通过小人获取其穿戴的传送服组件
+        /// </summary>
+        /// <param name="minion">目标小人（MinionIdentity）</param>
+        /// <returns>传送服组件（TeleportSuit），无则返回null</returns>
+        public static TeleportSuitTank GetMinionTeleportSuit(MinionIdentity minion)
+        {
+            if (minion == null || minion.gameObject == null || !minion.gameObject.activeInHierarchy)
+            {
+                LogUtils.LogWarning(ModuleName, $"[{minion.name}] 小人GameObject无效/未激活");
+                return null;
+            }
+
+            Equipment equipment = minion.GetEquipment();
+            if (equipment == null) return null;
+
+            Equippable equipped = GetEquippedTeleportSuit(equipment);
+            if (equipped == null)
+            {
+                LogUtils.LogDebug(ModuleName, $"[{minion.name}] 未穿戴传送服");
+                return null;
+            }
+
+            TeleportSuitTank suitTank = equipped.GetComponent<TeleportSuitTank>();
+            if (suitTank == null)
+            {
+                LogUtils.LogWarning(ModuleName, $"[{minion.name}] 传送服装备上无TeleportSuitTank组件");
+            }
+            return suitTank;
         }
 
     }

@@ -25,15 +25,16 @@ namespace TeleportSuitMod
         private class CabinState
         {
             public bool IsSummoning { get; set; }
-            public HashSet<MinionIdentity> AssignedCrewNames { get; set; }
+            public HashSet<MinionIdentity> AssignedCrew { get; set; }
 
             public CabinState(bool isSummoning, HashSet<MinionIdentity> crew)
             {
                 IsSummoning = isSummoning;
-                AssignedCrewNames = crew ?? new HashSet<MinionIdentity>();
+                AssignedCrew = crew ?? new HashSet<MinionIdentity>();
             }
         }
 
+        private static readonly string ModuleName = "RocketCabinRestriction";
         private const int InvalidWorldId = -1;
         private bool _isInitialized = false;
         private bool _isMarkingCrew = false;
@@ -46,19 +47,16 @@ namespace TeleportSuitMod
             {
                 lock (_lockObj)
                 {
-
                     if (_instance != null && _instance.isActiveAndEnabled)
                     {
                         return _instance;
                     }
-
-
                     var existingInstances = FindObjectsOfType<RocketCabinRestriction>();
                     foreach (var instance in existingInstances)
                     {
                         if (instance.isActiveAndEnabled)
                         {
-                            LogUtils.LogDebug("RocketCabinRestriction", $"找到已激活的现有实例：{instance.gameObject.name}");
+                            LogUtils.LogDebug(ModuleName, $"找到已激活的现有实例：{instance.gameObject.name}");
                             _instance = instance;
                             return _instance;
                         }
@@ -75,11 +73,11 @@ namespace TeleportSuitMod
                     _instance = singletonObj.AddComponent<RocketCabinRestriction>();
 
                     // 同步初始化
-                    LogUtils.LogDebug("RocketCabinRestriction", "开始执行同步初始化");
+                    LogUtils.LogDebug(ModuleName, "开始执行同步初始化");
                     _instance.OnPrefabInit();
                     _instance.OnSpawn();
 
-                    LogUtils.LogDebug("RocketCabinRestriction", $"新单例创建完成：{singletonObj.name}，_isInitialized={_instance._isInitialized}");
+                    LogUtils.LogDebug(ModuleName, $"新单例创建完成：{singletonObj.name}，_isInitialized={_instance._isInitialized}");
                     return _instance;
                 }
             }
@@ -119,7 +117,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"OnPrefabInit异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"OnPrefabInit异常：{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -133,7 +131,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"OnSpawn异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"OnSpawn异常：{e.Message}\n{e.StackTrace}");
                 _isInitialized = false;
             }
         }
@@ -164,7 +162,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"OnCleanUp异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"OnCleanUp异常：{e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
@@ -181,7 +179,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"RegisterUpdateHandlers异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"RegisterUpdateHandlers异常：{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -193,12 +191,12 @@ namespace TeleportSuitMod
             }
             try
             {
-                LogUtils.LogDebug("RocketCabinRestriction", $"OnMinionAdded：检测到新小人：{minion.GetProperName()}");
+                LogUtils.LogDebug(ModuleName, $"OnMinionAdded：检测到新小人：{minion.GetProperName()}");
                 UpdateMinionCabinMapping(minion);
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"OnMinionAdded异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"OnMinionAdded异常：{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -217,7 +215,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"OnMinionRemoved异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"OnMinionRemoved异常：{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -230,7 +228,7 @@ namespace TeleportSuitMod
             try
             {
                 int currentWorldId = GetMinionCurrentWorldId(minion);
-                LogUtils.LogDebug("RocketCabinRestriction", $"UpdateMinionCabinMapping：小人{minion.GetProperName()}，当前世界ID={currentWorldId}");
+                LogUtils.LogDebug(ModuleName, $"UpdateMinionCabinMapping：小人{minion.GetProperName()}，当前世界ID={currentWorldId}");
 
                 if (_cabinStateCache != null)
                 {
@@ -241,9 +239,9 @@ namespace TeleportSuitMod
                             if (_minionToCabinMap != null)
                             {
                                 _minionToCabinMap[minion] = currentWorldId;
-                                LogUtils.LogDebug("RocketCabinRestriction", $"UpdateMinionCabinMapping：标记小人{minion.GetProperName()}到舱{currentWorldId}");
+                                LogUtils.LogDebug(ModuleName, $"UpdateMinionCabinMapping：标记小人{minion.GetProperName()}到舱{currentWorldId}");
                             }
-                            cabinEntry.Value.AssignedCrewNames.Add(minion);
+                            cabinEntry.Value.AssignedCrew.Add(minion);
                             break;
                         }
                     }
@@ -251,7 +249,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"UpdateMinionCabinMapping异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"UpdateMinionCabinMapping异常：{e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
@@ -261,7 +259,7 @@ namespace TeleportSuitMod
         {
             if (!_isInitialized)
             {
-                LogUtils.LogWarning("RocketCabinRestriction", "Render1000ms：实例未完成初始化");
+                LogUtils.LogWarning(ModuleName, "Render1000ms：实例未完成初始化");
             }
         }
         #endregion
@@ -281,48 +279,45 @@ namespace TeleportSuitMod
                 int cabinWorldId = InvalidWorldId;
                 if (Instance._minionToCabinMap != null && Instance._minionToCabinMap.TryGetValue(minion, out cabinWorldId))
                 {
-                    //LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：小人{minion.GetProperName()}的舱世界ID={cabinWorldId}");
-                    if (cabinWorldId == InvalidWorldId)
+                    //LogUtils.LogDebug(ModuleName, $"小人{minion.GetProperName()}的舱世界ID={cabinWorldId}");
+                    if (cabinWorldId == InvalidWorldId || targetWorldId == cabinWorldId)
                     {
-                        LogUtils.LogDebug("RocketCabinRestriction", "QuickCheckBlockTeleport：舱世界ID无效，返回false");
+                        LogUtils.LogDebug(ModuleName, $"舱世界ID无效、或 非跨界传送 [{cabinWorldId}] To[{targetWorldId}]");
                         return false;
                     }
                 }
                 else
                 {
-                    LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：未找到小人{minion.GetProperName()}的舱映射，返回false");
                     return false;
                 }
 
                 CabinState cabinState = null;
                 if (Instance._cabinStateCache != null && Instance._cabinStateCache.TryGetValue(cabinWorldId, out cabinState))
                 {
-                    //LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：舱{cabinWorldId}的IsSummoning={cabinState.IsSummoning}");
                     if (!cabinState.IsSummoning)
                     {
-                        LogUtils.LogDebug("RocketCabinRestriction", "QuickCheckBlockTeleport：舱未召集，返回false");
+                        LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]未召集");
                         return false;
                     }
                 }
                 else
                 {
-                    LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：未找到舱{cabinWorldId}的状态，返回false");
+                    LogUtils.LogDebug(ModuleName, $"未找到舱[{cabinWorldId}]的状态");
                     return false;
                 }
 
-                if (!cabinState.AssignedCrewNames.Contains(minion))
+                if (!cabinState.AssignedCrew.Contains(minion))
                 {
-                    LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：小人{minion.GetProperName()}不在舱{cabinWorldId}的召集列表，返回false");
+                    LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]不在舱[{cabinWorldId}]的召集列表");
                     return false;
                 }
 
-                bool result = targetWorldId != cabinWorldId;
-                //LogUtils.LogDebug("RocketCabinRestriction", $"QuickCheckBlockTeleport：返回{result}（targetWorldId={targetWorldId} != cabinWorldId={cabinWorldId}）");
-                return result;
+                //LogUtils.LogDebug(ModuleName, $"阻断传送 [{cabinWorldId}] To [{targetWorldId}]");
+                return true;
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"QuickCheckBlockTeleport异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"QuickCheckBlockTeleport异常：{e.Message}\n{e.StackTrace}");
                 return false;
             }
         }
@@ -343,52 +338,89 @@ namespace TeleportSuitMod
         #endregion
 
         #region 舱状态管理
-        public void UpdateCabinSummonState(int cabinWorldId, bool isSummoning)
+        public void UpdateCabinSummonState(PassengerRocketModule canbinModule,int cabinWorldId, bool isSummoning)
         {
             if (!_isInitialized || cabinWorldId == InvalidWorldId)
             {
-                LogUtils.LogDebug("RocketCabinRestriction", $"UpdateCabinSummonState跳过：_isInitialized={_isInitialized} / cabinWorldId={cabinWorldId}");
+                LogUtils.LogDebug(ModuleName, $"UpdateCabinSummonState跳过：_isInitialized={_isInitialized} / cabinWorldId={cabinWorldId}");
                 return;
             }
             try
             {
-                LogUtils.LogDebug("RocketCabinRestriction", $"进入UpdateCabinSummonState：舱{cabinWorldId}，IsSummoning={isSummoning}");
                 EnsureCacheInitialized();
 
                 if (_cabinStateCache.ContainsKey(cabinWorldId))
                 {
                     var currentState = _cabinStateCache[cabinWorldId];
                     currentState.IsSummoning = isSummoning;
-                    LogUtils.LogDebug("RocketCabinRestriction", $"UpdateCabinSummonState：更新舱{cabinWorldId}的IsSummoning为{isSummoning}");
+                    LogUtils.LogDebug(ModuleName, $"更新舱[{cabinWorldId}]的所有Crew isSummoning:{currentState.IsSummoning}");
                 }
                 else
                 {
                     _cabinStateCache.Add(cabinWorldId, new CabinState(isSummoning, new HashSet<MinionIdentity>()));
-                    LogUtils.LogDebug("RocketCabinRestriction", $"UpdateCabinSummonState：新增舱{cabinWorldId}的状态，IsSummoning={isSummoning}");
+                }
+                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]的状态IsSummoning：{isSummoning}");
+                if (!isSummoning){
+                    LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]的Notice所有Crew");
+                    Instance.NoticeCrewOfCabin(cabinWorldId);
                 }
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"UpdateCabinSummonState异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"UpdateCabinSummonState异常：{e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
+        private void NoticeCrewOfCabin(int cabinWorldId)
+        {
+            if (!_cabinStateCache.ContainsKey(cabinWorldId))
+            {
+                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]Assigned Crew列表为空,Notice失败");
+                return;
+            }
+            LogUtils.LogDebug(ModuleName, $"AssignedCrew Count: {_cabinStateCache[cabinWorldId].AssignedCrew.Count}");
+            foreach (var m in _cabinStateCache[cabinWorldId].AssignedCrew)
+            {
+                MinionIdentity mm = m as MinionIdentity;
+                if (mm == null)
+                {
+                    LogUtils.LogWarning(ModuleName, $"AssignedCrew中存在非MinionIdentity对象：{m}");
+                    continue;
+                }
 
-        #region 船员标记（终极兼容版：无依赖内置组件）
+                TeleportSuitTank suitTank = Utils.GetMinionTeleportSuit(mm);
+                if (suitTank == null)
+                {
+                    // 仅当mm无效时，才尝试通过InstanceID恢复
+                    if (mm.gameObject == null || !mm.gameObject.activeInHierarchy)
+                    {
+                        mm = Utils.restoreMinionByInstanceID(m.GetInstanceID());
+                        // 恢复后再次校验
+                        if (mm == null)
+                        {
+                            LogUtils.LogWarning(ModuleName, $"无法恢复InstanceID[{m.GetInstanceID()}]的小人");
+                            continue;
+                        }
+                        suitTank = Utils.GetMinionTeleportSuit(mm);
+                    }
+                }
+
+                if (suitTank != null)
+                {
+                    LogUtils.LogDebug(ModuleName, $"重置小人权限[{mm.GetProperName()}] Summoning: [{_cabinStateCache[cabinWorldId].IsSummoning}]");
+                    suitTank.HandleRocketEnterChore(mm);
+                }
+                else
+                {
+                    LogUtils.LogDebug(ModuleName, $"[{mm.GetProperName()}] 未找到有效传送服组件");
+                }
+            }
+        }
+        #region 船员标记
         public static void MarkCrewForCabin(PassengerRocketModule passengerModule)
         {
             // 前置判断
-            if (Instance == null|| !Instance._isInitialized || passengerModule == null)
-            {
-                return;
-            }
-
-
-            if (Instance._isMarkingCrew)
-            {
-                LogUtils.LogWarning("RocketCabinRestriction", "MarkCrewForCabin：重复调用，跳过");
-                return;
-            }
+            if (Instance == null|| !Instance._isInitialized || passengerModule == null || Instance._isMarkingCrew) return;
 
             Instance._isMarkingCrew = true;
             try
@@ -399,7 +431,7 @@ namespace TeleportSuitMod
                 int cabinWorldId = Instance.GetCabinWorldIdSafely(passengerModule);
                 if (cabinWorldId == InvalidWorldId)
                 {
-                    LogUtils.LogError("RocketCabinRestriction", "MarkCrewForCabin：舱世界ID无效，返回");
+                    LogUtils.LogError(ModuleName, "舱世界ID无效，返回");
                     Instance._isMarkingCrew = false;
                     return;
                 }
@@ -411,7 +443,7 @@ namespace TeleportSuitMod
                 AssignmentGroupController agc = passengerModule.GetComponent<AssignmentGroupController>();
                 if (agc == null)
                 {
-                    LogUtils.LogWarning("RocketCabinRestriction", "MarkCrewForCabin：当前舱无AssignmentGroupController组件，终止操作");
+                    LogUtils.LogWarning(ModuleName, "当前舱无AssignmentGroupController组件，终止操作");
                     Instance._isMarkingCrew = false;
                     return;
                 }
@@ -419,16 +451,17 @@ namespace TeleportSuitMod
                 // 获取当前舱的分配组
                 if (!Game.Instance.assignmentManager.assignment_groups.TryGetValue(agc.AssignmentGroupID, out AssignmentGroup group))
                 {
-                    LogUtils.LogWarning("RocketCabinRestriction", $"MarkCrewForCabin：未找到舱[{passengerModule.name}]的分配组（ID：{agc.AssignmentGroupID}），终止操作");
+                    LogUtils.LogWarning(ModuleName, $"未找到舱[{passengerModule.name}]的分配组（ID：{agc.AssignmentGroupID}），终止操作");
                     Instance._isMarkingCrew = false;
                     return;
                 }
                 for (int i = 0; i < Components.LiveMinionIdentities.Count; i++)
                 {
-                    if (Game.Instance.assignmentManager.assignment_groups[passengerModule.GetComponent<AssignmentGroupController>().AssignmentGroupID].HasMember(Components.LiveMinionIdentities[i].assignableProxy.Get()))
+                    MinionIdentity m =  Components.LiveMinionIdentities[i];
+                    if (Game.Instance.assignmentManager.assignment_groups[passengerModule.GetComponent<AssignmentGroupController>().AssignmentGroupID].HasMember(m.assignableProxy.Get()))
                     {
-                        assignedMinions.Add(Components.LiveMinionIdentities[i]);
-                        LogUtils.LogDebug("RocketCabinRestriction", $"MarkCrewForCabin：匹配到分配给舱的小人 | 小人：{Components.LiveMinionIdentities[i].GetProperName()} | 舱：{passengerModule.name}");
+                        assignedMinions.Add(m);
+                        LogUtils.LogDebug(ModuleName, $"匹配到分配给舱[{passengerModule.name} {cabinWorldId}]的小人[{m.GetProperName()}]");
                     }
                 }
 
@@ -436,14 +469,14 @@ namespace TeleportSuitMod
                 // 无分配小人直接终止
                 if (assignedMinions.Count == 0)
                 {
-                    LogUtils.LogWarning("RocketCabinRestriction", "MarkCrewForCabin：未找到任何分配给当前太空员舱的有效小人，终止操作");
+                    LogUtils.LogWarning(ModuleName, "未找到任何分配给当前太空员舱的有效小人，终止操作");
                     Instance._isMarkingCrew = false;
                     return;
                 }
 
                 // 打印分配的船员名单
                 string crewList = string.Join(", ", assignedMinions.Select(m => m.GetProperName()));
-                LogUtils.LogDebug("RocketCabinRestriction", $"MarkCrewForCabin：分配给当前太空员舱的有效船员名单：{crewList}");
+                LogUtils.LogDebug(ModuleName, $"分配给当前太空员舱的有效船员名单：{crewList}");
 
                 // 标记分配的小人
                 Instance.InternalMarkCrewForCabin(cabinWorldId, assignedMinions);
@@ -452,16 +485,16 @@ namespace TeleportSuitMod
                 if (Instance._cabinStateCache.ContainsKey(cabinWorldId))
                 {
                     var cabinState = Instance._cabinStateCache[cabinWorldId];
-                    string finalCrewList = cabinState.AssignedCrewNames.Count > 0
-                        ? string.Join(", ", cabinState.AssignedCrewNames)
+                    string finalCrewList = cabinState.AssignedCrew.Count > 0
+                        ? string.Join(", ", cabinState.AssignedCrew)
                         : "无";
-                    LogUtils.LogDebug("RocketCabinRestriction", $"MarkCrewForCabin：舱{cabinWorldId}最终标记的船员名单：{finalCrewList}");
+                    LogUtils.LogDebug(ModuleName, $"舱{cabinWorldId}最终标记的船员名单：{finalCrewList}");
                 }
 
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"MarkCrewForCabin异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"MarkCrewForCabin异常：{e.Message}\n{e.StackTrace}");
             }
             finally
             {
@@ -476,7 +509,6 @@ namespace TeleportSuitMod
             var validMinions = new List<MinionIdentity>();
             try
             {
-                LogUtils.LogDebug("RocketCabinRestriction", "进入GetAllValidMinionsInGame");
 
                 // 直接遍历所有MinionIdentity组件
                 var allMinionComps = UnityEngine.Object.FindObjectsOfType<MinionIdentity>();
@@ -485,24 +517,24 @@ namespace TeleportSuitMod
                     // 过滤有效小人：激活、有名称（移除IsDead()判断）
                     if (minion == null || !minion.isActiveAndEnabled)
                     {
-                        LogUtils.LogDebug("RocketCabinRestriction", $"GetAllValidMinionsInGame：跳过非激活小人");
+                        LogUtils.LogDebug(ModuleName, $"跳过非激活小人");
                         continue;
                     }
 
                     string minionName = minion.GetProperName();
                     if (string.IsNullOrEmpty(minionName))
                     {
-                        LogUtils.LogDebug("RocketCabinRestriction", "GetAllValidMinionsInGame：跳过无名称小人");
+                        LogUtils.LogDebug(ModuleName, "跳过无名称小人");
                         continue;
                     }
 
                     validMinions.Add(minion);
-                    LogUtils.LogDebug("RocketCabinRestriction", $"GetAllValidMinionsInGame：添加有效小人{minionName}");
+                    LogUtils.LogDebug(ModuleName, $"添加有效小人{minionName}");
                 }
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"GetAllValidMinionsInGame异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"GetAllValidMinionsInGame异常：{e.Message}\n{e.StackTrace}");
             }
             return validMinions;
         }
@@ -515,11 +547,10 @@ namespace TeleportSuitMod
             var filteredMinions = new List<MinionIdentity>();
             try
             {
-                LogUtils.LogDebug("RocketCabinRestriction", "进入FilterMinionsForRocket");
 
                 // 获取火箭位置
                 Vector3 rocketPos = passengerModule.transform.position;
-                LogUtils.LogDebug("RocketCabinRestriction", $"FilterMinionsForRocket：火箭位置={rocketPos}");
+                LogUtils.LogDebug(ModuleName, $"火箭位置={rocketPos}");
 
                 // 遍历所有小人，按距离筛选（50米内）
                 foreach (var minion in allMinions)
@@ -527,19 +558,19 @@ namespace TeleportSuitMod
                     if (minion == null) continue;
 
                     float distance = Vector3.Distance(rocketPos, minion.transform.position);
-                    LogUtils.LogDebug("RocketCabinRestriction", $"FilterMinionsForRocket：小人{minion.GetProperName()}，距离={distance}");
+                    LogUtils.LogDebug(ModuleName, $"小人{minion.GetProperName()}，距离={distance}");
 
                     // 扩大到50米，确保能覆盖
                     if (distance <= 50f)
                     {
                         filteredMinions.Add(minion);
-                        LogUtils.LogDebug("RocketCabinRestriction", $"FilterMinionsForRocket：添加小人{minion.GetProperName()}（距离{distance}米）");
+                        LogUtils.LogDebug(ModuleName, $"添加小人{minion.GetProperName()}（距离{distance}米）");
                     }
                 }
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"FilterMinionsForRocket异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"FilterMinionsForRocket异常：{e.Message}\n{e.StackTrace}");
             }
             return filteredMinions;
         }
@@ -558,25 +589,23 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"GetCabinWorldIdSafely异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"GetCabinWorldIdSafely异常：{e.Message}\n{e.StackTrace}");
                 return InvalidWorldId;
             }
         }
 
         private void InternalMarkCrewForCabin(int cabinWorldId, List<MinionIdentity> minions)
         {
-            LogUtils.LogDebug("RocketCabinRestriction", "进入InternalMarkCrewForCabin");
-
             // 前置判断
             if (cabinWorldId == InvalidWorldId)
             {
-                LogUtils.LogError("RocketCabinRestriction", "InternalMarkCrewForCabin：舱世界ID无效，返回");
+                LogUtils.LogError(ModuleName, "舱世界ID无效，返回");
                 return;
             }
 
             if (minions == null || minions.Count == 0)
             {
-                LogUtils.LogWarning("RocketCabinRestriction", "InternalMarkCrewForCabin：小人列表为空，返回");
+                LogUtils.LogWarning(ModuleName, "小人列表为空，返回");
                 return;
             }
 
@@ -586,34 +615,32 @@ namespace TeleportSuitMod
                 if (!_cabinStateCache.ContainsKey(cabinWorldId))
                 {
                     _cabinStateCache.Add(cabinWorldId, new CabinState(false, new HashSet<MinionIdentity>()));
-                    LogUtils.LogDebug("RocketCabinRestriction", $"InternalMarkCrewForCabin：新增舱{cabinWorldId}的状态");
+                    LogUtils.LogDebug(ModuleName, $"新增舱[{cabinWorldId}]记录");
                 }
 
                 var cabinState = _cabinStateCache[cabinWorldId];
-                LogUtils.LogDebug("RocketCabinRestriction", $"InternalMarkCrewForCabin：舱{cabinWorldId}当前召集列表数量={cabinState.AssignedCrewNames.Count}");
+                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]当前召集列表数量[{cabinState.AssignedCrew.Count}]");
 
                 // 遍历小人标记
                 foreach (var minion in minions)
                 {
                     if (minion == null) continue;
 
-                    cabinState.AssignedCrewNames.Add(minion);
+                    cabinState.AssignedCrew.Add(minion);
 
                     if (_minionToCabinMap != null)
                     {
                         _minionToCabinMap[minion] = cabinWorldId;
                     }
 
-                    LogUtils.LogDebug("RocketCabinRestriction", $"InternalMarkCrewForCabin：标记小人{minion.GetProperName()}到舱{cabinWorldId}");
+                    LogUtils.LogDebug(ModuleName, $"标记小人[{minion.GetProperName()}]到舱[{cabinWorldId}]");
                 }
 
-                // 更新召集状态为true
-                cabinState.IsSummoning = true;
-                LogUtils.LogDebug("RocketCabinRestriction", $"InternalMarkCrewForCabin：设置舱{cabinWorldId}的IsSummoning为true");
+                LogUtils.LogDebug(ModuleName, $"设置舱[{cabinWorldId}]的IsSummoning为[{cabinState.IsSummoning}]");
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"InternalMarkCrewForCabin异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"InternalMarkCrewForCabin异常：{e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
@@ -643,7 +670,7 @@ namespace TeleportSuitMod
             }
             catch (Exception e)
             {
-                LogUtils.LogError("RocketCabinRestriction", $"GetMinionCurrentWorldId异常：{e.Message}\n{e.StackTrace}");
+                LogUtils.LogError(ModuleName, $"GetMinionCurrentWorldId异常：{e.Message}\n{e.StackTrace}");
                 return InvalidWorldId;
             }
         }
@@ -663,13 +690,11 @@ namespace TeleportSuitMod
                 _lastCheckTime = Time.time;
                 try
                 {
-                    LogUtils.LogDebug("RocketCabinRestriction", "MinionUpdateChecker：开始检查小人变化");
                     CheckMinionChanges();
-                    LogUtils.LogDebug("RocketCabinRestriction", "MinionUpdateChecker：小人变化检查完成");
                 }
                 catch (Exception e)
                 {
-                    LogUtils.LogError("RocketCabinRestriction", $"MinionUpdateChecker异常：{e.Message}\n{e.StackTrace}");
+                    LogUtils.LogError(ModuleName, $"MinionUpdateChecker异常：{e.Message}\n{e.StackTrace}");
                 }
             }
 
@@ -678,7 +703,7 @@ namespace TeleportSuitMod
                 var allMinions = UnityEngine.Object.FindObjectsOfType<MinionIdentity>()
                     .Where(m => m != null)
                     .Take(50);
-                LogUtils.LogDebug("RocketCabinRestriction", $"MinionUpdateChecker：找到{allMinions.Count()}个小人");
+                LogUtils.LogDebug(ModuleName, $"找到{allMinions.Count()}个小人");
 
                 HashSet<MinionIdentity> currentMinions = new HashSet<MinionIdentity>();
                 foreach (var minion in allMinions)
@@ -692,7 +717,7 @@ namespace TeleportSuitMod
                     if (!_knownMinions.Contains(mm))
                     {
                         var minion = allMinions.FirstOrDefault(m => m == mm);
-                        LogUtils.LogDebug("RocketCabinRestriction", $"MinionUpdateChecker：新增小人{name}");
+                        LogUtils.LogDebug(ModuleName, $"新增小人{name}");
                         if (RocketCabinRestriction.Instance != null)
                         {
                             RocketCabinRestriction.Instance.OnMinionAdded(minion);
@@ -705,7 +730,7 @@ namespace TeleportSuitMod
                 {
                     if (!currentMinions.Contains(name) && RocketCabinRestriction.Instance != null)
                     {
-                        LogUtils.LogDebug("RocketCabinRestriction", $"MinionUpdateChecker：移除小人{name}");
+                        LogUtils.LogDebug(ModuleName, $"移除小人{name}");
                         RocketCabinRestriction.Instance.OnMinionRemoved(name);
                     }
                 }
