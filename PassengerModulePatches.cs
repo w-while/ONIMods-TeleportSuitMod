@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HarmonyLib;
+using STRINGS;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using HarmonyLib;
 using UnityEngine;
-using STRINGS;
+using static Operational;
 
 namespace TeleportSuitMod
 {
@@ -40,6 +41,7 @@ namespace TeleportSuitMod
                         {
                             isSummoning = true;
                         }
+                        sycMinionStat(passengerModule, isSummoning);
                         // 同步舱召集状态到RocketCabinRestriction
                         var worldContainer = passengerModule.GetComponent<ClustercraftExteriorDoor>().GetTargetWorld();
                         if (worldContainer != null)
@@ -54,6 +56,33 @@ namespace TeleportSuitMod
                     }
                 }
                 return true;
+            }
+            public static void sycMinionStat(PassengerRocketModule Cabin, bool isRestrict)
+            {
+                for (int i = 0; i < Components.LiveMinionIdentities.Count; i++)
+                {
+                    RefreshAccessStatus(Cabin, Components.LiveMinionIdentities[i], isRestrict);
+                }
+            }
+            private static void RefreshAccessStatus(PassengerRocketModule Cabin, MinionIdentity minion, bool restrict)
+            {
+                Component interiorDoor = Cabin.GetComponent<ClustercraftExteriorDoor>().GetInteriorDoor();
+                AccessControl component = Cabin.GetComponent<AccessControl>();
+                AccessControl component2 = interiorDoor.GetComponent<AccessControl>();
+                if (!restrict)
+                {
+                    component.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Both);
+                    component2.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Both);
+                    return;
+                }
+                if (Game.Instance.assignmentManager.assignment_groups[Cabin.GetComponent<AssignmentGroupController>().AssignmentGroupID].HasMember(minion.assignableProxy.Get()))
+                {
+                    component.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Both);
+                    component2.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Neither);
+                    return;
+                }
+                component.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Neither);
+                component2.SetPermission(minion.assignableProxy.Get(), AccessControl.Permission.Both);
             }
         }
         #endregion

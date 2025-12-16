@@ -92,7 +92,6 @@
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
     <Compile Include="SimDebugViewsPatches.cs" />
     <Compile Include="TeleportationOverlay.cs" />
-    <Compile Include="TeleportCabinConst.cs" />
     <Compile Include="TeleportChore.cs" />
     <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
