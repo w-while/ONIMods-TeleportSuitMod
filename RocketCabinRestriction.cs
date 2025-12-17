@@ -317,7 +317,7 @@ namespace TeleportSuitMod
         #endregion
 
         #region 舱状态管理
-        public void UpdateCabinSummonState(PassengerRocketModule cabinModule, int cabinWorldId, bool isSummoning)
+        public void UpdateCabinSummonState(int cabinWorldId, bool isSummoning)
         {
             if (!_isInitialized || cabinWorldId == InvalidWorldId) { return; }
             try
@@ -342,7 +342,7 @@ namespace TeleportSuitMod
                         _cabinStateCache.Add(cabinWorldId, new CabinState(isSummoning, new HashSet<MinionIdentity>()));
                     }
 
-                    LogUtils.LogDebug(ModuleName, $"舱世界ID[{cabinWorldId}]召集状态更新为：{isSummoning}");
+                    //LogUtils.LogDebug(ModuleName, $"舱世界ID[{cabinWorldId}]召集状态更新为：{isSummoning}");
                 }
             }
             catch (Exception e)
@@ -366,7 +366,6 @@ namespace TeleportSuitMod
                 if (_minionToCabinMap.ContainsKey(minion))
                 {
                     _minionToCabinMap.Remove(minion);
-                    LogUtils.LogDebug(ModuleName, $"清空小人[{minion.GetProperName()}]与舱[{cabinWorldId}]的映射");
                 }
             }
 
@@ -435,7 +434,7 @@ namespace TeleportSuitMod
 
                 // 打印分配的船员名单
                 string crewList = string.Join(", ", assignedMinions.Select(m => m.GetProperName()));
-                LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]分配船员：{crewList}");
+                //LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]分配船员：{crewList}");
 
                 // 标记分配的小人
                 Instance.InternalMarkCrewForCabin(cabinWorldId, assignedMinions);
@@ -447,7 +446,7 @@ namespace TeleportSuitMod
                     string finalCrewList = cabinState.AssignedCrew.Count > 0
                         ? string.Join(", ", cabinState.AssignedCrew.Select(m => m.GetProperName()))
                         : "无";
-                    LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]最终船员列表：{finalCrewList}");
+                    //LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]最终船员列表：{finalCrewList}");
                 }
 
             }
@@ -547,13 +546,13 @@ namespace TeleportSuitMod
                         // 2. 绑定小人-舱映射（覆盖旧映射）
                         if (_minionToCabinMap.ContainsKey(minion))
                         {
-                            LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]从旧舱[{_minionToCabinMap[minion]}]切换到新舱[{cabinWorldId}]");
+                            //LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]从旧舱[{_minionToCabinMap[minion]}]切换到新舱[{cabinWorldId}]");
                             _minionToCabinMap[minion] = cabinWorldId;
                         }
                         else
                         {
                             _minionToCabinMap.Add(minion, cabinWorldId);
-                            LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]绑定到舱[{cabinWorldId}]");
+                            //LogUtils.LogDebug(ModuleName, $"小人[{minion.GetProperName()}]绑定到舱[{cabinWorldId}]");
                         }
                     }
                 }
