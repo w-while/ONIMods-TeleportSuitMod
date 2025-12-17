@@ -16,9 +16,20 @@ namespace TeleportSuitMod
     public class TeleportSuitMod : KMod.UserMod2
     {
         static Harmony ModHarmony = null;
-
         public override void OnLoad(Harmony harmony)
         {
+            // 开发环境：输出所有日志
+            LogUtils.SetGlobalLogLevel(LogLevel.Debug);
+
+            // 发布环境：仅输出错误日志
+            // LogUtils.SetGlobalLogLevel(LogLevel.Error);
+
+            // 自定义模组前缀
+            LogUtils.ModPrefix = "[MyTeleportSuit]";
+            // 关闭错误日志的调用栈（减少日志长度）
+            LogUtils.EnableErrorStackTrace = false;
+            // 紧急调试：强制打印（不受配置影响）
+
             ModHarmony = harmony;
             base.OnLoad(harmony);
             PUtil.InitLibrary();
@@ -35,6 +46,7 @@ namespace TeleportSuitMod
             GameObject gameObject = new GameObject(nameof(TeleportSuitWorldCountManager));
             gameObject.AddComponent<TeleportSuitWorldCountManager>();
             gameObject.SetActive(true);
+
         }
         [PLibMethod(RunAt.BeforeDbInit)]
         internal static void BeforeDbInit()

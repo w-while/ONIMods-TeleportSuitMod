@@ -1,13 +1,24 @@
-﻿using System.Collections.Generic;
-using KSerialization;
+﻿using KSerialization;
 using STRINGS;
+using System;
+using System.Collections.Generic;
+using System.Security.AccessControl;
 using UnityEngine;
 
 namespace TeleportSuitMod
 {
-    [SerializationConfig(MemberSerialization.OptIn)]
-    public class TeleportSuitTank : KMonoBehaviour, IGameObjectEffectDescriptor
+    public class CabinTriggerData
     {
+        public int WorldID { get; set; }
+        public PassengerRocketModule Cabin { get; set; }
+    }
+    [DisallowMultipleComponent]
+    [SerializationConfig(MemberSerialization.OptIn)]
+    public class TeleportSuitTank : ModComponent, IGameObjectEffectDescriptor
+    {
+
+        protected override string ModuleName => "TeleportSuitTank";
+
         [Serialize]
         public float batteryCharge = 1f;
 
@@ -19,8 +30,12 @@ namespace TeleportSuitMod
 
         public Tag coolantTag;
 
-        private TeleportSuitMonitor.Instance teleportSuitMonitor;
+        private TeleportSuitMonitor.Instance _teleportSuitMonitor;
 
+        [MyCmpReq] private SuitTank suitTank;
+        [MyCmpReq] private Equippable equippable;
+
+        // 核心：Klei引擎标准事件委托
         private static readonly EventSystem.IntraObjectHandler<TeleportSuitTank> OnEquippedDelegate = new EventSystem.IntraObjectHandler<TeleportSuitTank>(delegate (TeleportSuitTank component, object data)
         {
             component.OnEquipped(data);
@@ -34,10 +49,36 @@ namespace TeleportSuitMod
         protected override void OnPrefabInit()
         {
             base.OnPrefabInit();
+
+        }
+
+        protected override void OnSpawn()
+        {
+            base.OnSpawn();
+
+        }
+        protected override void OnCleanUp()
+        {
+            base.OnCleanUp();
+        }
+        // 核心：注册装备事件映射
+        private void SubscribeToEquipEvents()
+        {
+
+            // 移除重复注册（避免多次OnPrefabInit导致重复）
+            UnsubscribeFromEquipEvents();
+
+            // 注册穿戴事件（Klei引擎标准方式）
             Subscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
             Subscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);
         }
+        // 取消装备事件映射
+        private void UnsubscribeFromEquipEvents()
+        {
 
+            Unsubscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
+            Unsubscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);
+        }
         public float PercentFull()
         {
             return batteryCharge;
@@ -65,19 +106,19 @@ namespace TeleportSuitMod
             list.Add(new Descriptor(text, text));
             return list;
         }
-
         private void OnEquipped(object data)
         {
+            //电池与氧气储量检查
             Equipment equipment = (Equipment)data;
             NameDisplayScreen.Instance.SetSuitBatteryDisplay(equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject(), PercentFull, bVisible: true);
-            teleportSuitMonitor = new TeleportSuitMonitor.Instance(this, equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject());
-            teleportSuitMonitor.StartSM();
+            _teleportSuitMonitor = new TeleportSuitMonitor.Instance(this, equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject());
+            _teleportSuitMonitor.StartSM();
             if (NeedsRecharging())
             {
                 equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject().AddTag(GameTags.SuitBatteryLow);
             }
-        }
 
+        }
         private void OnUnequipped(object data)
         {
             Equipment equipment = (Equipment)data;
@@ -87,11 +128,12 @@ namespace TeleportSuitMod
                 equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject().RemoveTag(GameTags.SuitBatteryOut);
                 NameDisplayScreen.Instance.SetSuitBatteryDisplay(equipment.GetComponent<MinionAssignablesProxy>().GetTargetGameObject(), null, bVisible: false);
             }
-            if (teleportSuitMonitor != null)
+            if (_teleportSuitMonitor != null)
             {
-                teleportSuitMonitor.StopSM("Removed teleportsuit tank");
-                teleportSuitMonitor = null;
+                _teleportSuitMonitor.StopSM("Removed teleportsuit tank");
+                _teleportSuitMonitor = null;
             }
         }
     }
+
 }
