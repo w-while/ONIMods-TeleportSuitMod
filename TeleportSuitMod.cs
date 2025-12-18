@@ -19,7 +19,7 @@ namespace TeleportSuitMod
         public override void OnLoad(Harmony harmony)
         {
             // 开发环境：输出所有日志
-            LogUtils.SetGlobalLogLevel(LogLevel.Warning);
+            LogUtils.SetGlobalLogLevel(LogLevel.Debug);
 
             // 发布环境：仅输出错误日志
             // LogUtils.SetGlobalLogLevel(LogLevel.Error);

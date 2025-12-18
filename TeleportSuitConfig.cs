@@ -22,6 +22,19 @@ namespace TeleportSuitMod
                 return interactAnim;
             }
         }
+        public static KAnimFile AstomStandAnim
+        {
+            get
+            {
+                if (astomstandAnim == null)
+                {
+                    astomstandAnim = Assets.GetAnim("astom_stand_kanim");
+                }
+                return astomstandAnim;
+            }
+        }
+
+        private static KAnimFile astomstandAnim = null;
         private static KAnimFile interactAnim = null;
         public static string ID = "Teleport_Suit";
         public static string WORN_ID = "Worn_Teleport_Suit";
@@ -37,6 +50,8 @@ namespace TeleportSuitMod
         public static float ATHLETICS = -8;
         public static readonly string ModuleName = "TeleportSuitConfig";
 
+        public static bool TeleportAnyWhere = true;
+        public KBatchedAnimController astomStandAnim;
         //private AttributeModifier expertAthleticsModifier;
 
         static CellOffset[] bounding_offsets = new CellOffset[2]
@@ -85,7 +100,8 @@ namespace TeleportSuitMod
             foreach (CellOffset offset in bounding_offsets)
             {
                 cell2 = Grid.OffsetCell(targetcell , offset);
-                if (!Grid.IsWorldValidCell(cell2) || !IsCellPassable(cell2 , true))
+                //虚空强者判断
+                if (!TeleportAnyWhere &&( !Grid.IsWorldValidCell(cell2) || !IsCellPassable(cell2 , true)))
                 {
                     return false;
                 }
@@ -95,6 +111,7 @@ namespace TeleportSuitMod
                     return false;
                 }
             }
+            if (TeleportAnyWhere) return true;
             //flag4 初次判断是落点是否有效，原系统方法
             if (GameNavGrids.FloorValidator.IsWalkableCell(targetcell , Grid.CellBelow(targetcell) , true) || Grid.HasLadder[targetcell] || Grid.HasPole[targetcell])
             {
@@ -244,9 +261,56 @@ namespace TeleportSuitMod
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
 
-        }
+            //astomStandAnim = this.AddTrackedAnim("jet", Assets.GetAnim("jetsuit_thruster_fx_kanim"), "loop", Grid.SceneLayer.Creatures, "snapTo_neck", true);
 
-    public string[] GetDlcIds()
+        }
+        //private KBatchedAnimController GetAssigneeController()
+        //{
+        //    Equippable component = base.GetComponent<Equippable>();
+        //    if (component.assignee != null)
+        //    {
+        //        GameObject assigneeGameObject = this.GetAssigneeGameObject(component.assignee);
+        //        if (assigneeGameObject)
+        //        {
+        //            return assigneeGameObject.GetComponent<KBatchedAnimController>();
+        //        }
+        //    }
+        //    return null;
+        //}
+        //private KBatchedAnimController AddTrackedAnim(string name, KAnimFile tracked_anim_file, string anim_clip, Grid.SceneLayer layer, string symbol_name, bool require_looping_sound = false)
+        //{
+        //    KBatchedAnimController assigneeController = this.GetAssigneeController();
+        //    if (assigneeController == null)
+        //    {
+        //        return null;
+        //    }
+        //    string name2 = assigneeController.name + "." + name;
+        //    GameObject gameObject = new GameObject(name2);
+        //    gameObject.SetActive(false);
+        //    gameObject.transform.parent = assigneeController.transform;
+        //    gameObject.AddComponent<KPrefabID>().PrefabTag = new Tag(name2);
+        //    KBatchedAnimController kbatchedAnimController = gameObject.AddComponent<KBatchedAnimController>();
+        //    kbatchedAnimController.AnimFiles = new KAnimFile[]
+        //    {
+        //    tracked_anim_file
+        //    };
+        //    kbatchedAnimController.initialAnim = anim_clip;
+        //    kbatchedAnimController.isMovable = true;
+        //    kbatchedAnimController.sceneLayer = layer;
+        //    if (require_looping_sound)
+        //    {
+        //        gameObject.AddComponent<LoopingSounds>();
+        //    }
+        //    gameObject.AddComponent<KBatchedAnimTracker>().symbol = symbol_name;
+        //    bool flag;
+        //    Vector3 position = assigneeController.GetSymbolTransform(symbol_name, out flag).GetColumn(3);
+        //    position.z = Grid.GetLayerZ(layer);
+        //    gameObject.transform.SetPosition(position);
+        //    gameObject.SetActive(true);
+        //    kbatchedAnimController.Play(anim_clip, KAnim.PlayMode.Loop, 1f, 0f);
+        //    return kbatchedAnimController;
+        //}
+        public string[] GetDlcIds()
         {
             //应该是让dlc和原版都可以使用
             return DlcManager.AVAILABLE_ALL_VERSIONS;

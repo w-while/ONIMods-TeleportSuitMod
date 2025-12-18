@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using FMOD;
+using HarmonyLib;
 using PeterHan.PLib.Detours;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace TeleportSuitMod
 {
@@ -299,22 +301,20 @@ namespace TeleportSuitMod
                         transition = new Navigator.ActiveTransition();
 
                         int reservedCell = ___reservedCell;
-                        KBatchedAnimController reactor_anim = __instance.GetComponent<KBatchedAnimController>();
+                        KBatchedAnimController minion_anim = __instance.GetComponent<KBatchedAnimController>();
+                        KAnimFile f = Assets.GetAnim("anim_teleport_suit_astom_stand_kanim");
+                        //KAnimFile f = Assets.GetAnim("anim_teleport_suit_teleporting_kanim");
                         Action<object> action = null;
 
                         //「强制修改小人坐标」+「重置导航状态」
                         action = delegate (object data)
                         {
-                            if (reactor_anim != null)
-                            {
-                                reactor_anim.PlaySpeedMultiplier = 1f;
-                            }
-                            if (__instance == null)
-                            {
-                                return;
-                            }
+                            if (minion_anim != null) minion_anim.PlaySpeedMultiplier = 1f;
+                            
+                            if (__instance == null) return;
+                            
                             // 移除传送动画覆盖
-                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
+                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(f);
                             // ========== 核心：瞬移到目标格子 ==========
                             // 计算目标格子的世界坐标（Bottom对齐，场景层25）
                             Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
@@ -322,35 +322,56 @@ namespace TeleportSuitMod
                             __instance.transform.SetPosition(position);
                             // ========== 重置导航状态（适配目标格子） ==========
                             // 若目标格子有梯子 → 切换为爬梯子状态
-                            if (Grid.HasLadder[reservedCell])
-                            {
-                                __instance.CurrentNavType = NavType.Ladder;
-                            }
-                            if (Grid.HasPole[reservedCell])
-                            {
-                                __instance.CurrentNavType = NavType.Pole;
-                            }
+                            if (Grid.HasLadder[reservedCell]) __instance.CurrentNavType = NavType.Ladder;
+                            
+                            if (Grid.HasPole[reservedCell]) __instance.CurrentNavType = NavType.Pole;
+                            
                             // 若为可走地面 → 切换为步行状态
-                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
-                            {
-                                __instance.CurrentNavType = NavType.Floor;
-                            }
+                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true)) __instance.CurrentNavType = NavType.Floor;
+                            
                             // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
                             // 取消动画回调订阅（避免内存泄漏）
                             __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
 
                         };
-
+                        
                         float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
+                        string play_anim = "working_pst";
                         if (PlaySpeedMultiplier != 0)
                         {
-                            // 播放传送动画（覆盖默认动画）
-                            reactor_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
-                            reactor_anim.PlaySpeedMultiplier = PlaySpeedMultiplier;
-                            //reactor_anim.Play("working_pre");
-                            reactor_anim.Queue("working_loop");
-                            reactor_anim.Queue("working_pst");
+                            
+                            if (f == null) LogUtils.LogDebug("Navi", "AstomStandAnim 动画集为空");
+                            
+                            minion_anim.AddAnimOverrides(f, 1f);
+
+                            if (!minion_anim.isActiveAndEnabled)
+                            {
+                                LogUtils.LogDebug("Navi", "动画组件未激活");
+                                minion_anim.enabled = true;
+                            }
+                            if (!minion_anim.HasAnimation(play_anim))LogUtils.LogDebug("Navi", $"{play_anim}不存在");
+                            KAnimFileData data = f.GetData();
+                            LogUtils.LogDebug("Navi", $"IsAnimLoaded：{f.IsAnimLoaded}  name：{data.name} elementCount：{data.elementCount}\n"+
+                                $"frameCount：{data.frameCount} animCount：{data.animCount} {play_anim} Frame: [{data.GetAnim(2).name}] hashname: {new HashedString(data.GetAnim(2).name)}\n"+
+                                $"build：{data.build} symbols.Length:{data.build.symbols.Length}");
+
+                            
+
+                            LogUtils.LogDebug("Navi", $"currentAnim :  {minion_anim.currentAnim} Anima Name:{minion_anim.GetAnim(minion_anim.currentAnim).name} minionName: {minion_anim.GetName()} currentFrame: {minion_anim.currentFrame}");
+
+                            minion_anim.SetLayer(0);
+                            minion_anim.SetElapsedTime(0f);
+                            minion_anim.Play(play_anim, KAnim.PlayMode.Once, PlaySpeedMultiplier, 0); // 最后一个参数是layer索引
+
+                            KAnim.Anim targetAnim = minion_anim.GetAnim(new HashedString("working_pst"));
+                            LogUtils.LogDebug("Navi", $"working_pst 总帧数：{targetAnim.numFrames} | 帧时长：{targetAnim.totalTime} | 帧率：{targetAnim.numFrames / targetAnim.totalTime}");
+                            LogUtils.LogDebug("Navi", $"当前帧104是否超出范围：{104 >= targetAnim.numFrames}");
+
+                            LogUtils.LogDebug("Navi", $"当前播放图层：{minion_anim.GetLayer()}");
+
+                            LogUtils.LogDebug("Navi", $"currentAnim :  {minion_anim.currentAnim} Anima Name:{minion_anim.GetAnim(minion_anim.currentAnim).name} minionName: {minion_anim.GetName()} currentFrame: {minion_anim.currentFrame}");
+
                             // 动画播放完成后执行瞬移逻辑
                             __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
 
@@ -365,6 +386,26 @@ namespace TeleportSuitMod
                         __instance.Stop();
                     }
                     return false;
+                }
+                return true;
+            }
+        }
+        //虚空强者
+        [HarmonyPatch(typeof(FallMonitor.Instance),nameof(FallMonitor.Instance.UpdateFalling))]
+        public static class FallMonitor_updateFalling_Pathes
+        {
+            private static readonly string ModuleName = "FallMonitor_updateFalling_Pathes";
+            public static bool Prefix(FallMonitor.Instance __instance)
+            {
+                if (__instance == null) return true;
+
+                FieldInfo navigatorField = AccessTools.Field(typeof(FallMonitor.Instance), "navigator");
+                if (navigatorField != null)
+                {
+                    Navigator navigator = (Navigator)navigatorField.GetValue(__instance);
+                    if (navigator != null && navigator.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags)) {
+                        return false;
+                    }
                 }
                 return true;
             }
