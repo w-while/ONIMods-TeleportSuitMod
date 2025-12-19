@@ -133,6 +133,16 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WOR
 msgid "A worn out <link=\"TELEPORTSUIT\">Teleport Suit</link>.\n\nSuits can be repaired at an <link=\"SUITFABRICATOR\">Exosuit Forge</link>."
 msgstr ""
 
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME"
+msgid "Repair Teleport Suit"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_DESC
+msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_DESC"
+msgid "Restore a <link=\"TELEPORTSUIT\">Worn Teleport Suit</link> to working order."
+msgstr ""
+
 #. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
 msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
 msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"

@@ -29,11 +29,12 @@ namespace TeleportSuitMod
         public static PathFinder.PotentialPath.Flags TeleportSuitFlags = (PathFinder.PotentialPath.Flags)32;//必须是2的幂且大于8
 
         public static int OXYGENCAPACITY = 75;
-        public static int SCALDING = 1000;
+        public static int SCALDING = 2000;
         public static float RADIATION_SHIELDING = 0.66f;
         public static float STRENGTH = 10f;
-        public static float INSULATION = 50f;
-        public static float THERMAL_CONDUCTIVITY_BARRIER = 0.3f;
+        public static float INSULATION = 100f;
+        public static float THERMAL_CONDUCTIVITY_BARRIER = 0.5f;
+        public static int LEADSUIT_SCOLDING = -1000;
         public static float ATHLETICS = -8;
         public static readonly string ModuleName = "TeleportSuitConfig";
 
@@ -124,16 +125,17 @@ namespace TeleportSuitMod
             //修改小人穿上服装之后的属性
             //运动-8
             //list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.ATHLETICS, ATHLETICS, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME));
-            //
+            //烫伤阈值
             list.Add(new AttributeModifier(Db.Get().Attributes.ScaldingThreshold.Id , (float) SCALDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
-            //list.Add(new AttributeModifier(Db.Get().Attributes.ScoldingThreshold.Id, (float)TUNING.EQUIPMENT.SUITS.LEADSUIT_SCOLDING, STRINGS.EQUIPMENT.PREFABS.LEAD_SUIT.NAME, false, false, true));
+            //冻伤阈值
+            list.Add(new AttributeModifier(Db.Get().Attributes.ScoldingThreshold.Id, (float)LEADSUIT_SCOLDING, STRINGS.EQUIPMENT.PREFABS.LEAD_SUIT.NAME, false, false, true));
             //辐射抗性
             list.Add(new AttributeModifier(Db.Get().Attributes.RadiationResistance.Id , RADIATION_SHIELDING , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
             //力量
             list.Add(new AttributeModifier(Db.Get().Attributes.Strength.Id , STRENGTH , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
             //隔热
             list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.INSULATION , INSULATION , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
-            //烫伤阈值
+            //隔热厚度
             list.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER , THERMAL_CONDUCTIVITY_BARRIER , TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.NAME, false, false, true));
 
             //技能减免

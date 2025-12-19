@@ -305,14 +305,10 @@ namespace TeleportSuitMod
                         //「强制修改小人坐标」+「重置导航状态」
                         action = delegate (object data)
                         {
-                            if (reactor_anim != null)
-                            {
-                                reactor_anim.PlaySpeedMultiplier = 1f;
-                            }
-                            if (__instance == null)
-                            {
-                                return;
-                            }
+                            if (reactor_anim != null)reactor_anim.PlaySpeedMultiplier = 1f;
+                            
+                            if (__instance == null)return;
+                            
                             // 移除传送动画覆盖
                             __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
                             // ========== 核心：瞬移到目标格子 ==========
@@ -322,19 +318,14 @@ namespace TeleportSuitMod
                             __instance.transform.SetPosition(position);
                             // ========== 重置导航状态（适配目标格子） ==========
                             // 若目标格子有梯子 → 切换为爬梯子状态
-                            if (Grid.HasLadder[reservedCell])
-                            {
-                                __instance.CurrentNavType = NavType.Ladder;
-                            }
-                            if (Grid.HasPole[reservedCell])
-                            {
-                                __instance.CurrentNavType = NavType.Pole;
-                            }
+                            if (Grid.HasLadder[reservedCell])__instance.CurrentNavType = NavType.Ladder;
+                            
+                            if (Grid.HasPole[reservedCell]) __instance.CurrentNavType = NavType.Pole;
+                            
                             // 若为可走地面 → 切换为步行状态
                             if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
-                            {
                                 __instance.CurrentNavType = NavType.Floor;
-                            }
+                            
                             // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
                             // 取消动画回调订阅（避免内存泄漏）

@@ -378,8 +378,8 @@ namespace TeleportSuitMod
                 navigator.CurrentNavType = NavType.Tube;
             else if (Grid.HasPole[cell])
                 navigator.CurrentNavType = NavType.Pole;
-            else if (Grid.IsSubstantialLiquid(cell))
-                navigator.CurrentNavType = NavType.Swim;
+            //else if (Grid.IsSubstantialLiquid(cell))
+            //    navigator.CurrentNavType = NavType.Swim;
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace TeleportSuitMod
                 return NavType.Floor;
             if (Grid.HasTube[cell]) return NavType.Tube;
             if (Grid.HasPole[cell]) return NavType.Pole;
-            if (Grid.IsSubstantialLiquid(cell)) return NavType.Swim;
+            //if (Grid.IsSubstantialLiquid(cell)) return NavType.Swim;
 
             return NavType.NumNavTypes;
         }

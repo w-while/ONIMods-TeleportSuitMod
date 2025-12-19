@@ -110,6 +110,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand_anim.bytes" />
+    <None Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand_build.bytes" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_anim.bytes" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_build.bytes" />
     <None Include="anim\assets\teleport_suit\teleport_suit_anim.bytes" />
@@ -127,9 +129,11 @@
     <None Include="mod.yaml" />
     <None Include="mod_info.yaml" />
     <None Include="translations\curr_mods_templates.pot" />
+    <None Include="translations\zh.mo" />
     <None Include="translations\zh.po" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand.png" />
     <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
