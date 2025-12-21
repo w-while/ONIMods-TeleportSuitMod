@@ -282,6 +282,20 @@ msgstr ""
 "影响传送速度，数值越高传送越快\n"
 "如果数值为零，立即传送"
 
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE"
+msgid "Walking Bounds"
+msgstr "步行边界"
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP"
+msgid ""
+"Note: This feature will cause some performance consumption.\n"
+"Walk instead of teleport within the set number of cells."
+msgstr ""
+"注意：这个功能会造成些许性能消耗\n"
+"在设定的格子内步行，不进行传送。"
+
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
 msgid "The number of times of teleport after a full charge"

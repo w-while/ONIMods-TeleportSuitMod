@@ -248,6 +248,17 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPOR
 msgid "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately"
 msgstr ""
 
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE"
+msgid "Walking Bounds"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP"
+msgid "Note: This feature will cause some performance consumption.\nWalk instead of teleport within the set number of cells."
+msgstr ""
+
+
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
 msgid "The number of times of teleport after a full charge"

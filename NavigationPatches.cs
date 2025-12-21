@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Epic.OnlineServices.Stats;
+using HarmonyLib;
 using PeterHan.PLib.Detours;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(MinionGroupProber), nameof(MinionGroupProber.IsReachable), new Type[] { typeof(int) })]
         public static class MinionGroupProber_IsReachable_AssumeLock_Patch
         {
+            private static readonly string ModuleName = "MinionGroupProberPatch";
             public static void Postfix(int cell, ref bool __result)
             {
                 //如果判定为无法常规到达，则开始判定是否能传送到达
@@ -55,11 +57,24 @@ namespace TeleportSuitMod
         [HarmonyPatch(new Type[] { typeof(int) })]//GetNavigationCost函数有重载，需要确定参数类型
         public static class Navigator_GetNavigationCost_Patch
         {
+            private static readonly string ModuleName = "NavigationCostPath";
             public static bool Prefix(Navigator __instance, int cell, ref int __result)
             {
                 if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
                     __result = -1;
+                    if (TeleNavigator.ShortRange > 0)
+                    {
+                        // 1. 获取PathGrid的原生ProberCells成本（ShortRange内已更新）
+                        int nativeCost = __instance.PathGrid.GetCost(cell);
+
+                        // 2. 判定：成本<ShortRange则使用原生Cost，否则用Tele逻辑
+                        if (nativeCost > 0 && nativeCost <= TeleNavigator.ShortRange && nativeCost != float.MaxValue)
+                        {
+                            __result = nativeCost; // 走原生寻路逻辑
+                            return false;
+                        }
+                    }
                     if (NavigatorWorldId.TryGetValue(__instance, out int id) && id != -1)
                     {
                         if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue
@@ -90,11 +105,45 @@ namespace TeleportSuitMod
                 return true;
             }
         }
+        [HarmonyPatch(typeof(Navigator), nameof(Navigator.GoTo), new Type[] {
+            typeof(KMonoBehaviour), typeof(CellOffset[]), typeof(NavTactic)
+        })]
+        public static class Navigator_GoTo_Patch
+        {
+            private static readonly string ModuleName = "NavigatorGoToPatch";
+            public static void Prefix(Navigator __instance, KMonoBehaviour target)
+            {
+                if (TeleNavigator.ShortRange <= 0) return;
+                if (__instance == null || target == null) return;
+
+                // 仅处理穿着Tele服的小人
+                if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0) return;
+
+                // 1. 获取初始目标单元格（稳定值，不受后续路径重算影响）
+                int initialTargetCell = Grid.PosToCell(target.transform.position);
+                // 2. 获取小人当前单元格（发起导航时的位置，而非移动过程中的位置）
+                int currentCell = __instance.cachedCell;
+
+                // 3. 计算初始目标与当前位置的距离（曼哈顿距离，适配ONI导航逻辑）
+                float distance = TeleportCore.GetManhattanDistance(currentCell, initialTargetCell);
+                // 4. 判定是否为短距离
+                bool isShortRange = distance <= TeleNavigator.ShortRange;
+
+                // 5. 缓存结果（加锁保证线程安全）
+                lock (TeleNavigator._naviTargetCacheLock) { 
+                    if (TeleNavigator.NavTargetCache.ContainsKey(__instance))
+                        TeleNavigator.NavTargetCache[__instance] = (initialTargetCell, isShortRange);
+                    else
+                        TeleNavigator.NavTargetCache.Add(__instance, (initialTargetCell, isShortRange));
+                }
+            }
+        }
 
         //取消穿着传送服的小人到各个格子的可达性更新（为了优化一点性能），并且记录小人的世界信息，
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.UpdateProbe), new Type[] { typeof(bool) })]
         public static class PathProber_UpdateProbe_Patch
         {
+            private static readonly string ModuleName = "UpdateProbePath";
             public static bool Prefix(Navigator __instance, bool forceUpdate = false)
             {
                 if (__instance == null) return true;
@@ -120,8 +169,8 @@ namespace TeleportSuitMod
                             NavigatorWorldId[__instance] = -1;
                         }
                     }
-
-                    return false;
+                    //核心: 步行边界设置后，需要始终调用UpdateProbe来更新ProberCells
+                    if(TeleNavigator.ShortRange <= 0) return false;
                 }
                 return true;
             }
@@ -133,6 +182,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
         public static class Navigator_RunQuery_Patch
         {
+            private static readonly string ModuleName = "RunQueryPatch";
             // 彻底简化：只保留“最近的可传送格子”或“目标格子是否可传送”
             static int maxCheckDistance = 30; // 进一步缩小范围（传送不需要远距寻路）
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
@@ -229,6 +279,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.AdvancePath))]
         public static class PathFinder_UpdatePath_Patch
         {
+            private static readonly string ModuleName = "AdvancePathPatch";
             public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
             {
                 if (__instance.target != null && __instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags) && Grid.PosToCell(__instance) != ___reservedCell)
@@ -237,7 +288,11 @@ namespace TeleportSuitMod
                     int targetWorldId = Grid.WorldIdx[target_position_cell];
                     int mycell = Grid.PosToCell(__instance);
                     //LogUtils.LogDebug("NaviP",$"TWID:{targetWorldId} T:{target_position_cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}" );
-
+                    //===关键逻辑：近距离内使用原生方法寻路
+                    if (TeleNavigator.ShortRange > 0 && TeleNavigator.IsInShortRange(__instance))
+                    {
+                        return true;
+                    }
                     //===== 新增：太空舱拦截逻辑（最优先判断）=====
                     if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
                     {
@@ -318,10 +373,10 @@ namespace TeleportSuitMod
                             __instance.transform.SetPosition(position);
                             // ========== 重置导航状态（适配目标格子） ==========
                             // 若目标格子有梯子 → 切换为爬梯子状态
-                            if (Grid.HasLadder[reservedCell])__instance.CurrentNavType = NavType.Ladder;
-                            
+                            if (Grid.HasLadder[reservedCell]) __instance.CurrentNavType = NavType.Ladder;
+
                             if (Grid.HasPole[reservedCell]) __instance.CurrentNavType = NavType.Pole;
-                            
+
                             // 若为可走地面 → 切换为步行状态
                             if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
                                 __instance.CurrentNavType = NavType.Floor;
