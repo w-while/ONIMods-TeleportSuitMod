@@ -182,7 +182,7 @@ namespace TeleportSuitMod
                         }
                     }
                     MinionResume component4 = targetGameObject2.GetComponent<MinionResume>();
-
+                    targetGameObject2.AddTag(GameTags.HasAirtightSuit);
                 }
             };
 
@@ -214,6 +214,7 @@ namespace TeleportSuitMod
                         }
                         Tag elementTag = eq.GetComponent<SuitTank>().elementTag;
                         eq.GetComponent<Storage>().DropUnlessHasTag(elementTag);
+                        targetGameObject.RemoveTag(GameTags.HasAirtightSuit);
                     }
                 }
             };
