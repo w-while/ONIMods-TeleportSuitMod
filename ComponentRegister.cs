@@ -53,7 +53,7 @@ namespace TeleportSuitMod
             ComplexRecipe.RecipeElement[] array30003 = new ComplexRecipe.RecipeElement[2]
             {
                     new ComplexRecipe.RecipeElement(TeleportSuitConfig.WORN_ID.ToTag(), 1f),
-                    new ComplexRecipe.RecipeElement(SimHashes.Ceramic.ToString(), 20f)
+                    new ComplexRecipe.RecipeElement(SimHashes.Ceramic.CreateTag(), 20f)
             };
             ComplexRecipe.RecipeElement[] array30004 = new ComplexRecipe.RecipeElement[1]
             {

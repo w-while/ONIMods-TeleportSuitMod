@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClusterTeleportBlocker.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="LogUtils.cs" />
     <Compile Include="ModComponent.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="SimDebugViewsPatches.cs" />
     <Compile Include="TeleNavigator.cs" />
     <Compile Include="TeleportationOverlay.cs" />
+    <Compile Include="TeleportBlockerManage.cs" />
     <Compile Include="TeleportChore.cs" />
     <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="WalkBouldsTeleportBlocker.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -124,13 +124,14 @@ namespace TeleportSuitMod
                 // 2. 获取小人当前单元格（发起导航时的位置，而非移动过程中的位置）
                 int currentCell = __instance.cachedCell;
 
-                // 3. 计算初始目标与当前位置的距离（曼哈顿距离，适配ONI导航逻辑）
-                float distance = TeleportCore.GetManhattanDistance(currentCell, initialTargetCell);
+                // 3. 计算初始目标与当前位置的距离
+                int distance = __instance.PathGrid.GetCost(initialTargetCell);
                 // 4. 判定是否为短距离
-                bool isShortRange = distance <= TeleNavigator.ShortRange;
+                bool isShortRange = distance != -1 ? distance <= TeleNavigator.ShortRange : false;
 
                 // 5. 缓存结果（加锁保证线程安全）
-                lock (TeleNavigator._naviTargetCacheLock) { 
+                lock (TeleNavigator._naviTargetCacheLock)
+                {
                     if (TeleNavigator.NavTargetCache.ContainsKey(__instance))
                         TeleNavigator.NavTargetCache[__instance] = (initialTargetCell, isShortRange);
                     else
@@ -170,7 +171,7 @@ namespace TeleportSuitMod
                         }
                     }
                     //核心: 步行边界设置后，需要始终调用UpdateProbe来更新ProberCells
-                    if(TeleNavigator.ShortRange <= 0) return false;
+                    if (TeleNavigator.ShortRange <= 0) return false;
                 }
                 return true;
             }
@@ -184,7 +185,7 @@ namespace TeleportSuitMod
         {
             private static readonly string ModuleName = "RunQueryPatch";
             // 彻底简化：只保留“最近的可传送格子”或“目标格子是否可传送”
-            static int maxCheckDistance = 30; // 进一步缩小范围（传送不需要远距寻路）
+            static int maxCheckDistance = 20; // 进一步缩小范围（传送不需要远距寻路）
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
             {
                 if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
@@ -287,31 +288,20 @@ namespace TeleportSuitMod
                     int target_position_cell = Grid.PosToCell(__instance.target);
                     int targetWorldId = Grid.WorldIdx[target_position_cell];
                     int mycell = Grid.PosToCell(__instance);
-                    //LogUtils.LogDebug("NaviP",$"TWID:{targetWorldId} T:{target_position_cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}" );
-                    //===关键逻辑：近距离内使用原生方法寻路
-                    if (TeleNavigator.ShortRange > 0 && TeleNavigator.IsInShortRange(__instance))
-                    {
-                        return true;
-                    }
-                    //===== 新增：太空舱拦截逻辑（最优先判断）=====
-                    if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
-                    {
-                        if (Grid.IsValidCell(target_position_cell))
-                        {
-                            // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
-                            if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
-                            {
-                                __instance.Stop();
-                                return false;
-                            }
-                        }
-                    }
-                    bool needTeleport = true;
+
                     if ((!Grid.IsValidCell(mycell)) || (!Grid.IsValidCell(target_position_cell)))
                     {
                         __instance.Stop();
                         return true;
                     }
+
+                    //===关键逻辑：Blockers
+                    if (TeleportBlockerManager.Instance != null && TeleportBlockerManager.Instance.IsTeleportBlocked(__instance, targetWorldId))
+                    {
+                        return true;
+                    }
+                    bool needTeleport = true;
+
                     for (int i = 0; i < __instance.targetOffsets.Length; i++)
                     {
                         int cell = Grid.OffsetCell(target_position_cell, __instance.targetOffsets[i]);
@@ -360,10 +350,10 @@ namespace TeleportSuitMod
                         //「强制修改小人坐标」+「重置导航状态」
                         action = delegate (object data)
                         {
-                            if (reactor_anim != null)reactor_anim.PlaySpeedMultiplier = 1f;
-                            
-                            if (__instance == null)return;
-                            
+                            if (reactor_anim != null) reactor_anim.PlaySpeedMultiplier = 1f;
+
+                            if (__instance == null) return;
+
                             // 移除传送动画覆盖
                             __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
                             // ========== 核心：瞬移到目标格子 ==========
@@ -380,7 +370,7 @@ namespace TeleportSuitMod
                             // 若为可走地面 → 切换为步行状态
                             if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true))
                                 __instance.CurrentNavType = NavType.Floor;
-                            
+
                             // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
                             // 取消动画回调订阅（避免内存泄漏）
@@ -477,173 +467,174 @@ namespace TeleportSuitMod
             {
                 //Depes or Bonic 判断
                 FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
-                    if (targetNavigatorField != null)
+                if (targetNavigatorField != null)
+                {
+                    Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
+                    if (TeleportCore.IsClusterTeleportEnabled(targetNavigator))
                     {
-                        Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
-                        if(TeleportCore.IsClusterTeleportEnabled(targetNavigator)){
-                            if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
-                            {
-                                //__result = CanBeReachByMinionGroup(target_cell);
-                                __result = true;
-                                return false;
-                            }
+                        if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
+                        {
+                            //__result = CanBeReachByMinionGroup(target_cell);
+                            __result = true;
+                            return false;
                         }
                     }
+                }
                 //如果是物体移动，那就走原逻辑
                 return true;
             }
         }
 
-    [HarmonyPatch]
-    public static class MoveToLocationTool_SetMoveToLocation_Patch
-    {
-        static MethodBase TargetMethod()
+        [HarmonyPatch]
+        public static class MoveToLocationTool_SetMoveToLocation_Patch
         {
-            return AccessTools.Method(
-                typeof(MoveToLocationTool),
-                "SetMoveToLocation",
-                new[] { typeof(int) }
-            );
-        }
-
-        [HarmonyPrefix]
-        public static bool Prefix(MoveToLocationTool __instance, int target_cell)
-        {
-            // 1. 空值防护：提前校验关键对象
-            if (__instance == null) return true;
-
-            // 2. 获取targetNavigator（保留你的逻辑+空值防护）
-            FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
-            if (targetNavigatorField == null) return true;
-
-            Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
-            if (targetNavigator == null || targetNavigator.gameObject == null) return true;
-
-            // 3. 仅处理穿传送服且启用集群传送的小人（保留你的逻辑）
-            if (!TeleportCore.IsClusterTeleportEnabled(targetNavigator)
-                || (targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
+            static MethodBase TargetMethod()
             {
+                return AccessTools.Method(
+                    typeof(MoveToLocationTool),
+                    "SetMoveToLocation",
+                    new[] { typeof(int) }
+                );
+            }
+
+            [HarmonyPrefix]
+            public static bool Prefix(MoveToLocationTool __instance, int target_cell)
+            {
+                // 1. 空值防护：提前校验关键对象
+                if (__instance == null) return true;
+
+                // 2. 获取targetNavigator（保留你的逻辑+空值防护）
+                FieldInfo targetNavigatorField = AccessTools.Field(typeof(MoveToLocationTool), "targetNavigator");
+                if (targetNavigatorField == null) return true;
+
+                Navigator targetNavigator = (Navigator)targetNavigatorField.GetValue(__instance);
+                if (targetNavigator == null || targetNavigator.gameObject == null) return true;
+
+                // 3. 仅处理穿传送服且启用集群传送的小人（保留你的逻辑）
+                if (!TeleportCore.IsClusterTeleportEnabled(targetNavigator)
+                    || (targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
+                {
+                    return true;
+                }
+
+                ChoreProvider choreProvider = null;
+                try
+                {
+                    // ========== 1. 安全获取ChoreProvider（避免空引用） ==========
+                    choreProvider = targetNavigator.GetComponent<ChoreProvider>();
+                    if (choreProvider != null)
+                    {
+                        // 清空当前小人的任务（仅自身，不影响其他）
+                        ClearMinionSelfChores(choreProvider);
+                    }
+
+                    // ========== 2. 构建传送任务数据（空值防护） ==========
+                    TeleportData teleportData = new TeleportData
+                    {
+                        navigator = targetNavigator,
+                        targetCell = target_cell
+                    };
+
+                    // 跨世界传送判断（保留你的逻辑+空值防护）
+                    if (TeleportCore.IsClusterWorldTargetValid(target_cell, out WorldContainer targetWorld, out Vector3 targetWorldPos))
+                    {
+                        if (targetWorld != null && targetWorldPos != Vector3.zero)
+                        {
+                            teleportData.targetWorld = targetWorld;
+                            teleportData.targetPos = targetWorldPos;
+                        }
+                    }
+
+                    // ========== 3. 安全创建并启动传送任务（核心修复：解决Context空引用） ==========
+                    IStateMachineTarget master = targetNavigator.GetComponent<IStateMachineTarget>();
+                    if (master != null && choreProvider != null)
+                    {
+                        TeleportChore teleportChore = new TeleportChore(master, teleportData);
+
+                        // 修复1：ChoreConsumerState不能传null，用默认值/空实例
+                        ChoreConsumer consumer = targetNavigator.GetComponent<ChoreConsumer>();
+                        ChoreConsumerState defaultConsumerState = new ChoreConsumerState(consumer); // 传当前小人的ChoreConsumer
+                                                                                                    // 修复2：Context构造函数参数补全，避免空引用
+                        Chore.Precondition.Context choreContext = new Chore.Precondition.Context(
+                            teleportChore,
+                            defaultConsumerState, // 替换null，使用默认状态
+                            false,
+                            null
+                        );
+
+                        // 先添加任务到队列，再启动
+                        choreProvider.AddChore(teleportChore);
+                        teleportChore.Begin(choreContext);
+
+                        // 同世界传送：更新预留格子（保留你的逻辑+空值防护）
+                        if (teleportData.targetWorld == null)
+                        {
+                            Traverse navTraverse = Traverse.Create(targetNavigator);
+                            int reservedCell = navTraverse.Field("reservedCell").GetValue<int>();
+                            if (TeleportCore.ExecuteTeleportForce(targetNavigator, target_cell, ref reservedCell))
+                            {
+                                navTraverse.Field("reservedCell").SetValue(reservedCell);
+                            }
+                        }
+
+                        return false;
+                    }
+                }
+                catch (NullReferenceException nullEx)
+                {
+                    // 精准捕获空引用异常，定位问题
+                    Debug.LogWarning($"[TelePortSuit] MoveTo 空引用错误：{nullEx.Message}\n涉及对象：ChoreProvider={(choreProvider == null ? "null" : "存在")}，Navigator={(targetNavigator == null ? "null" : targetNavigator.name)}");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[TelePortSuit] MoveTo 执行错误：{e.Message}\n{e.StackTrace}");
+                }
+
+                // 任何异常/失败，均走原生逻辑兜底
                 return true;
             }
 
-            ChoreProvider choreProvider = null;
-            try
+            /// <summary>
+            /// 仅清空当前小人自身的所有任务（封装为独立方法，便于维护）
+            /// </summary>
+            private static void ClearMinionSelfChores(ChoreProvider choreProvider)
             {
-                // ========== 1. 安全获取ChoreProvider（避免空引用） ==========
-                choreProvider = targetNavigator.GetComponent<ChoreProvider>();
-                if (choreProvider != null)
-                {
-                    // 清空当前小人的任务（仅自身，不影响其他）
-                    ClearMinionSelfChores(choreProvider);
-                }
+                if (choreProvider == null) return;
 
-                // ========== 2. 构建传送任务数据（空值防护） ==========
-                TeleportData teleportData = new TeleportData
+                // 1. 清空待执行任务队列（chores字段）
+                FieldInfo choresField = AccessTools.Field(typeof(ChoreProvider), "chores");
+                if (choresField != null)
                 {
-                    navigator = targetNavigator,
-                    targetCell = target_cell
-                };
-
-                // 跨世界传送判断（保留你的逻辑+空值防护）
-                if (TeleportCore.IsClusterWorldTargetValid(target_cell, out WorldContainer targetWorld, out Vector3 targetWorldPos))
-                {
-                    if (targetWorld != null && targetWorldPos != Vector3.zero)
+                    List<Chore> selfChores = choresField.GetValue(choreProvider) as List<Chore>;
+                    if (selfChores != null)
                     {
-                        teleportData.targetWorld = targetWorld;
-                        teleportData.targetPos = targetWorldPos;
-                    }
-                }
-
-                // ========== 3. 安全创建并启动传送任务（核心修复：解决Context空引用） ==========
-                IStateMachineTarget master = targetNavigator.GetComponent<IStateMachineTarget>();
-                if (master != null && choreProvider != null)
-                {
-                    TeleportChore teleportChore = new TeleportChore(master, teleportData);
-
-                    // 修复1：ChoreConsumerState不能传null，用默认值/空实例
-                    ChoreConsumer consumer = targetNavigator.GetComponent<ChoreConsumer>();
-                    ChoreConsumerState defaultConsumerState = new ChoreConsumerState(consumer); // 传当前小人的ChoreConsumer
-                     // 修复2：Context构造函数参数补全，避免空引用
-                    Chore.Precondition.Context choreContext = new Chore.Precondition.Context(
-                        teleportChore,
-                        defaultConsumerState, // 替换null，使用默认状态
-                        false,
-                        null
-                    );
-
-                    // 先添加任务到队列，再启动
-                    choreProvider.AddChore(teleportChore);
-                    teleportChore.Begin(choreContext);
-
-                    // 同世界传送：更新预留格子（保留你的逻辑+空值防护）
-                    if (teleportData.targetWorld == null)
-                    {
-                        Traverse navTraverse = Traverse.Create(targetNavigator);
-                        int reservedCell = navTraverse.Field("reservedCell").GetValue<int>();
-                        if (TeleportCore.ExecuteTeleportForce(targetNavigator, target_cell, ref reservedCell))
+                        for (int i = selfChores.Count - 1; i >= 0; i--)
                         {
-                            navTraverse.Field("reservedCell").SetValue(reservedCell);
+                            Chore chore = selfChores[i];
+                            if (chore != null && !chore.isNull)
+                            {
+                                chore.Cancel("TeleportPreempt");
+                                choreProvider.RemoveChore(chore);
+                            }
                         }
+                        selfChores.Clear();
                     }
-
-                    return false;
                 }
-            }
-            catch (NullReferenceException nullEx)
-            {
-                // 精准捕获空引用异常，定位问题
-                Debug.LogWarning($"[TelePortSuit] MoveTo 空引用错误：{nullEx.Message}\n涉及对象：ChoreProvider={(choreProvider == null ? "null" : "存在")}，Navigator={(targetNavigator == null ? "null" : targetNavigator.name)}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TelePortSuit] MoveTo 执行错误：{e.Message}\n{e.StackTrace}");
-            }
 
-            // 任何异常/失败，均走原生逻辑兜底
-            return true;
-        }
-
-        /// <summary>
-        /// 仅清空当前小人自身的所有任务（封装为独立方法，便于维护）
-        /// </summary>
-        private static void ClearMinionSelfChores(ChoreProvider choreProvider)
-        {
-            if (choreProvider == null) return;
-
-            // 1. 清空待执行任务队列（chores字段）
-            FieldInfo choresField = AccessTools.Field(typeof(ChoreProvider), "chores");
-            if (choresField != null)
-            {
-                List<Chore> selfChores = choresField.GetValue(choreProvider) as List<Chore>;
-                if (selfChores != null)
+                // 2. 终止当前执行的主动任务（activeChore字段）
+                FieldInfo activeChoreField = AccessTools.Field(typeof(ChoreProvider), "activeChore");
+                if (activeChoreField != null)
                 {
-                    for (int i = selfChores.Count - 1; i >= 0; i--)
+                    Chore activeChore = activeChoreField.GetValue(choreProvider) as Chore;
+                    if (activeChore != null && !activeChore.isNull)
                     {
-                        Chore chore = selfChores[i];
-                        if (chore != null && !chore.isNull)
-                        {
-                            chore.Cancel("TeleportPreempt");
-                            choreProvider.RemoveChore(chore);
-                        }
+                        activeChore.Cancel("TeleportPreempt");
+                        activeChoreField.SetValue(choreProvider, null);
                     }
-                    selfChores.Clear();
-                }
-            }
-
-            // 2. 终止当前执行的主动任务（activeChore字段）
-            FieldInfo activeChoreField = AccessTools.Field(typeof(ChoreProvider), "activeChore");
-            if (activeChoreField != null)
-            {
-                Chore activeChore = activeChoreField.GetValue(choreProvider) as Chore;
-                if (activeChore != null && !activeChore.isNull)
-                {
-                    activeChore.Cancel("TeleportPreempt");
-                    activeChoreField.SetValue(choreProvider, null);
                 }
             }
         }
     }
-}
 
 
 }
