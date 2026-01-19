@@ -14,7 +14,7 @@ namespace TeleportSuitMod
     [SerializationConfig(MemberSerialization.OptIn)]
     [AddComponentMenu("TeleportSuitMod/RocketCabinRestriction")]
     [RequireComponent(typeof(KPrefabID))]
-    public class RocketCabinRestriction : KMonoBehaviour, IRender1000ms
+    public class RocketCabinRestriction : KMonoBehaviour, IRender1000ms, ITeleportBlocker
     {
         [Serialize]
         private Dictionary<int, CabinState> _cabinStateCache;
@@ -619,6 +619,21 @@ namespace TeleportSuitMod
             {
                 LogUtils.LogError(ModuleName, $"RefreshAllMinionCabinMapping异常：{e.Message}\n{e.StackTrace}");
             }
+        }
+
+        public bool ShouldBlockTeleport(Navigator navigator, int targetWorldId)
+        {
+            int mycell = Grid.PosToCell(navigator);
+            //===== 新增：太空舱拦截逻辑（最优先判断）=====
+            if (targetWorldId != Grid.WorldIdx[mycell] && navigator.TryGetComponent<MinionIdentity>(out var minion))
+            {
+                // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
+                if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, targetWorldId))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
     }

@@ -251,6 +251,62 @@ namespace TeleportSuitMod
             return null;
         }
         /// <summary>
+        /// 验证跨世界目标合法性
+        /// </summary>
+        public static bool IsClusterWorldTargetValid(int targetCell, out WorldContainer targetWorld, out Vector3 targetWorldPos)
+        {
+            targetWorld = null;
+            targetWorldPos = Vector3.zero;
+
+            // 1. 基础校验：目标格子有效
+            if (!Grid.IsValidCell(targetCell)) return false;
+
+            // 2. 获取目标世界索引
+            byte targetWorldIdx = Grid.WorldIdx[targetCell];
+            LogUtils.LogDebug(ModuleName, $"targetWorldIdx:{targetWorldIdx}");
+            if (targetWorldIdx == byte.MaxValue) return false;
+
+            // 3. 通过ClusterManager获取目标世界容器（强校验：世界必须存在且激活）
+            targetWorld = ClusterManager.Instance?.GetWorld(targetWorldIdx);
+            if (targetWorld == null || !targetWorld.isActiveAndEnabled) return false;
+
+            // 4. 计算目标世界内的世界坐标（仅跨世界时生效）
+            targetWorldPos = Grid.CellToPos(targetCell, CellAlignment.Bottom, Grid.SceneLayer.Move);
+
+
+            return true;
+        }
+
+        public static int GetManhattanDistance(int cellA, int cellB)
+        {
+            if (!Grid.IsValidCell(cellA) || !Grid.IsValidCell(cellB))
+                return int.MaxValue;
+
+            int x1, y1, x2, y2;
+            Grid.CellToXY(cellA, out x1, out y1);
+            Grid.CellToXY(cellB, out x2, out y2);
+
+            return Mathf.Abs(x1 - x2) + Mathf.Abs(y1 - y2);
+        }
+        /// <summary>
+        /// 根据格子属性获取导航类型
+        /// </summary>
+        public static NavType GetNavTypeForCell(int cell)
+        {
+            if (!Grid.IsValidCell(cell))
+                return NavType.NumNavTypes;
+
+            if (Grid.HasLadder[cell]) return NavType.Ladder;
+            if (Grid.HasPole[cell]) return NavType.Pole;
+            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
+                return NavType.Floor;
+            if (Grid.HasTube[cell]) return NavType.Tube;
+            if (Grid.HasPole[cell]) return NavType.Pole;
+            //if (Grid.IsSubstantialLiquid(cell)) return NavType.Swim;
+
+            return NavType.NumNavTypes;
+        }
+        /// <summary>
         /// 通过小人获取其穿戴的传送服组件
         /// </summary>
         /// <param name="minion">目标小人（MinionIdentity）</param>

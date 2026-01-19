@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClusterTeleportBlocker.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="LogUtils.cs" />
     <Compile Include="ModComponent.cs" />
@@ -91,7 +92,9 @@
     <Compile Include="SanchozzONIMods.Lib\KAnimGroupManager.cs" />
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
     <Compile Include="SimDebugViewsPatches.cs" />
+    <Compile Include="TeleNavigator.cs" />
     <Compile Include="TeleportationOverlay.cs" />
+    <Compile Include="TeleportBlockerManage.cs" />
     <Compile Include="TeleportChore.cs" />
     <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
@@ -106,6 +109,7 @@
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="WalkBouldsTeleportBlocker.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +135,7 @@
     <None Include="mod.yaml" />
     <None Include="mod_info.yaml" />
     <None Include="translations\curr_mods_templates.pot" />
+    <None Include="translations\zh.mo" />
     <None Include="translations\zh.po" />
   </ItemGroup>
   <ItemGroup>

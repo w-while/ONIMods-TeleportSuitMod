@@ -34,6 +34,9 @@ namespace TeleportSuitMod
 ;
                     public static LocString RECIPE_DESC = "Allowing Duplicants to teleport，and provides the protection as " + STRINGS.EQUIPMENT.PREFABS.LEAD_SUIT.NAME
 ;
+                    public static LocString REPAIR_WORN_DESC = "Restore a " + STRINGS.UI.FormatAsLink("Worn Teleport Suit", TeleportSuitConfig.ID) + " to working order.";
+
+
                     public static LocString GENERICNAME = "Teleport Suit";
 
                     public static LocString BATTERY_EFFECT_NAME = "Teleport Suit Battery";
@@ -41,6 +44,7 @@ namespace TeleportSuitMod
                     public static LocString SUIT_OUT_OF_BATTERIES = "Teleport Suit Batteries Empty";
 
                     public static LocString WORN_NAME = STRINGS.UI.FormatAsLink("Worn Teleport Suit" , TeleportSuitConfig.ID);
+                    public static LocString REPAIR_WORN_RECIPE_NAME = "Repair Teleport Suit";
 
                     public static LocString WORN_DESC = "A worn out " + STRINGS.UI.FormatAsLink("Teleport Suit" , TeleportSuitConfig.ID) + ".\n\nSuits can be repaired at an " + STRINGS.UI.FormatAsLink("Exosuit Forge" , "SUITFABRICATOR") + "."
 ;
@@ -81,6 +85,8 @@ namespace TeleportSuitMod
                     public static LocString TELEPORT_SPEED_MULTIPLIER_TOOLTIP = "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately";
                     public static LocString CLUSTER_TELEPORT_BY_MOVETO_TITLE = "Teleport to other colony";
                     public static LocString CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP = "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton";
+                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TITLE = "Walking Bounds";
+                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TOOLTIP = "Note: This feature will cause some performance consumption.\nWalk instead of teleport within the set number of cells.";
 
                 }
             }

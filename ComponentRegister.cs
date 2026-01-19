@@ -1,5 +1,6 @@
 ﻿using Database;
 using HarmonyLib;
+using Klei.AI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeleportSuitMod.PeterHan.BulkSettingsChange;
 using TeleportSuitMod.SanchozzONIMods.Lib;
+using UnityEngine;
 using static ComplexRecipe;
 
 namespace TeleportSuitMod
@@ -23,11 +25,16 @@ namespace TeleportSuitMod
         public static void Postfix()
         {
             int index = 7;
-            //传送服配方：钨 200f + 钻石 50f
+            //传送服配方：陶瓷/隔热质 200 + 钨 50 + 铅 50
             ComplexRecipe.RecipeElement[] array30001 = new ComplexRecipe.RecipeElement[]
             {
-                new ComplexRecipe.RecipeElement(SimHashes.Tungsten.CreateTag(), 200f),
-                new ComplexRecipe.RecipeElement(SimHashes.Diamond.CreateTag(), 50f)
+                new ComplexRecipe.RecipeElement(new Tag[]{SimHashes.Ceramic.CreateTag(),SimHashes.SuperInsulator.CreateTag() }, 200f),
+                new ComplexRecipe.RecipeElement(new Tag[]
+                {
+                    SimHashes.Tungsten.CreateTag()
+                }, 50f),
+                new ComplexRecipe.RecipeElement(SimHashes.Lead.CreateTag(), 50f)
+                //BasicFabric/FeatherFabric
             };
             ComplexRecipe.RecipeElement[] array30002 = new ComplexRecipe.RecipeElement[]
             {
@@ -38,29 +45,30 @@ namespace TeleportSuitMod
             {
                 time = 20,
                 description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC,
-                nameDisplay = ComplexRecipe.RecipeNameDisplay.ResultWithIngredient,
+                nameDisplay = ComplexRecipe.RecipeNameDisplay.Result,
                 fabricators = new List<Tag> { "SuitFabricator" },
                 sortOrder = index++
             };
-            //维修配方：损坏传送服 1 + 钻石 20
+            //维修配方：损坏传送服 1 + 陶瓷 20
             ComplexRecipe.RecipeElement[] array30003 = new ComplexRecipe.RecipeElement[2]
             {
                     new ComplexRecipe.RecipeElement(TeleportSuitConfig.WORN_ID.ToTag(), 1f),
-                    new ComplexRecipe.RecipeElement(SimHashes.Diamond.ToString(), 20f)
+                    new ComplexRecipe.RecipeElement(SimHashes.Ceramic.CreateTag(), 20f)
             };
             ComplexRecipe.RecipeElement[] array30004 = new ComplexRecipe.RecipeElement[1]
             {
                     new ComplexRecipe.RecipeElement(TeleportSuitConfig.ID.ToTag(), 1f, ComplexRecipe.RecipeElement.TemperatureOperation.Heated)
             };
-            TeleportSuitConfig.recipe = new ComplexRecipe(ComplexRecipeManager.MakeRecipeID("SuitFabricator", array30003, array30004), array30003, array30004)
+            ComplexRecipe complexRecipe = new ComplexRecipe(ComplexRecipeManager.MakeRecipeID("SuitFabricator", array30003, array30004), array30003, array30004)
             {
                 time = TUNING.EQUIPMENT.SUITS.ATMOSUIT_FABTIME,
-                description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.RECIPE_DESC,
-                nameDisplay = ComplexRecipe.RecipeNameDisplay.ResultWithIngredient,
+                description = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_DESC,
+                nameDisplay = ComplexRecipe.RecipeNameDisplay.Custom,
                 fabricators = new List<Tag> { "SuitFabricator" },
                 requiredTech = TeleportSuitStrings.TechString,
                 sortOrder = index++
             };
+            complexRecipe.customName = TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME;
         }
     }
 

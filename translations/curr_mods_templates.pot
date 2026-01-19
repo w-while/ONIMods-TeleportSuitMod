@@ -133,6 +133,16 @@ msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WOR
 msgid "A worn out <link=\"TELEPORTSUIT\">Teleport Suit</link>.\n\nSuits can be repaired at an <link=\"SUITFABRICATOR\">Exosuit Forge</link>."
 msgstr ""
 
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME
+msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME"
+msgid "Repair Teleport Suit"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_DESC
+msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_DESC"
+msgid "Restore a <link=\"TELEPORTSUIT\">Worn Teleport Suit</link> to working order."
+msgstr ""
+
 #. TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME
 msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.WORN_NAME"
 msgid "<link=\"TELEPORTSUIT\">Worn Teleport Suit</link>"
@@ -237,6 +247,17 @@ msgstr ""
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_SPEED_MULTIPLIER_TOOLTIP"
 msgid "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately"
 msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE"
+msgid "Walking Bounds"
+msgstr ""
+
+#. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP
+msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP"
+msgid "Note: This feature will cause some performance consumption.\nWalk instead of teleport within the set number of cells."
+msgstr ""
+
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE"
