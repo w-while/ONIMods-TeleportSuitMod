@@ -66,8 +66,11 @@ namespace TeleportSuitMod
         }
         public static bool IsInShortRange(Navigator __instance)
         {
-            if (!TeleNavigator.NavTargetCache.TryGetValue(__instance, out var cacheData))
+            if (!TeleNavigator.NavTargetCache.TryGetValue(__instance, out var cacheData)){
+                LogUtils.LogDebug("TeleNavigator", $"导航器 {__instance.GetHashCode()} 未命中缓存，默认非短距离");
                 return false;
+            }
+            LogUtils.LogDebug("TeleNavigator", $"导航器 {__instance.GetHashCode()} 命中缓存,短距离:[{cacheData.isShortRange}]");
             if (cacheData.isShortRange) return true;
             return false;
         }
@@ -82,6 +85,35 @@ namespace TeleportSuitMod
             // 曼哈顿距离（ONI导航优先走直线，比欧氏距离更适配）
             float distance = Mathf.Abs(rootPos.x - targetPos.x) + Mathf.Abs(rootPos.y - targetPos.y);
             return distance <= ShortRange;
+        }
+        public static bool isTeleMiniom(Navigator navigator)
+        {
+            return navigator != null && navigator.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags);
+        }
+        /// <summary>
+        /// 根据格子属性获取导航类型
+        /// </summary>
+        public static NavType GetNavTypeForCell(int cell)
+        {
+            if (!Grid.IsValidCell(cell))
+                return NavType.NumNavTypes;
+
+            if (Grid.HasLadder[cell]) return NavType.Ladder;
+            if (Grid.HasPole[cell]) return NavType.Pole;
+            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
+                return NavType.Floor;
+            if (Grid.HasTube[cell]) return NavType.Tube;
+
+            return NavType.NumNavTypes;
+        }
+        public static void resetNavType(Navigator navigator,int cell)
+        {
+            if (navigator == null) return;
+            if (Grid.HasLadder[cell]) navigator.CurrentNavType = NavType.Ladder;
+            if (Grid.HasPole[cell]) navigator.CurrentNavType = NavType.Pole;
+            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
+                navigator.CurrentNavType = NavType.Floor;
+            if (Grid.HasTube[cell]) navigator.CurrentNavType = NavType.Tube;
         }
     }
 }

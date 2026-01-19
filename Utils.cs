@@ -238,17 +238,23 @@ namespace TeleportSuitMod
             LogUtils.LogWarning(ModuleName, $"未找到InstanceID[{instanceId}]的小人");
             return null;
         }
-        public static MinionIdentity GetMinionFromEquippable(Equippable eq)
+        public static GameObject GetAssigneeGameObject(IAssignableIdentity ass_id)
         {
-            if (eq?.assignee == null) return null;
-
-            // 方式1：通过AssignableProxy获取
-            if (eq.assignee is MinionAssignablesProxy proxy)
+            GameObject result = null;
+            MinionAssignablesProxy minionAssignablesProxy = ass_id as MinionAssignablesProxy;
+            if (minionAssignablesProxy)
             {
-                return proxy.GetTargetGameObject()?.GetComponent<MinionIdentity>();
+                result = minionAssignablesProxy.GetTargetGameObject();
             }
-
-            return null;
+            else
+            {
+                MinionIdentity minionIdentity = ass_id as MinionIdentity;
+                if (minionIdentity)
+                {
+                    result = minionIdentity.gameObject;
+                }
+            }
+            return result;
         }
         /// <summary>
         /// 验证跨世界目标合法性
@@ -289,24 +295,6 @@ namespace TeleportSuitMod
             return Mathf.Abs(x1 - x2) + Mathf.Abs(y1 - y2);
         }
         /// <summary>
-        /// 根据格子属性获取导航类型
-        /// </summary>
-        public static NavType GetNavTypeForCell(int cell)
-        {
-            if (!Grid.IsValidCell(cell))
-                return NavType.NumNavTypes;
-
-            if (Grid.HasLadder[cell]) return NavType.Ladder;
-            if (Grid.HasPole[cell]) return NavType.Pole;
-            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
-                return NavType.Floor;
-            if (Grid.HasTube[cell]) return NavType.Tube;
-            if (Grid.HasPole[cell]) return NavType.Pole;
-            //if (Grid.IsSubstantialLiquid(cell)) return NavType.Swim;
-
-            return NavType.NumNavTypes;
-        }
-        /// <summary>
         /// 通过小人获取其穿戴的传送服组件
         /// </summary>
         /// <param name="minion">目标小人（MinionIdentity）</param>
@@ -336,6 +324,32 @@ namespace TeleportSuitMod
             }
             return suitTank;
         }
-
+        private static void SetField(object obj, string name, object value)
+        {
+            if (obj == null) return;
+            var field = obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null)
+                field.SetValue(obj, value);
+        }
+        public static bool GetField(object obj, string name, out object result)
+        {
+            result = null;
+            if (obj == null) return false;
+            var field = obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null)
+            {
+                result = field.GetValue(obj);
+                return true;
+            }
+            return false;
+        }
+        public static void InvokeMethod(object obj, string name, out object result,params object[] args)
+        {
+            result = null;
+            if (obj == null) return;
+            var types = args == null ? Type.EmptyTypes : Array.ConvertAll(args, a => a?.GetType() ?? typeof(object));
+            var method = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, types, null);
+            result = method?.Invoke(obj, args);
+        }
     }
 }

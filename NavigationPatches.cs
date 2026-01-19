@@ -1,5 +1,3 @@
-﻿using FMOD;
-﻿using Epic.OnlineServices.Stats;
 using HarmonyLib;
 using PeterHan.PLib.Detours;
 using System;
@@ -10,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
+using static STRINGS.INPUT_BINDINGS;
 
 namespace TeleportSuitMod
 {
@@ -55,21 +55,20 @@ namespace TeleportSuitMod
         }
 
         //修改穿着传送服的小人到各个格子的可达性,影响小人获取任务等等
-        [HarmonyPatch(typeof(Navigator), nameof(Navigator.GetNavigationCost))]
-        [HarmonyPatch(new Type[] { typeof(int) })]//GetNavigationCost函数有重载，需要确定参数类型
+        [HarmonyPatch(typeof(Navigator), nameof(Navigator.GetNavigationCost), new Type[] { typeof(int) })]
         public static class Navigator_GetNavigationCost_Patch
         {
             private static readonly string ModuleName = "NavigationCostPath";
             public static bool Prefix(Navigator __instance, int cell, ref int __result)
             {
-                if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
+                if (!TeleNavigator.isTeleMiniom(__instance))//穿着传送服
                 {
                     __result = -1;
                     if (TeleNavigator.ShortRange > 0)
                     {
                         // 1. 获取PathGrid的原生ProberCells成本（ShortRange内已更新）
                         int nativeCost = __instance.PathGrid.GetCost(cell);
-
+                        
                         // 2. 判定：成本<ShortRange则使用原生Cost，否则用Tele逻辑
                         if (nativeCost > 0 && nativeCost <= TeleNavigator.ShortRange && nativeCost != float.MaxValue)
                         {
@@ -84,11 +83,8 @@ namespace TeleportSuitMod
                                 && ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId == id
                                 && TeleportSuitConfig.CanTeloportTo(cell))
                         {
-                            //int target_position_cell = Grid.PosToCell(__instance.target);
                             int targetWorldId = Grid.WorldIdx[cell];
                             int mycell = Grid.PosToCell(__instance);
-                            //LogUtils.LogDebug("NaviP", $"TWID:{targetWorldId} T:{cell} MWID:{Grid.WorldIdx[mycell]} M:{mycell}");
-
                             //===== 新增：太空舱拦截逻辑（最优先判断）=====
                             if (targetWorldId != Grid.WorldIdx[mycell] && __instance.TryGetComponent<MinionIdentity>(out var minion))
                             {
@@ -113,21 +109,22 @@ namespace TeleportSuitMod
         public static class Navigator_GoTo_Patch
         {
             private static readonly string ModuleName = "NavigatorGoToPatch";
-            public static void Prefix(Navigator __instance, KMonoBehaviour target)
+            public static void Prefix(Navigator __instance, KMonoBehaviour target, CellOffset[] offsets, NavTactic tactic)
             {
                 if (TeleNavigator.ShortRange <= 0) return;
                 if (__instance == null || target == null) return;
 
                 // 仅处理穿着Tele服的小人
-                if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0) return;
+                if (!TeleNavigator.isTeleMiniom(__instance)) return;
 
                 // 1. 获取初始目标单元格（稳定值，不受后续路径重算影响）
-                int initialTargetCell = Grid.PosToCell(target.transform.position);
+                int initialTargetCell = Grid.PosToCell(target);
                 // 2. 获取小人当前单元格（发起导航时的位置，而非移动过程中的位置）
                 int currentCell = __instance.cachedCell;
 
                 // 3. 计算初始目标与当前位置的距离
-                int distance = __instance.PathGrid.GetCost(initialTargetCell);
+                int cellPrefernce = tactic.GetCellPreferences(currentCell,offsets,__instance);
+                int distance = __instance.PathGrid.GetCost(cellPrefernce);
                 // 4. 判定是否为短距离
                 bool isShortRange = distance != -1 ? distance <= TeleNavigator.ShortRange : false;
 
@@ -149,12 +146,13 @@ namespace TeleportSuitMod
             private static readonly string ModuleName = "UpdateProbePath";
             public static bool Prefix(Navigator __instance, bool forceUpdate = false)
             {
+                //LogUtils.LogDebug("NaviP",$"forceUpdate:[{forceUpdate}] executePathProbeTaskAsync: [{__instance.executePathProbeTaskAsync}]");
                 if (__instance == null) return true;
 
                 int cell = Grid.PosToCell(__instance.gameObject.transform.position);
-                if (Grid.IsValidCell(cell) && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)
+                if (Grid.IsValidCell(cell) && TeleNavigator.isTeleMiniom(__instance))
                 {
-                    if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue)
+                    if (Grid.WorldIdx[cell] != byte.MaxValue)
                     {
                         //线程安全
                         lock (NavigatorWorldId)
@@ -179,8 +177,6 @@ namespace TeleportSuitMod
             }
         }
 
-
-
         //修改穿着传送服的小人RunQuery的方式
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
         public static class Navigator_RunQuery_Patch
@@ -190,6 +186,7 @@ namespace TeleportSuitMod
             static int maxCheckDistance = 20; // 进一步缩小范围（传送不需要远距寻路）
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
             {
+                LogUtils.LogDebug("Navigator_RunQuery_Patch","RunQuery Prefix");
                 if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
                     return true;
 
@@ -224,53 +221,39 @@ namespace TeleportSuitMod
             {
                 try
                 {
-                    // 方式1：反射获取targetCell字段
-                    var targetCellField = query.GetType().GetField(
-                        "targetCell",
-                        BindingFlags.NonPublic | BindingFlags.Instance
-                    );
-                    if (targetCellField != null)
-                    {
-                        int targetCell = (int)targetCellField.GetValue(query);
-                        if (Grid.IsValidCell(targetCell))
-                            return targetCell;
-                    }
-
-                    // 方式2：兼容其他字段名
-                    string[] possibleFields = new[] { "goalCell", "destinationCell", "m_TargetCell" };
+                    int targetCell = -1;
+                    //反射获取targetCell字段
+                    string[] possibleFields = new[] { "targetCell", "goalCell", "destinationCell", "m_TargetCell" };
                     foreach (var fieldName in possibleFields)
                     {
-                        var field = query.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-                        if (field != null)
+                        object targetCellObj;
+                        if (Utils.GetField(query, fieldName, out targetCellObj))
                         {
-                            int targetCell = (int)field.GetValue(query);
-                            if (Grid.IsValidCell(targetCell))
-                                return targetCell;
+                            if (targetCellObj != null) return (int)targetCellObj;
+                            else return -1;
                         }
                     }
-
-                    // 方式3：从Navigator的target解析
+                    //从Navigator的target解析
                     if (navigator.target != null)
                     {
-                        int rootTargetCell = Grid.PosToCell(navigator.target);
-                        if (!Grid.IsValidCell(rootTargetCell))
+                        targetCell = Grid.PosToCell(navigator.target);
+                        if (!Grid.IsValidCell(targetCell))
                             return Grid.PosToCell(navigator);
 
-                        foreach (var offset in navigator.targetOffsets ?? new CellOffset[] { new CellOffset(0, 0) })
+                        foreach (var offset in navigator.targetOffsets ?? new CellOffset[] { new CellOffset(0, 0), new CellOffset(0, 1) })
                         {
-                            int offsetCell = Grid.OffsetCell(rootTargetCell, offset);
+                            int offsetCell = Grid.OffsetCell(targetCell, offset);
                             if (Grid.IsValidCell(offsetCell))
                                 return offsetCell;
                         }
-                        return rootTargetCell;
+                        return targetCell;
                     }
-
                     // 最终兜底：返回当前格子
                     return Grid.PosToCell(navigator);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"[TeleportSuit] Analy Cell Failed：{e.Message}\n{e.StackTrace}");
+                    LogUtils.LogDebug("TeleportSuit",$"Analy Cell Failed：{e.Message}\n{e.StackTrace}");
                     return Grid.PosToCell(navigator);
                 }
             }
@@ -285,7 +268,7 @@ namespace TeleportSuitMod
             private static readonly string ModuleName = "AdvancePathPatch";
             public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
             {
-                if (__instance.target != null && __instance.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags) && Grid.PosToCell(__instance) != ___reservedCell)
+                if (TeleNavigator.isTeleMiniom(__instance) && Grid.PosToCell(__instance) != ___reservedCell)
                 {
                     int target_position_cell = Grid.PosToCell(__instance.target);
                     int targetWorldId = Grid.WorldIdx[target_position_cell];
@@ -347,8 +330,6 @@ namespace TeleportSuitMod
 
                         int reservedCell = ___reservedCell;
                         KBatchedAnimController minion_anim = __instance.GetComponent<KBatchedAnimController>();
-                        KAnimFile f = Assets.GetAnim("anim_teleport_suit_astom_stand_kanim");
-                        //KAnimFile f = Assets.GetAnim("anim_teleport_suit_teleporting_kanim");
                         Action<object> action = null;
 
                         //「强制修改小人坐标」+「重置导航状态」
@@ -359,63 +340,31 @@ namespace TeleportSuitMod
                             if (__instance == null) return;
                             
                             // 移除传送动画覆盖
-                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(f);
+                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
                             // ========== 核心：瞬移到目标格子 ==========
                             // 计算目标格子的世界坐标（Bottom对齐，场景层25）
                             Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
                             // 强制修改小人的世界坐标 → 实现“瞬移（传送）”
                             __instance.transform.SetPosition(position);
                             // ========== 重置导航状态（适配目标格子） ==========
-                            // 若目标格子有梯子 → 切换为爬梯子状态
-                            if (Grid.HasLadder[reservedCell]) __instance.CurrentNavType = NavType.Ladder;
-                            
-                            if (Grid.HasPole[reservedCell]) __instance.CurrentNavType = NavType.Pole;
-                            
-                            // 若为可走地面 → 切换为步行状态
-                            if (GameNavGrids.FloorValidator.IsWalkableCell(reservedCell, Grid.CellBelow(reservedCell), true)) __instance.CurrentNavType = NavType.Floor;
+                            TeleNavigator.resetNavType(__instance,reservedCell);
                             
                             // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
                             // 取消动画回调订阅（避免内存泄漏）
                             __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
+                            __instance.Trigger(1347184327);
 
                         };
                         
                         float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
-                        string play_anim = "working_pst";
                         if (PlaySpeedMultiplier != 0)
                         {
-                            
-                            if (f == null) LogUtils.LogDebug("Navi", "AstomStandAnim 动画集为空");
-                            
-                            minion_anim.AddAnimOverrides(f, 1f);
-
-                            if (!minion_anim.isActiveAndEnabled)
-                            {
-                                LogUtils.LogDebug("Navi", "动画组件未激活");
-                                minion_anim.enabled = true;
-                            }
-                            if (!minion_anim.HasAnimation(play_anim))LogUtils.LogDebug("Navi", $"{play_anim}不存在");
-                            KAnimFileData data = f.GetData();
-                            LogUtils.LogDebug("Navi", $"IsAnimLoaded：{f.IsAnimLoaded}  name：{data.name} elementCount：{data.elementCount}\n"+
-                                $"frameCount：{data.frameCount} animCount：{data.animCount} {play_anim} Frame: [{data.GetAnim(2).name}] hashname: {new HashedString(data.GetAnim(2).name)}\n"+
-                                $"build：{data.build} symbols.Length:{data.build.symbols.Length}");
-
-                            
-
-                            LogUtils.LogDebug("Navi", $"currentAnim :  {minion_anim.currentAnim} Anima Name:{minion_anim.GetAnim(minion_anim.currentAnim).name} minionName: {minion_anim.GetName()} currentFrame: {minion_anim.currentFrame}");
+                            minion_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
 
                             minion_anim.SetLayer(0);
                             minion_anim.SetElapsedTime(0f);
-                            minion_anim.Play(play_anim, KAnim.PlayMode.Once, PlaySpeedMultiplier, 0); // 最后一个参数是layer索引
-
-                            KAnim.Anim targetAnim = minion_anim.GetAnim(new HashedString("working_pst"));
-                            LogUtils.LogDebug("Navi", $"working_pst 总帧数：{targetAnim.numFrames} | 帧时长：{targetAnim.totalTime} | 帧率：{targetAnim.numFrames / targetAnim.totalTime}");
-                            LogUtils.LogDebug("Navi", $"当前帧104是否超出范围：{104 >= targetAnim.numFrames}");
-
-                            LogUtils.LogDebug("Navi", $"当前播放图层：{minion_anim.GetLayer()}");
-
-                            LogUtils.LogDebug("Navi", $"currentAnim :  {minion_anim.currentAnim} Anima Name:{minion_anim.GetAnim(minion_anim.currentAnim).name} minionName: {minion_anim.GetName()} currentFrame: {minion_anim.currentFrame}");
+                            minion_anim.Play("working_pst", KAnim.PlayMode.Once, PlaySpeedMultiplier, 0);
 
                             // 动画播放完成后执行瞬移逻辑
                             __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
@@ -455,6 +404,87 @@ namespace TeleportSuitMod
                 return true;
             }
         }
+        [HarmonyPatch]
+        public class HelmentController_OnPathAdvanced_Patch
+        {
+            static MethodBase TargetMethod()
+            {
+                return AccessTools.Method(
+                    typeof(HelmetController),
+                    "OnPathAdvanced",
+                    new Type[] {typeof(object)});
+            }
+            [HarmonyPrefix]
+            public static void Prefix(HelmetController __instance,object data)
+            {
+                if (__instance == null) return;
+                if (__instance.gameObject.HasTag(TeleportSuitConfig.ID))
+                {
+                    object obj;
+                    Utils.InvokeMethod(__instance, "UpdateJets",out obj,null);
+                }
+            }
+        }
+        [HarmonyPatch]
+        public class HelmentController_Patch
+        {
+            private static KBatchedAnimController tele_anim;
+            static MethodBase TargetMethod()
+            {
+                return AccessTools.Method(
+                    typeof(HelmetController),
+                    "UpdateJets");
+            }
+            [HarmonyPostfix]
+            public static void Postfix(HelmetController __instance)
+            {
+                if (__instance == null) return;
+                Navigator navigator;
+                object nav_obj = null;
+                GameObject miniom = null;
+                if (Utils.GetField(__instance, "owner_navigator", out nav_obj) && nav_obj != null)
+                {
+                    navigator = nav_obj as Navigator;
+                    
+                }
+                else{
+                    miniom = Utils.GetAssigneeGameObject(__instance.GetComponent<Equippable>()?.assignee);
+                    navigator = miniom.GetComponent<Navigator>();
+                    if (navigator == null) return;
+                }
+                if (TeleNavigator.isTeleMiniom(navigator) || __instance.gameObject.HasTag(TeleportSuitConfig.ID))
+                {
+                    int num = -1;
+                    if (navigator != null)
+                        num = Grid.CellBelow(Grid.PosToCell(navigator));
+                    else if (miniom != null)
+                        num = Grid.CellBelow(Grid.PosToCell(miniom.transform.position));
+                    else return;
+                    if (Grid.IsWorldValidCell(num))
+                    {
+                        bool flag = Grid.Solid[num] || Grid.FakeFloor[num] || Grid.IsSubstantialLiquid(num);
+                        if (!flag)
+                        {
+                            if (tele_anim != null) return;
+                            object anim_obj;
+                            Utils.InvokeMethod(__instance, "AddTrackedAnim", out anim_obj, new object[] {
+                                "teleSuit", Assets.GetAnim("tele_stand_kanim"), "loop", Grid.SceneLayer.Creatures, "foot", true
+                                });
+                            if (anim_obj != null) tele_anim = anim_obj as KBatchedAnimController;
+                        }
+                        else
+                        {
+                            if (tele_anim != null)
+                            {
+                                UnityEngine.Object.Destroy(tele_anim.gameObject);
+                                tele_anim = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         public static void PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_single(int cell, ref bool __result)
         {
@@ -524,7 +554,7 @@ namespace TeleportSuitMod
                     {
                         if (targetNavigator != null && ((targetNavigator.flags & TeleportSuitConfig.TeleportSuitFlags) != 0))
                         {
-                            //__result = CanBeReachByMinionGroup(target_cell);
+                            __result = CanBeReachByMinionGroup(target_cell);
                             __result = true;
                             return false;
                         }
