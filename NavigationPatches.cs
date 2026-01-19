@@ -61,7 +61,7 @@ namespace TeleportSuitMod
             private static readonly string ModuleName = "NavigationCostPath";
             public static bool Prefix(Navigator __instance, int cell, ref int __result)
             {
-                if (!TeleNavigator.isTeleMiniom(__instance))//穿着传送服
+                if (TeleNavigator.isTeleMiniom(__instance))//穿着传送服
                 {
                     __result = -1;
                     if (TeleNavigator.ShortRange > 0)
@@ -127,7 +127,7 @@ namespace TeleportSuitMod
                 int distance = __instance.PathGrid.GetCost(cellPrefernce);
                 // 4. 判定是否为短距离
                 bool isShortRange = distance != -1 ? distance <= TeleNavigator.ShortRange : false;
-
+                LogUtils.LogDebug("NaviP",$"currentCell:[{currentCell}] targetCell:[{initialTargetCell}] CellPrefernce:[{cellPrefernce}] cellPrefernce Cost:[{distance}]");
                 // 5. 缓存结果（加锁保证线程安全）
                 lock (TeleNavigator._naviTargetCacheLock)
                 {
@@ -186,7 +186,6 @@ namespace TeleportSuitMod
             static int maxCheckDistance = 20; // 进一步缩小范围（传送不需要远距寻路）
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
             {
-                LogUtils.LogDebug("Navigator_RunQuery_Patch","RunQuery Prefix");
                 if ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0)
                     return true;
 
