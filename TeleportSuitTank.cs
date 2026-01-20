@@ -49,25 +49,23 @@ namespace TeleportSuitMod
         protected override void OnPrefabInit()
         {
             base.OnPrefabInit();
-
+            SubscribeToEquipEvents();
         }
 
         protected override void OnSpawn()
         {
             base.OnSpawn();
-
+            //Trigger((int)GameHashes.EquippedItemEquippable);
         }
         protected override void OnCleanUp()
         {
+            UnsubscribeFromEquipEvents();
+
             base.OnCleanUp();
         }
         // 核心：注册装备事件映射
         private void SubscribeToEquipEvents()
         {
-
-            // 移除重复注册（避免多次OnPrefabInit导致重复）
-            UnsubscribeFromEquipEvents();
-
             // 注册穿戴事件（Klei引擎标准方式）
             Subscribe((int)GameHashes.EquippedItemEquippable, OnEquippedDelegate);
             Subscribe((int)GameHashes.UnequippedItemEquippable, OnUnequippedDelegate);

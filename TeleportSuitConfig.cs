@@ -264,56 +264,7 @@ namespace TeleportSuitMod
             storage.showInUI = true;
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
-
-            //astomStandAnim = this.AddTrackedAnim("jet", Assets.GetAnim("jetsuit_thruster_fx_kanim"), "loop", Grid.SceneLayer.Creatures, "snapTo_neck", true);
-
         }
-        //private KBatchedAnimController GetAssigneeController()
-        //{
-        //    Equippable component = base.GetComponent<Equippable>();
-        //    if (component.assignee != null)
-        //    {
-        //        GameObject assigneeGameObject = this.GetAssigneeGameObject(component.assignee);
-        //        if (assigneeGameObject)
-        //        {
-        //            return assigneeGameObject.GetComponent<KBatchedAnimController>();
-        //        }
-        //    }
-        //    return null;
-        //}
-        //private KBatchedAnimController AddTrackedAnim(string name, KAnimFile tracked_anim_file, string anim_clip, Grid.SceneLayer layer, string symbol_name, bool require_looping_sound = false)
-        //{
-        //    KBatchedAnimController assigneeController = this.GetAssigneeController();
-        //    if (assigneeController == null)
-        //    {
-        //        return null;
-        //    }
-        //    string name2 = assigneeController.name + "." + name;
-        //    GameObject gameObject = new GameObject(name2);
-        //    gameObject.SetActive(false);
-        //    gameObject.transform.parent = assigneeController.transform;
-        //    gameObject.AddComponent<KPrefabID>().PrefabTag = new Tag(name2);
-        //    KBatchedAnimController kbatchedAnimController = gameObject.AddComponent<KBatchedAnimController>();
-        //    kbatchedAnimController.AnimFiles = new KAnimFile[]
-        //    {
-        //    tracked_anim_file
-        //    };
-        //    kbatchedAnimController.initialAnim = anim_clip;
-        //    kbatchedAnimController.isMovable = true;
-        //    kbatchedAnimController.sceneLayer = layer;
-        //    if (require_looping_sound)
-        //    {
-        //        gameObject.AddComponent<LoopingSounds>();
-        //    }
-        //    gameObject.AddComponent<KBatchedAnimTracker>().symbol = symbol_name;
-        //    bool flag;
-        //    Vector3 position = assigneeController.GetSymbolTransform(symbol_name, out flag).GetColumn(3);
-        //    position.z = Grid.GetLayerZ(layer);
-        //    gameObject.transform.SetPosition(position);
-        //    gameObject.SetActive(true);
-        //    kbatchedAnimController.Play(anim_clip, KAnim.PlayMode.Loop, 1f, 0f);
-        //    return kbatchedAnimController;
-        //}
         public string[] GetDlcIds()
         {
             //应该是让dlc和原版都可以使用
