@@ -85,8 +85,8 @@ namespace TeleportSuitMod
                     public static LocString TELEPORT_SPEED_MULTIPLIER_TOOLTIP = "It affects the dupes' teleportation speed.The higher the value, the faster the speed\nIf this value is 0,dupes will teleport immediately";
                     public static LocString CLUSTER_TELEPORT_BY_MOVETO_TITLE = "Teleport to other colony";
                     public static LocString CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP = "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton";
-                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TITLE = "Walking Bounds";
-                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TOOLTIP = "Note: This feature will cause some performance consumption.\nWalk instead of teleport within the set number of cells.";
+                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TITLE = "Enalbe Walking nearby";
+                    public static LocString TELEPORT_RESTRICTIONBOUNDS_TOOLTIP = "Note: This feature will cause some performance consumption.\nWalking instead of teleport nearby.";
 
                 }
             }

@@ -10,9 +10,8 @@ namespace TeleportSuitMod
     {
         public bool ShouldBlockTeleport(Navigator navigator, int targetWorldId)
         {
-            LogUtils.LogDebug("WalkBouldsTeleportBlocker", $"Checking teleport block for Navigator at cell {navigator.GetHashCode()} to world {targetWorldId} [{TeleNavigator.ShortRange}].");
             // 距离判断（强制传送则跳过）
-            if (TeleNavigator.ShortRange > 0 && TeleNavigator.IsInShortRange(navigator))
+            if (TeleNavigator.ShortRangeEnable && TeleNavigator.IsInShortRange(navigator))
                 return true;
             return false;
         }

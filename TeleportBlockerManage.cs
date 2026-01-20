@@ -106,10 +106,8 @@ namespace TeleportSuitMod
             // 遍历所有拦截器，只要有一个触发就返回true
             foreach (var blocker in _registeredBlockers)
             {
-                LogUtils.LogDebug("TeleportBlockerManager", $"Checking blocker: {blocker.GetType().Name}");
                 if (blocker.ShouldBlockTeleport(navigator, targetWorldId))
                 {
-                    LogUtils.LogDebug("TeleportBlockerManager", $"Checking blocker: {blocker.GetType().Name} True");
                     return true;
                 }
             }

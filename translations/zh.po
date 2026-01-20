@@ -284,14 +284,19 @@ msgstr ""
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE"
-msgid "Walking Bounds"
-msgstr "步行边界"
+msgid "Enalbe Walking nearby"
+msgstr "近距离走路"
 
 #. TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP
+#, fuzzy
+#| msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP"
+#| msgid ""
+#| "Note: This feature will cause some performance consumption.\n"
+#| "Walk instead of teleport within the set number of cells."
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP"
 msgid ""
 "Note: This feature will cause some performance consumption.\n"
-"Walk instead of teleport within the set number of cells."
+"Walking instead of teleport nearby."
 msgstr ""
 "注意：这个功能会造成些许性能消耗\n"
 "在设定的格子内步行，不进行传送。"
@@ -357,6 +362,10 @@ msgstr ""
 msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.TOOLTIPS.TELEPORTATIONOVERLAYSTRING"
 msgid "Display teleportablity of <style=\"KKeyword\">Teleport Suit</style>"
 msgstr "显示<style=\"KKeyword\">传送服</style>可以到达的区域"
+
+#~ msgctxt "TeleportSuitMod.TeleportSuitStrings.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE"
+#~ msgid "Walking Bounds"
+#~ msgstr "步行边界"
 
 #~ msgctxt "TeleportSuitMod.TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.REPAIR_WORN_RECIPE_NAME"
 #~ msgid "Repair Wron Teleport Suit"

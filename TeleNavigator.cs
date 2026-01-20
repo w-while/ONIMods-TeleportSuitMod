@@ -15,8 +15,9 @@ namespace TeleportSuitMod
         public static readonly object _cacheLock = new object(); // 线程锁，保证多帧安全
 
 
-        // 短距离阈值（可配置）
-        public static int ShortRange = TeleportSuitOptions.Instance.teleportrestrictionBounds;
+        // 短距离阈值
+        public static bool ShortRangeEnable = TeleportSuitOptions.Instance.teleportrestrictionBounds;
+        public static int ShortRange = 100;
 
         private static TeleNavigator _instance;
         public static TeleNavigator Instance
@@ -67,10 +68,8 @@ namespace TeleportSuitMod
         public static bool IsInShortRange(Navigator __instance)
         {
             if (!TeleNavigator.NavTargetCache.TryGetValue(__instance, out var cacheData)){
-                LogUtils.LogDebug("TeleNavigator", $"导航器 {__instance.GetHashCode()} 未命中缓存，默认非短距离");
                 return false;
             }
-            LogUtils.LogDebug("TeleNavigator", $"导航器 {__instance.GetHashCode()} 命中缓存,短距离:[{cacheData.isShortRange}]");
             if (cacheData.isShortRange) return true;
             return false;
         }

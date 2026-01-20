@@ -55,9 +55,8 @@ namespace TeleportSuitMod
         public bool ShouldDropDuringSleep { get; set; } = true;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TITLE", "STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_RESTRICTIONBOUNDS_TOOLTIP", null)]
-        [Limit(0, 20)]
         [JsonProperty]
-        public int teleportrestrictionBounds { get; set; } = 0;
+        public bool teleportrestrictionBounds { get; set; } = true;
 
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE" , "" , null)]
         [Limit(1 , 999)]
