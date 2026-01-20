@@ -58,6 +58,10 @@ namespace TeleportSuitMod
         [JsonProperty]
         public bool teleportrestrictionBounds { get; set; } = true;
 
+        [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_FLOAT_TITLE", "", null)]
+        [JsonProperty]
+        public bool teleportfloat { get; set; } = false;
+
         [Option("STRINGS.UI.FRONTEND.TELEPORTSUITMOD.TELEPORT_TIMES_FULL_CHARGE_TITLE" , "" , null)]
         [Limit(1 , 999)]
         [JsonProperty]

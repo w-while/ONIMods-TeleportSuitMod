@@ -16,8 +16,10 @@ namespace TeleportSuitMod
 
 
         // 短距离阈值
-        public static bool ShortRangeEnable = TeleportSuitOptions.Instance.teleportrestrictionBounds;
+        public static readonly bool ShortRangeEnable = TeleportSuitOptions.Instance.teleportrestrictionBounds;
         public static int ShortRange = 100;
+
+        public static readonly bool StandInSpaceEnable = TeleportSuitOptions.Instance.teleportfloat;
 
         private static TeleNavigator _instance;
         public static TeleNavigator Instance

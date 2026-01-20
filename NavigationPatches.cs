@@ -211,115 +211,119 @@ namespace TeleportSuitMod
             private static readonly string ModuleName = "AdvancePathPatch";
             public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
             {
-                if (TeleNavigator.isTeleMiniom(__instance) && Grid.PosToCell(__instance) != ___reservedCell)
+                try
                 {
-                    int target_position_cell = Grid.PosToCell(__instance.target);
-                    int targetWorldId = Grid.WorldIdx[target_position_cell];
-                    int mycell = Grid.PosToCell(__instance);
-
-                    if ((!Grid.IsValidCell(mycell)) || (!Grid.IsValidCell(target_position_cell)))
+                    if (TeleNavigator.isTeleMiniom(__instance) && Grid.PosToCell(__instance) != ___reservedCell)
                     {
-                        __instance.Stop();
-                        return true;
-                    }
-                    //===关键逻辑：Blockers
-                    if (TeleportBlockerManager.Instance != null && TeleportBlockerManager.Instance.IsTeleportBlocked(__instance, targetWorldId)) return true;
-                    bool needTeleport = true;
+                        int target_position_cell = Grid.PosToCell(__instance.target);
+                        int targetWorldId = Grid.WorldIdx[target_position_cell];
+                        int mycell = Grid.PosToCell(__instance);
 
-                    for (int i = 0; i < __instance.targetOffsets.Length; i++)
-                    {
-                        int cell = Grid.OffsetCell(target_position_cell, __instance.targetOffsets[i]);
-                        if (__instance.CanReach(cell) && mycell == cell)
+                        if ((!Grid.IsValidCell(mycell)) || (!Grid.IsValidCell(target_position_cell)))
                         {
-                            needTeleport = false;
+                            __instance.Stop();
+                            return true;
                         }
-                    }
-                    if (!needTeleport)
-                    {
-                        __instance.Stop(arrived_at_destination: true, false);
-                        return false;
-                    }
+                        //===关键逻辑：Blockers
+                        if (TeleportBlockerManager.Instance != null && TeleportBlockerManager.Instance.IsTeleportBlocked(__instance, targetWorldId)) return true;
+                        bool needTeleport = true;
 
-                    //计算目标格子
-                    int cellPreferences = ___tactic.GetCellPreferences(target_position_cell, __instance.targetOffsets, __instance);
-                    //释放原预留格子，占用新目标格子（避免和其他小人冲突）
-                    NavigationReservations.Instance.RemoveOccupancy(___reservedCell);
-                    ___reservedCell = cellPreferences;
-                    NavigationReservations.Instance.AddOccupancy(cellPreferences);
-                    if (___reservedCell != NavigationReservations.InvalidReservation)
-                    {
-                        //传送服消耗计算
-                        Equipment equipment = __instance.GetComponent<MinionIdentity>().GetEquipment();
-                        Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
-                        if (assignable != null)
+                        for (int i = 0; i < __instance.targetOffsets.Length; i++)
                         {
-                            TeleportSuitTank tank = assignable.GetComponent<TeleportSuitTank>();
-                            if (tank != null && tank.batteryCharge > 0)
+                            int cell = Grid.OffsetCell(target_position_cell, __instance.targetOffsets[i]);
+                            if (__instance.CanReach(cell) && mycell == cell)
                             {
-                                tank.batteryCharge -= 1f / TeleportSuitOptions.Instance.teleportTimesFullCharge;
+                                needTeleport = false;
                             }
                         }
-                        // 结束当前的移动过渡状态（避免传送时状态卡死）
-                        __instance.transitionDriver.EndTransition();
-                        // 强制切换到“正常移动”状态（确保传送后状态正常）
-                        __instance.smi.GoTo(__instance.smi.sm.normal.moving);
-                        // 初始化过渡动画（避免空引用）
-                        Navigator.ActiveTransition transition = TRANSITION.Get(__instance.transitionDriver);
-                        transition = new Navigator.ActiveTransition();
-
-                        int reservedCell = ___reservedCell;
-                        KBatchedAnimController minion_anim = __instance.GetComponent<KBatchedAnimController>();
-                        Action<object> action = null;
-
-                        //「强制修改小人坐标」+「重置导航状态」
-                        action = delegate (object data)
+                        if (!needTeleport)
                         {
-                            if (minion_anim != null) minion_anim.PlaySpeedMultiplier = 1f;
-                            
-                            if (__instance == null) return;
-                            
-                            // 移除传送动画覆盖
-                            __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
-                            // ========== 核心：瞬移到目标格子 ==========
-                            // 计算目标格子的世界坐标（Bottom对齐，场景层25）
-                            Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
-                            // 强制修改小人的世界坐标 → 实现“瞬移（传送）”
-                            __instance.transform.SetPosition(position);
-                            // ========== 重置导航状态（适配目标格子） ==========
-                            TeleNavigator.resetNavType(__instance,reservedCell);
-                            
-                            // 标记“到达目标”，停止寻路 → 传送完成
                             __instance.Stop(arrived_at_destination: true, false);
-                            // 取消动画回调订阅（避免内存泄漏）
-                            __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
-                            __instance.Trigger(1347184327);
+                            return false;
+                        }
 
-                        };
-                        
-                        float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
-                        if (PlaySpeedMultiplier != 0)
+                        //计算目标格子
+                        int cellPreferences = ___tactic.GetCellPreferences(target_position_cell, __instance.targetOffsets, __instance);
+                        //释放原预留格子，占用新目标格子（避免和其他小人冲突）
+                        NavigationReservations.Instance.RemoveOccupancy(___reservedCell);
+                        ___reservedCell = cellPreferences;
+                        NavigationReservations.Instance.AddOccupancy(cellPreferences);
+                        if (___reservedCell != NavigationReservations.InvalidReservation)
                         {
-                            minion_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
+                            //传送服消耗计算
+                            Equipment equipment = __instance.GetComponent<MinionIdentity>().GetEquipment();
+                            Assignable assignable = equipment.GetAssignable(Db.Get().AssignableSlots.Suit);
+                            if (assignable != null)
+                            {
+                                TeleportSuitTank tank = assignable.GetComponent<TeleportSuitTank>();
+                                if (tank != null && tank.batteryCharge > 0)
+                                {
+                                    tank.batteryCharge -= 1f / TeleportSuitOptions.Instance.teleportTimesFullCharge;
+                                }
+                            }
+                            // 结束当前的移动过渡状态（避免传送时状态卡死）
+                            __instance.transitionDriver.EndTransition();
+                            // 强制切换到“正常移动”状态（确保传送后状态正常）
+                            __instance.smi.GoTo(__instance.smi.sm.normal.moving);
+                            // 初始化过渡动画（避免空引用）
+                            Navigator.ActiveTransition transition = TRANSITION.Get(__instance.transitionDriver);
+                            transition = new Navigator.ActiveTransition();
 
-                            minion_anim.SetLayer(0);
-                            minion_anim.SetElapsedTime(0f);
-                            minion_anim.Play("working_pst", KAnim.PlayMode.Once, PlaySpeedMultiplier, 0);
+                            int reservedCell = ___reservedCell;
+                            KBatchedAnimController minion_anim = __instance.GetComponent<KBatchedAnimController>();
+                            Action<object> action = null;
 
-                            // 动画播放完成后执行瞬移逻辑
-                            __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
+                            //「强制修改小人坐标」+「重置导航状态」
+                            action = delegate (object data)
+                            {
+                                if (minion_anim != null) minion_anim.PlaySpeedMultiplier = 1f;
 
+                                if (__instance == null) return;
+
+                                // 移除传送动画覆盖
+                                __instance.GetComponent<KBatchedAnimController>().RemoveAnimOverrides(TeleportSuitConfig.InteractAnim);
+                                // ========== 核心：瞬移到目标格子 ==========
+                                // 计算目标格子的世界坐标（Bottom对齐，场景层25）
+                                Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
+                                // 强制修改小人的世界坐标 → 实现“瞬移（传送）”
+                                __instance.transform.SetPosition(position);
+                                // ========== 重置导航状态（适配目标格子） ==========
+                                TeleNavigator.resetNavType(__instance, reservedCell);
+
+                                // 标记“到达目标”，停止寻路 → 传送完成
+                                __instance.Stop(arrived_at_destination: true, false);
+                                // 取消动画回调订阅（避免内存泄漏）
+                                __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
+                                __instance.Trigger(1347184327);
+
+                            };
+
+                            float PlaySpeedMultiplier = TeleportSuitOptions.Instance.teleportSpeedMultiplier;
+                            if (PlaySpeedMultiplier != 0)
+                            {
+                                minion_anim.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
+
+                                minion_anim.SetLayer(0);
+                                minion_anim.SetElapsedTime(0f);
+                                minion_anim.Play("working_pst", KAnim.PlayMode.Once, PlaySpeedMultiplier, 0);
+
+                                // 动画播放完成后执行瞬移逻辑
+                                __instance.Subscribe((int)GameHashes.AnimQueueComplete, action);
+
+                            }
+                            else
+                            {
+                                action(null);
+                            }
                         }
                         else
                         {
-                            action(null);
+                            __instance.Stop();
                         }
+                        return false;
                     }
-                    else
-                    {
-                        __instance.Stop();
-                    }
-                    return false;
                 }
+                catch (Exception ex) {/*当取消悬空站立之后读档会出现崩溃原因是与fallmonitor冲突*/ }
                 return true;
             }
         }

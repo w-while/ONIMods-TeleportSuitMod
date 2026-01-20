@@ -101,7 +101,7 @@ namespace TeleportSuitMod
             }
             public void UpdateFloat(Instance instance, float dt)
             {
-                if (instance == null && navigator == null) return;
+                if (!TeleNavigator.StandInSpaceEnable || instance == null && navigator == null) return;
                 int num = Grid.CellBelow(Grid.PosToCell(navigator));
                 if (Grid.IsWorldValidCell(num))
                 {
@@ -128,7 +128,7 @@ namespace TeleportSuitMod
                 private static readonly string ModuleName = "FallMonitor_updateFalling_Pathes";
                 public static bool Prefix(FallMonitor.Instance __instance)
                 {
-                    if (__instance == null) return true;
+                    if (!TeleNavigator.StandInSpaceEnable || __instance == null) return true;
 
                     FieldInfo navigatorField = AccessTools.Field(typeof(FallMonitor.Instance), "navigator");
                     if (navigatorField != null)
@@ -167,8 +167,8 @@ namespace TeleportSuitMod
 
             wearingSuit.hasBattery
                 .TagTransition(GameTags.SuitBatteryOut, wearingSuit.noBattery)
-                .Update("UpdateFloatAnim", (smi,dt)=>smi.UpdateFloat(smi,dt),UpdateRate.SIM_200ms)
-                .Exit((smi)=>smi.UpdateFloat(smi, 1));
+                .Update("UpdateFloatAnim", (smi,dt)=>smi.UpdateFloat(smi, dt), UpdateRate.SIM_200ms)
+                .Exit((smi) => smi.UpdateFloat(smi, 1));
 
             wearingSuit.noBattery
                 .Enter((smi) =>OnNoBattery(smi))

@@ -51,7 +51,7 @@ namespace TeleportSuitMod
         public static float ATHLETICS = -8;
         public static readonly string ModuleName = "TeleportSuitConfig";
 
-        public static bool TeleportAnyWhere = true;
+        public static bool TeleportAnyWhere = TeleNavigator.StandInSpaceEnable;
         public KBatchedAnimController astomStandAnim;
         //private AttributeModifier expertAthleticsModifier;
 
@@ -101,7 +101,7 @@ namespace TeleportSuitMod
             foreach (CellOffset offset in bounding_offsets)
             {
                 cell2 = Grid.OffsetCell(targetcell , offset);
-                //虚空强者判断
+                //悬空站立判断
                 if (!TeleportAnyWhere &&( !Grid.IsWorldValidCell(cell2) || !IsCellPassable(cell2 , true)))
                 {
                     return false;

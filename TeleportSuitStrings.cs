@@ -87,6 +87,7 @@ namespace TeleportSuitMod
                     public static LocString CLUSTER_TELEPORT_BY_MOVETO_TOOLTIP = "Note:This Function is not good now.\nYou can go to other colony by the Moveto Buttton";
                     public static LocString TELEPORT_RESTRICTIONBOUNDS_TITLE = "Enalbe Walking nearby";
                     public static LocString TELEPORT_RESTRICTIONBOUNDS_TOOLTIP = "Note: This feature will cause some performance consumption.\nWalking instead of teleport nearby.";
+                    public static LocString TELEPORT_FLOAT_TITLE = "Stand in space";
 
                 }
             }
