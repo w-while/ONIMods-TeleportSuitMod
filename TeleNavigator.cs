@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace TeleportSuitMod
         public static readonly bool ShortRangeEnable = TeleportSuitOptions.Instance.teleportrestrictionBounds;
         public static int ShortRange = 100;
 
-        public static readonly bool StandInSpaceEnable = TeleportSuitOptions.Instance.teleportfloat;
+        
 
         private static TeleNavigator _instance;
         public static TeleNavigator Instance
@@ -116,5 +117,112 @@ namespace TeleportSuitMod
                 navigator.CurrentNavType = NavType.Floor;
             if (Grid.HasTube[cell]) navigator.CurrentNavType = NavType.Tube;
         }
+
+        // --- 性能优化: 缓存 CellCount 和 TeleportRestrict ---
+        private static int CachedGridCellCount = -1;
+
+        // --- 配置 ---
+        public static readonly bool StandInSpaceEnable = TeleportSuitOptions.Instance.teleportfloat;
+                                                      // 假设 bounding_offsets 是固定的 { (0, 0), (0, 1) } 代表 1x2 单位 (脚, 头) 或类似定义
+        private static readonly CellOffset[] BoundingOffsets = { new CellOffset(0, 0), new CellOffset(0, 1) }; // Example
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static public bool CanTeloportTo(int targetcell)
+        {
+            // --- 1. 检查: 限制区域 ---
+            if (TeleportationOverlay.TeleportRestrict[targetcell])
+            {
+                return false;
+            }
+
+            // --- 2. 基础有效性检查 ---
+            if (!Grid.IsValidCell(targetcell) || !Grid.IsVisible(targetcell))
+            {
+                return false;
+            }
+
+            // --- 3. 遍历 bounding_offsets 区域 ---
+            foreach (CellOffset offset in BoundingOffsets)
+            {
+                int cell2 = Grid.OffsetCell(targetcell, offset);
+
+                // --- 内联 IsCellPassable(cell2, true) 逻辑 ---
+                // 注意: 这里假设 is_dupe 总是 true
+                {
+                    Grid.BuildFlags buildFlags = Grid.BuildMasks[cell2] & ~(Grid.BuildFlags.FakeFloor | Grid.BuildFlags.Foundation | Grid.BuildFlags.Door);
+                    if (buildFlags != ~Grid.BuildFlags.Any) // Not completely passable
+                {
+                        // Check DupeImpassable first (often a quick exit)
+                        if ((buildFlags & Grid.BuildFlags.DupeImpassable) != 0)
+                        {
+                            return false; // 立即失败
+                        }
+                        if ((buildFlags & Grid.BuildFlags.Solid) != 0)
+                        {
+                            // If solid, check if dupe-passable
+                            if ((buildFlags & Grid.BuildFlags.DupePassable) == 0) // Not DupePassable
+                            {
+                                return false; // 立即失败
+                            }
+                            // Else it's Solid but DupePassable -> continue checking
+                        }
+                        // If not Solid and not DupeImpassable -> continue checking
+                    }
+                    // If completely passable -> continue checking
+                }
+
+                // 检查该 cell 正上方的单元格是否不稳定
+                int num = Grid.CellAbove(cell2);
+                if (Grid.IsValidCell(num) && Grid.Element[num].IsUnstable)
+                {
+                    return false; // 立即失败
+                }
+            }
+
+            // --- 4. 检查: TeleportAnyWhere 模式 ---
+            if (StandInSpaceEnable)
+            {
+                // 在此模式下，只要通过了 bounding_offsets 检查，就成功
+                return true;
+            }
+
+            // --- 5. 普通模式: 综合检查 ---
+            // a. 检查目标点是否是标准位置 (flag4)
+            bool isStandardLocation = GameNavGrids.FloorValidator.IsWalkableCell(targetcell, Grid.CellBelow(targetcell), true) ||
+                                      Grid.HasLadder[targetcell] ||
+                                      Grid.HasPole[targetcell];
+
+            if (!isStandardLocation)
+            {
+                // 如果不是标准位置，直接失败
+                return false;
+            }
+
+            // b. 检查目标点上方单元格 (1x2 单位的头部)
+            int aboveCell = Grid.CellAbove(targetcell);
+
+            // b1. 检查头部单元格是否有效
+            if (!Grid.IsValidCell(aboveCell))
+            {
+                // 头部单元格无效，无法容纳 1x2 单位
+                return false;
+            }
+
+            // b2. 检查目标点 (脚部) 和上方 (头部) 是否是 DupeImpassable
+            if (Grid.DupeImpassable[targetcell] || Grid.DupeImpassable[aboveCell])
+            {
+                return false; // 有障碍
+            }
+
+            // b3. 检查上方 (头部) 是否是 Solid 且 !DupePassable (注意: 脚部 Solid 且 !DupePassable is okay if it's a standard location)
+            if (Grid.Solid[aboveCell] && !Grid.DupePassable[aboveCell])
+            {
+                return false; // 有障碍
+            }
+
+            // 所有条件满足：是标准位置，且上方没有 DupeImpassable 或 Solid&&!DupePassable 障碍
+            return true;
+        }
+
     }
 }

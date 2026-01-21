@@ -33,7 +33,7 @@ namespace TeleportSuitMod
             {
                 result=Color.red;
             }
-            else if (TeleportSuitConfig.CanTeloportTo(cell))
+            else if (TeleNavigator.CanTeloportTo(cell))
             {
                 result=Color.blue;
             }

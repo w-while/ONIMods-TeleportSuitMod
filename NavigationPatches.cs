@@ -63,6 +63,10 @@ namespace TeleportSuitMod
          * 两个版本中比较特殊的是由Sensor驱动的RunQuery用于主动查询物资或目的地
          */
 
+        /**
+         * GetNavigationCost 关键方法，适用于Job/Sensor/Chore等系统的前置判断
+         * TODO 性能优化的关键点，也是当前问题点
+         */
         //修改穿着传送服的小人到各个格子的可达性,影响小人获取任务等等
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.GetNavigationCost), new Type[] { typeof(int) })]
         public static class Navigator_GetNavigationCost_Patch
@@ -70,8 +74,10 @@ namespace TeleportSuitMod
             private static readonly string ModuleName = "NavigationCostPath";
             public static bool Prefix(Navigator __instance, int cell, ref int __result)
             {
-                //return true;
-                if (__instance != null && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
+                if (__instance == null || !Grid.IsValidCell(cell)) return true;
+                __result =  __instance.PathGrid.GetCost(cell);
+
+                if (__result == -1 && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
                     //===== 新增：太空舱拦截逻辑（最优先判断）=====
                     if (Grid.WorldIdx[cell] != Grid.WorldIdx[Grid.PosToCell(__instance)] && __instance.TryGetComponent<MinionIdentity>(out var minion))
@@ -96,10 +102,12 @@ namespace TeleportSuitMod
                     //        return false;
                     //    }
                     //}
-                    if(TeleportSuitConfig.CanTeloportTo(cell)){
-                        __result = 1;
-                        return false;
-                    }
+                    //if(TeleNavigator.CanTeloportTo(cell)){
+                    //    __result = 1;
+                    //    return false;
+                    //}
+                    __result = 1;
+                    return false;
                 }
                 return true;
             }
@@ -138,7 +146,15 @@ namespace TeleportSuitMod
                 }
             }
         }
+        [HarmonyPatch(typeof(Navigator),nameof(Navigator.UpdateProbe),new Type[] { typeof(bool)})]
+        public class Navigator_UpdateProbe_Patches
+        {
+            public static void Prefix(Navigator __instance,bool forceUpdate = false)
+            {
+                return;
+            }
 
+        }
         //RuQuery针对Tele小人的修改，用于Sensor等查询目的地等
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
         public static class Navigator_RunQuery_Patch
@@ -187,7 +203,7 @@ namespace TeleportSuitMod
 
                             if (!Grid.IsValidCellInWorld(currentCell, worldIdx)) break;
 
-                            if (TeleportSuitConfig.CanTeloportTo(currentCell))
+                            if (TeleNavigator.CanTeloportTo(currentCell))
                             {
                                 if (query.IsMatch(currentCell, rootCell, radius))
                                 {
@@ -213,7 +229,7 @@ namespace TeleportSuitMod
             {
                 try
                 {
-                    if (TeleNavigator.isTeleMiniom(__instance) && Grid.PosToCell(__instance) != ___reservedCell)
+                    if (__instance != null && ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)&& Grid.PosToCell(__instance) != ___reservedCell)
                     {
                         int target_position_cell = Grid.PosToCell(__instance.target);
                         int targetWorldId = Grid.WorldIdx[target_position_cell];
@@ -367,7 +383,7 @@ namespace TeleportSuitMod
         public static bool CanBeReachByMinionGroup(int cell)
         {
             if (!Grid.IsValidCell(cell)) return false;
-            return TeleportSuitConfig.CanTeloportTo(cell);
+            return TeleNavigator.CanTeloportTo(cell);
         }
         [HarmonyPatch(typeof(MoveToLocationTool), nameof(MoveToLocationTool.CanMoveTo), new Type[] { typeof(int) })]
         public class MoveToLocationTool_CanMoveTo_patch
