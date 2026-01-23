@@ -192,6 +192,12 @@ namespace TeleportSuitMod
             storage.showInUI = true;
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
+
+
+            go.AddOrGet<RocketCabinRestriction>();
+
+            go.AddOrGet<TeleNavigator>();
+
         }
         public string[] GetDlcIds()
         {

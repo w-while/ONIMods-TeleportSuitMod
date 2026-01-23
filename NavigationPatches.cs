@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UI;
-using static STRINGS.INPUT_BINDINGS;
 
 namespace TeleportSuitMod
 {
@@ -17,8 +15,6 @@ namespace TeleportSuitMod
     {
         private static readonly IDetouredField<TransitionDriver, Navigator.ActiveTransition> TRANSITION =
     PDetours.DetourField<TransitionDriver, Navigator.ActiveTransition>("transition");
-        //记录小人的星球信息
-        public static readonly Dictionary<Navigator, int> NavigatorWorldId = new Dictionary<Navigator, int>();
 
         public bool ClusterMoveTO = false;
         //退出一个存档时要把需要保存的数据设置为空，否则可能会影响下一个存档
@@ -28,11 +24,7 @@ namespace TeleportSuitMod
             internal static void Prefix()
             {
                 TeleportationOverlay.TeleportRestrict = null;
-                if (NavigatorWorldId != null)
-                {
-                    NavigatorWorldId.Clear();
-                }
-                if (TeleportSuitWorldCountManager.Instance != null && TeleportSuitWorldCountManager.Instance.WorldCount != null)
+                if (TeleportSuitWorldCountManager.Instance != null &&  TeleportSuitWorldCountManager.Instance.WorldCount != null)
                 {
                     TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
                 }
@@ -57,15 +49,16 @@ namespace TeleportSuitMod
          * 新版本逻辑：
          *   1.增加 近距离行走策略、太空舱策略
          *   2.原生PathGrid需要继续更新，作为近距离行走策略判断依据 在GoTo中进行判断
-         *   2.太空舱拦截 GetNavigationCost -1/AdvancePath Block
+         *   3.太空舱拦截 GetNavigationCost -1/AdvancePath Block
+         *   4.新增悬空站立，单独创建了TelePathGrid 单例维护可达区域
          * 
-         *TODO:需要单独处理RunQuery
+         * RunQuery：这是一个相对低频调用的查询函数
          * 两个版本中比较特殊的是由Sensor驱动的RunQuery用于主动查询物资或目的地
          */
 
         /**
          * GetNavigationCost 关键方法，适用于Job/Sensor/Chore等系统的前置判断
-         * TODO 性能优化的关键点，也是当前问题点
+         * 重点：性能优化的关键点，任何高复杂度的操作都会影响性能
          */
         //修改穿着传送服的小人到各个格子的可达性,影响小人获取任务等等
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.GetNavigationCost), new Type[] { typeof(int) })]
@@ -80,35 +73,38 @@ namespace TeleportSuitMod
                 if (__result == -1 && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
                     //===== 新增：太空舱拦截逻辑（最优先判断）=====
-                    if (Grid.WorldIdx[cell] != Grid.WorldIdx[Grid.PosToCell(__instance)] && __instance.TryGetComponent<MinionIdentity>(out var minion))
+                    //if (Grid.WorldIdx[cell] != Grid.WorldIdx[Grid.PosToCell(__instance)]) { }
+                    int targetWorldId = Grid.WorldIdx[cell];
+                    if (targetWorldId != Grid.WorldIdx[Grid.PosToCell(__instance)])
                     {
                         // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
-                        if (RocketCabinRestriction.QuickCheckBlockTeleport(minion, Grid.WorldIdx[cell]))
+                        if (RocketCabinRestriction.QuickCheckBlockTeleport(__instance, targetWorldId))
                         {
                             __result = -1;
                             return false;
                         }
                     }
 
-                    //if (TeleNavigator.ShortRange > 0)
-                    //{
-                    //    // 1. 获取PathGrid的原生ProberCells成本（ShortRange内已更新）
-                    //    int nativeCost = __instance.PathGrid.GetCost(cell);
-                    //    LogUtils.LogDebug(ModuleName,$"nativeCost:{nativeCost}");
-                    //    // 2. 判定：成本<ShortRange则使用原生Cost，否则用Tele逻辑
-                    //    if (nativeCost >= 0 && nativeCost <= TeleNavigator.ShortRange && nativeCost != float.MaxValue)
-                    //    {
-                    //        __result = nativeCost; // 走原生寻路逻辑
-                    //        return false;
-                    //    }
-                    //}
-                    //if(TeleNavigator.CanTeloportTo(cell)){
-                    //    __result = 1;
-                    //    return false;
-                    //}
-                    __result = 1;
+                    if (TeleNavigator.GetNavigatorWorldId(__instance,out int wid) && wid != -1
+                        && ClusterManager.Instance.GetWorld(targetWorldId).ParentWorldId == wid
+                        && TeleNavigator.IsCellTeleportAccessible(cell))
+                    {
+                        __result = 1;
+                        return false;
+                    }
+                    __result = -1;
                     return false;
                 }
+                return true;
+            }
+        }
+        [HarmonyPatch(typeof(Navigator), nameof(Navigator.UpdateProbe), new Type[] { typeof(bool) })]
+        public class Navigator_UpProbe_Patches
+        {
+            public static bool Prefix(Navigator __instance, bool forceUpdate = false)
+            {
+                if (__instance == null && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0) return true;
+                TeleNavigator.AddOrUpdateNavigatorWorldId(__instance);
                 return true;
             }
         }
@@ -125,7 +121,6 @@ namespace TeleportSuitMod
 
                 // 仅处理穿着Tele服的小人
                 if (!TeleNavigator.isTeleMiniom(__instance)) return;
-
                 // 1. 获取初始目标单元格（稳定值，不受后续路径重算影响）
                 int initialTargetCell = Grid.PosToCell(target);
                 // 2. 获取小人当前单元格（发起导航时的位置，而非移动过程中的位置）
@@ -145,15 +140,6 @@ namespace TeleportSuitMod
                         TeleNavigator.NavTargetCache.Add(__instance, (initialTargetCell, isShortRange));
                 }
             }
-        }
-        [HarmonyPatch(typeof(Navigator),nameof(Navigator.UpdateProbe),new Type[] { typeof(bool)})]
-        public class Navigator_UpdateProbe_Patches
-        {
-            public static void Prefix(Navigator __instance,bool forceUpdate = false)
-            {
-                return;
-            }
-
         }
         //RuQuery针对Tele小人的修改，用于Sensor等查询目的地等
         [HarmonyPatch(typeof(Navigator), nameof(Navigator.RunQuery))]
@@ -344,7 +330,6 @@ namespace TeleportSuitMod
             }
         }
 
-
         public static void PeterHan_FastTrack_SensorPatches_IsReachable_Postfix_single(int cell, ref bool __result)
         {
             if (__result == false)
@@ -385,6 +370,7 @@ namespace TeleportSuitMod
             if (!Grid.IsValidCell(cell)) return false;
             return TeleNavigator.CanTeloportTo(cell);
         }
+        #region MovTo功能 手动世界传送的基础
         [HarmonyPatch(typeof(MoveToLocationTool), nameof(MoveToLocationTool.CanMoveTo), new Type[] { typeof(int) })]
         public class MoveToLocationTool_CanMoveTo_patch
         {
@@ -559,6 +545,7 @@ namespace TeleportSuitMod
                 }
             }
         }
+        #endregion
     }
 
 

@@ -105,7 +105,7 @@ namespace TeleportSuitMod
                 int num = Grid.CellBelow(Grid.PosToCell(navigator));
                 if (Grid.IsWorldValidCell(num))
                 {
-                    bool flag = Grid.Solid[num] || Grid.FakeFloor[num] || Grid.IsSubstantialLiquid(num);
+                    bool flag = Grid.Solid[num] || Grid.FakeFloor[num] || Grid.IsSubstantialLiquid(num) || Grid.HasPole[num] || Grid.HasLadder[num];
                     if (!flag)
                     {
                         if (tele_anim != null) return;
