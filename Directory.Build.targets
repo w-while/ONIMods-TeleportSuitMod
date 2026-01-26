@@ -61,6 +61,11 @@
 		<Copy SourceFiles="$(TargetPath)" DestinationFiles="$(InstallFolder)\$(TargetFileName)" />
 		<Copy SourceFiles="@(PLibFiles)" DestinationFolder="$(InstallFolder)" Condition=" Exists(@(PLibFiles))"/>
 	</Target>
+	<Target Name="RunONI" DependsOnTargets="CopyArtifactsToInstallFolder" AfterTargets="CopyArtifactsToInstallFolder" Condition=" '$(ForceONIRestart)' == 'true' ">
+
+		<Exec Command="taskkill /f /im OxygenNotIncluded.exe|| ver &gt;nul"/>
+		<Exec Command="start steam://rungameid/457140"/>
+	</Target>
 </Project>
 
 <!--Modified from https://github.com/peterhaneve/ONIMods/tree/main/PLib-->
