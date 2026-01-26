@@ -238,17 +238,61 @@ namespace TeleportSuitMod
             LogUtils.LogWarning(ModuleName, $"未找到InstanceID[{instanceId}]的小人");
             return null;
         }
-        public static MinionIdentity GetMinionFromEquippable(Equippable eq)
+        public static GameObject GetAssigneeGameObject(IAssignableIdentity ass_id)
         {
-            if (eq?.assignee == null) return null;
-
-            // 方式1：通过AssignableProxy获取
-            if (eq.assignee is MinionAssignablesProxy proxy)
+            GameObject result = null;
+            MinionAssignablesProxy minionAssignablesProxy = ass_id as MinionAssignablesProxy;
+            if (minionAssignablesProxy)
             {
-                return proxy.GetTargetGameObject()?.GetComponent<MinionIdentity>();
+                result = minionAssignablesProxy.GetTargetGameObject();
             }
+            else
+            {
+                MinionIdentity minionIdentity = ass_id as MinionIdentity;
+                if (minionIdentity)
+                {
+                    result = minionIdentity.gameObject;
+                }
+            }
+            return result;
+        }
+        /// <summary>
+        /// 验证跨世界目标合法性
+        /// </summary>
+        public static bool IsClusterWorldTargetValid(int targetCell, out WorldContainer targetWorld, out Vector3 targetWorldPos)
+        {
+            targetWorld = null;
+            targetWorldPos = Vector3.zero;
 
-            return null;
+            // 1. 基础校验：目标格子有效
+            if (!Grid.IsValidCell(targetCell)) return false;
+
+            // 2. 获取目标世界索引
+            byte targetWorldIdx = Grid.WorldIdx[targetCell];
+            LogUtils.LogDebug(ModuleName, $"targetWorldIdx:{targetWorldIdx}");
+            if (targetWorldIdx == byte.MaxValue) return false;
+
+            // 3. 通过ClusterManager获取目标世界容器（强校验：世界必须存在且激活）
+            targetWorld = ClusterManager.Instance?.GetWorld(targetWorldIdx);
+            if (targetWorld == null || !targetWorld.isActiveAndEnabled) return false;
+
+            // 4. 计算目标世界内的世界坐标（仅跨世界时生效）
+            targetWorldPos = Grid.CellToPos(targetCell, CellAlignment.Bottom, Grid.SceneLayer.Move);
+
+
+            return true;
+        }
+
+        public static int GetManhattanDistance(int cellA, int cellB)
+        {
+            if (!Grid.IsValidCell(cellA) || !Grid.IsValidCell(cellB))
+                return int.MaxValue;
+
+            int x1, y1, x2, y2;
+            Grid.CellToXY(cellA, out x1, out y1);
+            Grid.CellToXY(cellB, out x2, out y2);
+
+            return Mathf.Abs(x1 - x2) + Mathf.Abs(y1 - y2);
         }
         /// <summary>
         /// 通过小人获取其穿戴的传送服组件
@@ -280,6 +324,32 @@ namespace TeleportSuitMod
             }
             return suitTank;
         }
-
+        private static void SetField(object obj, string name, object value)
+        {
+            if (obj == null) return;
+            var field = obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null)
+                field.SetValue(obj, value);
+        }
+        public static bool GetField(object obj, string name, out object result)
+        {
+            result = null;
+            if (obj == null) return false;
+            var field = obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null)
+            {
+                result = field.GetValue(obj);
+                return true;
+            }
+            return false;
+        }
+        public static void InvokeMethod(object obj, string name, out object result,params object[] args)
+        {
+            result = null;
+            if (obj == null) return;
+            var types = args == null ? Type.EmptyTypes : Array.ConvertAll(args, a => a?.GetType() ?? typeof(object));
+            var method = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, types, null);
+            result = method?.Invoke(obj, args);
+        }
     }
 }

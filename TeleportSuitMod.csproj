@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClusterTeleportBlocker.cs" />
     <Compile Include="ComponentRegister.cs" />
     <Compile Include="LogUtils.cs" />
     <Compile Include="ModComponent.cs" />
@@ -91,7 +92,9 @@
     <Compile Include="SanchozzONIMods.Lib\KAnimGroupManager.cs" />
     <Compile Include="SanchozzONIMods.Lib\Utils.cs" />
     <Compile Include="SimDebugViewsPatches.cs" />
+    <Compile Include="TeleNavigator.cs" />
     <Compile Include="TeleportationOverlay.cs" />
+    <Compile Include="TeleportBlockerManage.cs" />
     <Compile Include="TeleportChore.cs" />
     <Compile Include="TeleportCore.cs" />
     <Compile Include="TeleportRestrictToolSaveData.cs" />
@@ -106,20 +109,23 @@
     <Compile Include="TeleportSuitTank.cs" />
     <Compile Include="TeleportSuitWorldCountManager.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="WalkBouldsTeleportBlocker.cs" />
     <Compile Include="WorkablePatches.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand_anim.bytes" />
-    <None Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand_build.bytes" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_anim.bytes" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_build.bytes" />
+    <None Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_anim.bytes" />
+    <None Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_build.bytes" />
     <None Include="anim\assets\teleport_suit\teleport_suit_anim.bytes" />
     <None Include="anim\assets\teleport_suit\teleport_suit_build.bytes" />
     <None Include="anim\assets\teleport_suit_body\teleport_suit_body_anim.bytes" />
     <None Include="anim\assets\teleport_suit_body\teleport_suit_body_build.bytes" />
     <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_anim.bytes" />
     <None Include="anim\assets\teleport_suit_locker\teleport_suit_locker_build.bytes" />
+    <None Include="anim\assets\tele_stand\tele_stand_anim.bytes" />
+    <None Include="anim\assets\tele_stand\tele_stand_build.bytes" />
     <None Include="app.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -133,11 +139,12 @@
     <None Include="translations\zh.po" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="anim\assets\anim_teleport_suit_astom_stand\astom_stand.png" />
     <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
+    <Content Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_0.png" />
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />
+    <Content Include="anim\assets\tele_stand\tele_stand.png" />
     <Content Include="Issues.txt" />
     <EmbeddedResource Include="images\OverlayIcon.png" />
     <EmbeddedResource Include="images\Placer.png" />
@@ -149,4 +156,8 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

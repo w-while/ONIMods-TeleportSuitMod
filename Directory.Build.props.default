@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
 	<PropertyGroup>
+		<!--是否编译后强制重启ONI-->
+		<ForceONIRestart>true</ForceONIRestart>
 		<!--通过注册表获取路径-->
 		<GameFolderRegistry>$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 457140@InstallLocation)</GameFolderRegistry>
 		<GameFolderDefault>C:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded</GameFolderDefault>

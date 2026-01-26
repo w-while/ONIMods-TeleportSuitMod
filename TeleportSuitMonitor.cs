@@ -1,5 +1,7 @@
-﻿using Klei.AI;
+﻿using HarmonyLib;
+using Klei.AI;
 using STRINGS;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using TUNING;
@@ -16,7 +18,6 @@ namespace TeleportSuitMod
 
             public State noBattery;
         }
-
         public new class Instance : GameInstance
         {
             public Navigator navigator;
@@ -24,6 +25,7 @@ namespace TeleportSuitMod
             public TeleportSuitTank teleport_suit_tank;
 
             public List<AttributeModifier> noBatteryModifiers = new List<AttributeModifier>();
+            public KBatchedAnimController tele_anim;
 
             public Instance(IStateMachineTarget master, GameObject owner)
                 : base(master)
@@ -33,6 +35,121 @@ namespace TeleportSuitMod
                 teleport_suit_tank = master.GetComponent<TeleportSuitTank>();
                 noBatteryModifiers.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.INSULATION, -TeleportSuitConfig.INSULATION, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES));
                 noBatteryModifiers.Add(new AttributeModifier(TUNING.EQUIPMENT.ATTRIBUTE_MOD_IDS.THERMAL_CONDUCTIVITY_BARRIER, 0f - TeleportSuitConfig.THERMAL_CONDUCTIVITY_BARRIER, TeleportSuitStrings.EQUIPMENT.PREFABS.TELEPORT_SUIT.SUIT_OUT_OF_BATTERIES));
+            }
+            #region 虚空站立功能//虚空强者
+            private GameObject GetAssigneeGameObject(IAssignableIdentity ass_id)
+            {
+                GameObject result = null;
+                MinionAssignablesProxy minionAssignablesProxy = ass_id as MinionAssignablesProxy;
+                if (minionAssignablesProxy)
+                {
+                    result = minionAssignablesProxy.GetTargetGameObject();
+                }
+                else
+                {
+                    MinionIdentity minionIdentity = ass_id as MinionIdentity;
+                    if (minionIdentity)
+                    {
+                        result = minionIdentity.gameObject;
+                    }
+                }
+                return result;
+            }
+            private KBatchedAnimController GetAssigneeController()
+            {
+                Equippable component = base.GetComponent<Equippable>();
+                if (component.assignee != null)
+                {
+                    GameObject assigneeGameObject = this.GetAssigneeGameObject(component.assignee);
+                    if (assigneeGameObject)
+                    {
+                        return assigneeGameObject.GetComponent<KBatchedAnimController>();
+                    }
+                }
+                return null;
+            }
+            private KBatchedAnimController AddTrackedAnim(string name, KAnimFile tracked_anim_file, string anim_clip, Grid.SceneLayer layer, string symbol_name, bool require_looping_sound = false)
+            {
+                KBatchedAnimController assigneeController = this.GetAssigneeController();
+                if (assigneeController == null)return null;
+
+                string name2 = assigneeController.name + "." + name;
+                GameObject gameObject = new GameObject(name2);
+                gameObject.SetActive(false);
+                gameObject.transform.parent = assigneeController.transform;
+                gameObject.AddComponent<KPrefabID>().PrefabTag = new Tag(name2);
+                KBatchedAnimController kbatchedAnimController = gameObject.AddComponent<KBatchedAnimController>();
+                kbatchedAnimController.AnimFiles = new KAnimFile[]
+                {
+                    tracked_anim_file
+                };
+                kbatchedAnimController.initialAnim = anim_clip;
+                kbatchedAnimController.isMovable = true;
+                kbatchedAnimController.sceneLayer = layer;
+                if (require_looping_sound)
+                {
+                    gameObject.AddComponent<LoopingSounds>();
+                }
+                gameObject.AddComponent<KBatchedAnimTracker>().symbol = symbol_name;
+                bool flag;
+                Vector3 position = assigneeController.GetSymbolTransform(symbol_name, out flag).GetColumn(3);
+                position.z = Grid.GetLayerZ(layer);
+                gameObject.transform.SetPosition(position);
+                gameObject.SetActive(true);
+                kbatchedAnimController.Play(anim_clip, KAnim.PlayMode.Loop, 1f, 0f);
+                return kbatchedAnimController;
+            }
+            public void UpdateFloat(Instance instance, float dt)
+            {
+                if (!TeleNavigator.StandInSpaceEnable || instance == null && navigator == null) return;
+                int num = Grid.CellBelow(Grid.PosToCell(navigator));
+                if (Grid.IsWorldValidCell(num))
+                {
+                    bool flag = Grid.Solid[num] || Grid.FakeFloor[num] || Grid.IsSubstantialLiquid(num) || Grid.HasPole[num] || Grid.HasLadder[num];
+                    if (!flag)
+                    {
+                        if (tele_anim != null) return;
+                        tele_anim = AddTrackedAnim("teleSuit", Assets.GetAnim("tele_stand_kanim"), "loop", Grid.SceneLayer.Creatures, "foot", true);
+                    }
+                    else
+                    {
+                        if (tele_anim != null)
+                        {
+                            UnityEngine.Object.Destroy(tele_anim.gameObject);
+                            tele_anim = null;
+                        }
+                    }
+                }
+            }
+
+            [HarmonyPatch(typeof(FallMonitor.Instance), nameof(FallMonitor.Instance.UpdateFalling))]
+            public static class FallMonitor_updateFalling_Pathes
+            {
+                private static readonly string ModuleName = "FallMonitor_updateFalling_Pathes";
+                public static bool Prefix(FallMonitor.Instance __instance)
+                {
+                    if (!TeleNavigator.StandInSpaceEnable || __instance == null) return true;
+
+                    FieldInfo navigatorField = AccessTools.Field(typeof(FallMonitor.Instance), "navigator");
+                    if (navigatorField != null)
+                    {
+                        Navigator navigator = (Navigator)navigatorField.GetValue(__instance);
+                        if (navigator != null && navigator.flags.HasFlag(TeleportSuitConfig.TeleportSuitFlags))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            #endregion
+            public override void StartSM()
+            {
+                base.StartSM();
+            }
+            public override void StopSM(string reason)
+            {
+                base.StopSM(reason);
             }
         }
 
@@ -46,58 +163,19 @@ namespace TeleportSuitMod
             Target(owner);
 
             wearingSuit
-                .DefaultState(wearingSuit.hasBattery)
-                // 添加状态更新逻辑（替代重写UpdateStates）
-                .Update("TeleportSuitUpdate", UpdateTeleportSuitState, UpdateRate.SIM_1000ms);
+                .DefaultState(wearingSuit.hasBattery);
 
             wearingSuit.hasBattery
-                .TagTransition(GameTags.SuitBatteryOut, wearingSuit.noBattery);
+                .TagTransition(GameTags.SuitBatteryOut, wearingSuit.noBattery)
+                .Update("UpdateFloatAnim", (smi,dt)=>smi.UpdateFloat(smi, dt), UpdateRate.SIM_200ms)
+                .Exit((smi) => smi.UpdateFloat(smi, 1));
 
             wearingSuit.noBattery
-                .Enter(OnNoBattery)
+                .Enter((smi) =>OnNoBattery(smi))
                 .Exit(OnHasBattery)
                 .TagTransition(GameTags.SuitBatteryOut, wearingSuit.hasBattery, on_remove: true);
         }
-        // 新增：状态更新方法，处理舱内/舱外逻辑
-        private void UpdateTeleportSuitState(Instance smi, float dt)
-        {
-            if (smi.teleport_suit_tank == null || smi.navigator == null) return;
-
-            // 判断是否在舱内世界
-            bool isInCabin = IsInCabinWorld(smi);
-
-            // 根据舱内状态调整电池消耗
-            float consumptionRate = isInCabin ? 0.5f : 1f; // 舱内消耗减半
-            smi.teleport_suit_tank.batteryCharge -= consumptionRate / smi.teleport_suit_tank.batteryDuration * dt;
-
-            // 电池耗尽逻辑
-            if (smi.teleport_suit_tank.IsEmpty() && !smi.navigator.gameObject.HasTag(GameTags.SuitBatteryOut))
-            {
-                smi.navigator.gameObject.AddTag(GameTags.SuitBatteryOut);
-            }
-        }
-
-        // 判断是否在舱内世界（复用CabinStayReactable的逻辑）
-        private bool IsInCabinWorld(Instance smi)
-        {
-            int currentCell = Grid.PosToCell(smi.navigator.transform.position);
-            if (!Grid.IsValidCell(currentCell)) return false;
-
-            int worldId = Grid.WorldIdx[currentCell];
-            WorldContainer world = ClusterManager.Instance.GetWorld(worldId);
-            if (world == null) return false;
-
-            // 优先使用IsModuleInterior属性判断
-            var isModuleProp = typeof(WorldContainer).GetProperty("IsModuleInterior", BindingFlags.Public | BindingFlags.Instance);
-            if (isModuleProp != null)
-            {
-                return (bool)isModuleProp.GetValue(world);
-            }
-
-            // 兜底判断
-            return world.name.Contains("Rocket") || world.name.Contains("Module");
-        }
-
+        
         // 电池耗尽时的处理
         private void OnNoBattery(Instance smi)
         {
@@ -141,6 +219,10 @@ namespace TeleportSuitMod
             //        gameObject.AddTag(GameTags.SuitBatteryOut);
             //    }
             //}
+        }
+
+        internal class Def:BaseDef
+        {
         }
     }
 }

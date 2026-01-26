@@ -323,9 +323,9 @@ namespace TeleportSuitMod
             // 播放传送动画
             animController.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
             animController.PlaySpeedMultiplier = PlaySpeedMultiplier;
-            //animController.Play("working_pre");
-            animController.Queue("working_loop");
-            animController.Queue("working_pst");
+            animController.Play("working_pre");
+            //animController.Queue("working_loop");
+            //animController.Queue("working_pst");
 
             // 动画结束后重置
             Action<object> onAnimComplete = null;
@@ -378,8 +378,6 @@ namespace TeleportSuitMod
                 navigator.CurrentNavType = NavType.Tube;
             else if (Grid.HasPole[cell])
                 navigator.CurrentNavType = NavType.Pole;
-            //else if (Grid.IsSubstantialLiquid(cell))
-            //    navigator.CurrentNavType = NavType.Swim;
         }
 
         /// <summary>

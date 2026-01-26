@@ -18,7 +18,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(SummonCrewSideScreen), "ToggleCrewRequestState", MethodType.Normal)]
         public static class SummonCrewSideScreen_ToggleCrewRequestState_Patch
         {
-            private const string ModuleName = "ToggleCrewRequestState_Patch";
+            private const string ModuleName = "SummonCrewSideScreen_ToggleCrewRequestState_Patch";
             public static bool Prefix(SummonCrewSideScreen __instance)
             {
                 // 反射获取私有字段craftModuleInterface
@@ -167,7 +167,7 @@ namespace TeleportSuitMod
         [HarmonyPatch(typeof(LaunchableRocketCluster.StatesInstance), nameof(LaunchableRocketCluster.StatesInstance.FinalizeLanding))]
         public static class LaunchableRocketCluster_FinalizeLanding_Patch
         {
-            private static readonly string ModuleName = "RocketCabinRestriction";
+            private static readonly string ModuleName = "LaunchableRocketCluster_FinalizeLanding_Patch";
             // ========== 调试开关：控制内部世界对象溯源逻辑的启用/禁用 ==========
             // 上线前设为 false，调试时设为 true
             private const bool EnableCabinTraceDebug = false;

@@ -22,6 +22,19 @@ namespace TeleportSuitMod
                 return interactAnim;
             }
         }
+        public static KAnimFile AstomStandAnim
+        {
+            get
+            {
+                if (astomstandAnim == null)
+                {
+                    astomstandAnim = Assets.GetAnim("astom_stand_kanim");
+                }
+                return astomstandAnim;
+            }
+        }
+
+        private static KAnimFile astomstandAnim = null;
         private static KAnimFile interactAnim = null;
         public static string ID = "Teleport_Suit";
         public static string WORN_ID = "Worn_Teleport_Suit";
@@ -38,6 +51,8 @@ namespace TeleportSuitMod
         public static float ATHLETICS = -8;
         public static readonly string ModuleName = "TeleportSuitConfig";
 
+        public static bool TeleportAnyWhere = TeleNavigator.StandInSpaceEnable;
+        public KBatchedAnimController astomStandAnim;
         //private AttributeModifier expertAthleticsModifier;
 
         static CellOffset[] bounding_offsets = new CellOffset[2]
@@ -46,76 +61,6 @@ namespace TeleportSuitMod
                         new CellOffset(0, 1)
             };
 
-        protected static bool IsCellPassable(int cell , bool is_dupe)
-        {
-            Grid.BuildFlags buildFlags = Grid.BuildMasks[cell] & ~(Grid.BuildFlags.FakeFloor | Grid.BuildFlags.Foundation | Grid.BuildFlags.Door);
-            if (buildFlags == ~Grid.BuildFlags.Any)
-            {
-                return true;
-            }
-            if (is_dupe)
-            {
-                if ((buildFlags & Grid.BuildFlags.DupeImpassable) != 0)
-                {
-                    return false;
-                }
-                if ((buildFlags & Grid.BuildFlags.Solid) != 0)
-                {
-                    return (buildFlags & Grid.BuildFlags.DupePassable) != 0;
-                }
-                return true;
-            }
-            return (buildFlags & (Grid.BuildFlags.Solid | Grid.BuildFlags.CritterImpassable)) == 0;
-        }
-        static public bool CanTeloportTo(int targetcell)
-        {
-            if (TeleportationOverlay.TeleportRestrict == null)
-            {
-                TeleportationOverlay.TeleportRestrict = new bool[Grid.CellCount];
-            }
-            if ((!Grid.IsValidCell(targetcell)) || !(Grid.IsVisible(targetcell)))
-            {
-                return false;
-            }
-            if (TeleportationOverlay.TeleportRestrict[targetcell] == true)
-            {
-                return false;
-            }
-            int cell2;
-            bool flag4 = false;
-            foreach (CellOffset offset in bounding_offsets)
-            {
-                cell2 = Grid.OffsetCell(targetcell , offset);
-                if (!Grid.IsWorldValidCell(cell2) || !IsCellPassable(cell2 , true))
-                {
-                    return false;
-                }
-                int num = Grid.CellAbove(cell2);
-                if (Grid.IsValidCell(num) && Grid.Element[num].IsUnstable)
-                {
-                    return false;
-                }
-            }
-            //flag4 初次判断是落点是否有效，原系统方法
-            if (GameNavGrids.FloorValidator.IsWalkableCell(targetcell , Grid.CellBelow(targetcell) , true) || Grid.HasLadder[targetcell] || Grid.HasPole[targetcell])
-            {
-                flag4 = true;
-            }
-            bool value = false;
-            bool flag = false;
-
-            int aboveCell = Grid.CellAbove(targetcell);
-            bool cellValid = Grid.IsValidCell(targetcell);
-            bool aboveCellValid = Grid.IsValidCell(aboveCell);
-            //flag :flag4 失效后，落点的宽松判断
-            flag = (!flag4 && cellValid && Grid.Solid[targetcell] && !Grid.DupePassable[targetcell]) || (aboveCellValid && Grid.Solid[aboveCell] && !Grid.DupePassable[aboveCell]) || (cellValid && Grid.DupeImpassable[targetcell]) || (aboveCellValid && Grid.DupeImpassable[aboveCell]);
-            value = !flag4 && !flag;// 0 && ?
-            if (flag || value)//0 || 0
-            {
-                return false;
-            }
-            return true;
-        }
         public EquipmentDef CreateEquipmentDef()
         {
             //LocString.CreateLocStringKeys(typeof(TeleportSuitStrings.EQUIPMENT));
@@ -182,7 +127,8 @@ namespace TeleportSuitMod
                         }
                     }
                     MinionResume component4 = targetGameObject2.GetComponent<MinionResume>();
-                    targetGameObject2.AddTag(GameTags.HasAirtightSuit);
+                    targetGameObject2.AddTag(GameTags.HasAirtightSuit);                    targetGameObject2.AddTag(GameTags.HasAirtightSuit);
+
                 }
             };
 
@@ -213,6 +159,7 @@ namespace TeleportSuitMod
                             }
                         }
                         Tag elementTag = eq.GetComponent<SuitTank>().elementTag;
+                        targetGameObject.RemoveTag(GameTags.HasAirtightSuit);
                         eq.GetComponent<Storage>().DropUnlessHasTag(elementTag);
                         targetGameObject.RemoveTag(GameTags.HasAirtightSuit);
                     }
@@ -247,9 +194,13 @@ namespace TeleportSuitMod
             go.AddOrGet<AtmoSuit>();
             go.AddComponent<SuitDiseaseHandler>();
 
-        }
 
-    public string[] GetDlcIds()
+            go.AddOrGet<RocketCabinRestriction>();
+
+            go.AddOrGet<TeleNavigator>();
+
+        }
+        public string[] GetDlcIds()
         {
             //应该是让dlc和原版都可以使用
             return DlcManager.AVAILABLE_ALL_VERSIONS;
