@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PeterHan.PLib.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -64,34 +65,31 @@ namespace TeleportSuitMod
         }
         protected override void OnSpawn()
         {
-            LogUtils.LogDebug("TeleNavigator",$"OnSpawn");
+            LogUtils.LogDebug("TeleNavigator", $"OnSpawn");
             base.OnSpawn();
             InitializeTelePathGrid();
 
             SimAndRenderScheduler.instance.Add(this, false);
 
-            if(Game.Instance != null){
+            if (Game.Instance != null) {
                 Game.Instance.Subscribe((int)GameHashes.ActiveWorldChanged, OnWorldChanged);
             }
 
             if (ClusterManager.Instance != null) activeWorldIdx = ClusterManager.Instance.activeWorldId;
-
-            //Subscribe((int)GameHashes.GameLoaded, OnGameLoaded);
         }
 
         protected override void OnCleanUp()
         {
             LogUtils.LogDebug("TeleNavigator", $"OnCleanUp");
             if (NavTargetCache != null) NavTargetCache.Clear();
-            if(NavigatorWorldId != null) NavigatorWorldId.Clear();
+            if (NavigatorWorldId != null) NavigatorWorldId.Clear();
 
-            //Game.Instance.Unsubscribe((int)GameHashes.ActiveWorldChanged);
             TelePathGrid = null;
             base.OnCleanUp();
         }
         public static bool IsInShortRange(Navigator __instance)
         {
-            if (!TeleNavigator.NavTargetCache.TryGetValue(__instance, out var cacheData)){
+            if (!TeleNavigator.NavTargetCache.TryGetValue(__instance, out var cacheData)) {
                 return false;
             }
             if (cacheData.isShortRange) return true;
@@ -129,14 +127,16 @@ namespace TeleportSuitMod
 
             return NavType.NumNavTypes;
         }
-        public static void resetNavType(Navigator navigator,int cell)
+        public static void resetNavType(Navigator navigator, int cell)
         {
             if (navigator == null) return;
+
             if (Grid.HasLadder[cell]) navigator.CurrentNavType = NavType.Ladder;
-            if (Grid.HasPole[cell]) navigator.CurrentNavType = NavType.Pole;
-            if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
+            else if (Grid.HasPole[cell]) navigator.CurrentNavType = NavType.Pole;
+            else if (GameNavGrids.FloorValidator.IsWalkableCell(cell, Grid.CellBelow(cell), true))
                 navigator.CurrentNavType = NavType.Floor;
-            if (Grid.HasTube[cell]) navigator.CurrentNavType = NavType.Tube;
+            else if (Grid.HasTube[cell]) navigator.CurrentNavType = NavType.Tube;
+            else navigator.CurrentNavType = NavType.Hover;
         }
 
         // --- 性能优化: 缓存 CellCount 和 TeleportRestrict ---
@@ -144,8 +144,8 @@ namespace TeleportSuitMod
 
         // --- 配置 ---
         public static readonly bool StandInSpaceEnable = TeleportSuitOptions.Instance.teleportfloat;
-                                                      // 假设 bounding_offsets 是固定的 { (0, 0), (0, 1) } 代表 1x2 单位 (脚, 头) 或类似定义
-        private static readonly CellOffset[] BoundingOffsets = { new CellOffset(0, 0), new CellOffset(0, 1) }; 
+        // 假设 bounding_offsets 是固定的 { (0, 0), (0, 1) } 代表 1x2 单位 (脚, 头) 或类似定义
+        private static readonly CellOffset[] BoundingOffsets = { new CellOffset(0, 0), new CellOffset(0, 1) };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static public bool CanTeloportTo(int targetcell)
@@ -166,7 +166,7 @@ namespace TeleportSuitMod
             foreach (CellOffset offset in BoundingOffsets)
             {
                 int cell2 = Grid.OffsetCell(targetcell, offset);
-                if(cell2 < 0 || cell2 > Grid.CellCount) continue;
+                if (cell2 < 0 || cell2 > Grid.CellCount) continue;
                 // --- 内联 IsCellPassable(cell2, true) 逻辑 ---
                 // 注意: 这里假设 is_dupe 总是 true
                 {
@@ -247,6 +247,9 @@ namespace TeleportSuitMod
 
         // --- 新增: TelePathGrid 相关 ---
         private static bool[] TelePathGrid = null;
+        // 缓存：当前受限制的Navigators及其目标WorldId目前用于舱内世界
+        private static Dictionary<Navigator, int> _cachedRestrictWorlds = new Dictionary<Navigator, int>();
+
         // 引入一个简单的更新周期计数器或标志
         private static readonly int UPDATE_CYCLE_INTERVAL = 100; // 例如，每 100 个 Sim Tick 周期启动一次完整更新
         //标记
@@ -269,7 +272,7 @@ namespace TeleportSuitMod
         private void OnWorldChanged(object obj)
         {
             //世界切换
-            LogUtils.LogDebug("TeleNavigator",$"OnWorldChanged [{((Tuple <int,int>)obj).second}] To [{((Tuple<int, int>)obj).first}]");
+            LogUtils.LogDebug("TeleNavigator", $"OnWorldChanged [{((Tuple<int, int>)obj).second}] To [{((Tuple<int, int>)obj).first}]");
             activeWorldIdx = ((Tuple<int, int>)obj).first;
             dirtyData = true;
             //中断正在更新的TelePathGrid
@@ -290,7 +293,7 @@ namespace TeleportSuitMod
             }
             else if (Grid.CellCount == 0)
             {
-                LogUtils.LogError("TeleNavigator", $"Grid.CellCount is 0 during InitializeTelePathGrid!");
+                LogUtils.LogWarning("TeleNavigator", $"Grid.CellCount is 0 during InitializeTelePathGrid!");
             }
         }
         // MarkTelePathGridDirty becomes less critical or can be removed/modified
@@ -304,12 +307,36 @@ namespace TeleportSuitMod
                                                             // if (TelePathGridUpdateStartFrame == -1) { PerformTelePathGridUpdateFrame(); }
                                                             // But Option 1 integrates better with the tick-based schedule.
         }
+        //更新太空舱的显示关联关系
+        public static void UpdateCachedRestrictions()
+        {
+            // 从 RocketCabinRestriction 获取最新的限制信息
+            var newRestrictions = RocketCabinRestriction.GetRestrictWorld();
+
+            // 替换本地缓存
+            _cachedRestrictWorlds = newRestrictions;
+
+        }
+        /**
+         * 查询太空舱是否被限制
+         * navigator的 目标格子worldId 被限制返回 true
+         */
+        public static bool IsNavigatorRestricted(Navigator navigator, int targetWorldId)
+        {
+            if (navigator != null && _cachedRestrictWorlds.TryGetValue(navigator, out int restrictedToWorldId))
+            {
+                // 如果缓存中有这个navigator的记录，并且目标世界ID匹配，则返回true（表示阻止）
+                return targetWorldId == restrictedToWorldId;
+            }
+            // 否则（不在缓存中，或目标世界ID不匹配）返回false（表示不阻止）
+            return false;
+        }
         /// <summary>
         /// 在每一帧的 Sim 更新中调用此方法，以推进分片更新。
         /// </summary>
         private static void OnSimEveryTick_FrameUpdate(float dt)
         {
-            if(TelePathGridUpdateStartFrame == -1)
+            if (TelePathGridUpdateStartFrame == -1)
             {
                 updateCycleCounter++;
 
@@ -323,7 +350,8 @@ namespace TeleportSuitMod
                         }
                     } else
                     {
-                        LogUtils.LogDebug("TeleNavigator", "Scheduled update skipped: TelePathGrid or Grid.CellCount invalid.");
+                        LogUtils.LogDebug("TeleNavigator", "Scheduled update skipped: TelePathGrid or Grid.CellCount invalid,Initialize TelePathGrid again.");
+                        InitializeTelePathGrid();
                     }
                 }
                 else
@@ -369,7 +397,7 @@ namespace TeleportSuitMod
                 TelePathGridUpdateStartFrame = -1;
                 TelePathGridUpdateCurrentIndex = 0;
                 updateCycleCounter = 0; // Also reset scheduler if grid is gone
-                LogUtils.LogError("TeleNavigator", "TelePathGrid is null during PerformTelePathGridUpdateFrame!");
+                LogUtils.LogWarning("TeleNavigator", "TelePathGrid is null during PerformTelePathGridUpdateFrame!");
                 return;
             }
 
@@ -390,7 +418,7 @@ namespace TeleportSuitMod
                 }
                 else
                 {
-                    LogUtils.LogError("TeleNavigator", $"Grid.CellCount is 0, cannot start update.");
+                    LogUtils.LogWarning("TeleNavigator", $"Grid.CellCount is 0, cannot start update.");
                     TelePathGridUpdateStartFrame = -1; // Ensure it can start again next time
                     return;
                 }
@@ -411,7 +439,7 @@ namespace TeleportSuitMod
                 {
                     bool canTeloportTo = false;
                     {
-                       canTeloportTo = CanTeloportTo(i);
+                        canTeloportTo = CanTeloportTo(i);
                     }
                     TelePathGrid[i] = canTeloportTo;
                     if (TelePathGrid[i]) lastFullUpdateCellCount++;
@@ -432,7 +460,7 @@ namespace TeleportSuitMod
                 // --- 更新完成 ---
                 TelePathGridUpdateStartFrame = -1; // <--- CRITICAL: Allows next scheduled cycle to start fresh
                 updateCycleCounter = 0; // 重置计数器
-                if(dirtyData) dirtyData = false;
+                if (dirtyData) dirtyData = false;
 
                 // --- 性能评测结束 (完整更新) ---
                 updateStopwatch.Stop();
@@ -453,11 +481,11 @@ namespace TeleportSuitMod
         //记录小人的星球信息
         public static Dictionary<Navigator, int> NavigatorWorldId = new Dictionary<Navigator, int>();
         public static readonly object NavigatorWorldIdLocker = new object();
-        public static void AddOrUpdateNavigatorWorldId(Navigator navigator)
+        public static int AddOrUpdateNavigatorWorldId(Navigator navigator)
         {
-            if (navigator == null) return;
+            if (navigator == null) return -1;
             int cell = Grid.PosToCell(navigator.gameObject.transform.position);
-            if(Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue){
+            if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue) {
                 lock (NavigatorWorldIdLocker)
                 {
                     if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]) != null)
@@ -465,15 +493,20 @@ namespace TeleportSuitMod
                         NavigatorWorldId[navigator] = ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
                     }
                 }
-            }else {
+            } else {
                 lock (NavigatorWorldIdLocker)
                 {
                     NavigatorWorldId[navigator] = -1;
                 }
             }
+            return NavigatorWorldId[navigator];
         }
-        public static bool GetNavigatorWorldId(Navigator navigator,out int worldId) {
-            worldId = NavigatorWorldId.TryGetValue(navigator,out var wid) ? wid : -1;
+        public static bool GetNavigatorWorldId(Navigator navigator, out int worldId) {
+            worldId = -1;
+            if (!NavigatorWorldId.TryGetValue(navigator, out var wid)) {
+                worldId = AddOrUpdateNavigatorWorldId(navigator);
+            }
+            worldId = wid;
             return true;
         }
 

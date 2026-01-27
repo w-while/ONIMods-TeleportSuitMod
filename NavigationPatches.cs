@@ -30,7 +30,19 @@ namespace TeleportSuitMod
                 }
             }
         }
-
+        //实例化两个重要的单例TeleNavigator/RocketCabinRestriction
+        [HarmonyPatch(typeof(Game), "OnSpawn")]
+        public class ModSingletonManager
+        {
+            public static void Postfix()
+            {
+                LogUtils.LogDebug("ModSingletonManager", "ModSingletonManager Postfix");
+                GameObject teleNavigatorGameObject = new GameObject(nameof(TeleNavigator));
+                teleNavigatorGameObject.AddComponent<TeleNavigator>();
+                teleNavigatorGameObject.AddComponent<RocketCabinRestriction>();
+                teleNavigatorGameObject.SetActive(true);
+            }
+        }
         //修改整个殖民地能否到达某个方块，会影响世界的库存等等
         [HarmonyPatch(typeof(MinionGroupProber), nameof(MinionGroupProber.IsReachable), new Type[] { typeof(int) })]
         public static class MinionGroupProber_IsReachable_AssumeLock_Patch
@@ -72,39 +84,24 @@ namespace TeleportSuitMod
 
                 if (__result == -1 && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
-                    //===== 新增：太空舱拦截逻辑（最优先判断）=====
-                    //if (Grid.WorldIdx[cell] != Grid.WorldIdx[Grid.PosToCell(__instance)]) { }
+                    
                     int targetWorldId = Grid.WorldIdx[cell];
-                    if (targetWorldId != Grid.WorldIdx[Grid.PosToCell(__instance)])
-                    {
-                        // 太空舱拦截：阻断则直接返回，不执行后续传送逻辑
-                        if (RocketCabinRestriction.QuickCheckBlockTeleport(__instance, targetWorldId))
-                        {
-                            __result = -1;
-                            return false;
-                        }
-                    }
-
                     if (TeleNavigator.GetNavigatorWorldId(__instance,out int wid) && wid != -1
                         && ClusterManager.Instance.GetWorld(targetWorldId).ParentWorldId == wid
                         && TeleNavigator.IsCellTeleportAccessible(cell))
                     {
+                        //===== 新增：太空舱拦截逻辑（最优先判断）=====
+                        if (wid != targetWorldId && TeleNavigator.IsNavigatorRestricted(__instance, targetWorldId))
+                        {
+                            __result = -1;
+                            return false;
+                        }
                         __result = 1;
                         return false;
                     }
-                    __result = -1;
+                    __result = -1; 
                     return false;
                 }
-                return true;
-            }
-        }
-        [HarmonyPatch(typeof(Navigator), nameof(Navigator.UpdateProbe), new Type[] { typeof(bool) })]
-        public class Navigator_UpProbe_Patches
-        {
-            public static bool Prefix(Navigator __instance, bool forceUpdate = false)
-            {
-                if (__instance == null && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) == 0) return true;
-                TeleNavigator.AddOrUpdateNavigatorWorldId(__instance);
                 return true;
             }
         }
@@ -211,7 +208,7 @@ namespace TeleportSuitMod
         public static class PathFinder_UpdatePath_Patch
         {
             private static readonly string ModuleName = "AdvancePathPatch";
-            public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell)
+            public static bool Prefix(Navigator __instance, ref NavTactic ___tactic, ref int ___reservedCell, bool trigger_advance = true)
             {
                 try
                 {
@@ -289,6 +286,8 @@ namespace TeleportSuitMod
                                 Vector3 position = Grid.CellToPos(reservedCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
                                 // 强制修改小人的世界坐标 → 实现“瞬移（传送）”
                                 __instance.transform.SetPosition(position);
+                                //更新小人所属世界
+                                TeleNavigator.AddOrUpdateNavigatorWorldId(__instance);
                                 // ========== 重置导航状态（适配目标格子） ==========
                                 TeleNavigator.resetNavType(__instance, reservedCell);
 
@@ -296,7 +295,8 @@ namespace TeleportSuitMod
                                 __instance.Stop(arrived_at_destination: true, false);
                                 // 取消动画回调订阅（避免内存泄漏）
                                 __instance.Unsubscribe((int)GameHashes.AnimQueueComplete, action);
-                                __instance.Trigger(1347184327);
+
+                                if (trigger_advance) __instance.Trigger(1347184327);
 
                             };
 

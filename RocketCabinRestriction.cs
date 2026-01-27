@@ -179,6 +179,24 @@ namespace TeleportSuitMod
             if(Instance == null || Instance._cabinStateCache == null ) return false;
             return Instance._cabinStateCache.TryGetValue(canbinWorldId,out var cabinState) && cabinState.IsSummoning;
         }
+        public static Dictionary<Navigator, int> GetRestrictWorld() { 
+            var restrictions = new Dictionary<Navigator, int>();
+            if (Instance != null && Instance._cabinStateCache != null && Instance._navigatorToCabinMap != null)
+            {
+                foreach (var kvp in Instance._cabinStateCache)
+                {
+                    if (kvp.Value.IsSummoning)
+                    {
+                        foreach (var kvp2 in Instance._navigatorToCabinMap)
+                        {
+                            if (kvp2.Value == kvp.Key) { restrictions.Add(kvp2.Key, kvp.Key); break; }
+                        }
+
+                    }
+                }
+            }
+            return restrictions;
+        }
         public static bool QuickCheckBlockTeleport(Navigator navigator, int canbinWorldId)
         {
             if(Instance == null || navigator == null) return false;
@@ -334,6 +352,7 @@ namespace TeleportSuitMod
                         : "无";
                     LogUtils.LogDebug(ModuleName, $"舱[{cabinWorldId}]最终船员列表：{finalCrewList}");
                 }
+                TeleNavigator.UpdateCachedRestrictions();
 
             }
             catch (Exception e)

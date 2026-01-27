@@ -138,7 +138,8 @@ namespace TeleportSuitMod
             // 核心：修改小人坐标到目标格子
             Vector3 targetPos = Grid.CellToPos(targetCell, CellAlignment.Bottom, (Grid.SceneLayer)25);
             navigator.transform.SetPosition(targetPos);
-
+            //更新小人所属世界
+            TeleNavigator.AddOrUpdateNavigatorWorldId(navigator);
             // 适配目标格子的导航类型
             ResetNavType(navigator, targetCell);
 
@@ -216,6 +217,8 @@ namespace TeleportSuitMod
 
             // ========== 坐标修改 + 状态重置 ==========
             navigator.transform.SetPosition(targetWorldPos);
+            //更新小人所属世界
+            TeleNavigator.AddOrUpdateNavigatorWorldId(navigator);
             int newCell = Grid.PosToCell(navigator.transform.position);
             ResetNavType(navigator, newCell);
 
@@ -323,9 +326,9 @@ namespace TeleportSuitMod
             // 播放传送动画
             animController.AddAnimOverrides(TeleportSuitConfig.InteractAnim, 1f);
             animController.PlaySpeedMultiplier = PlaySpeedMultiplier;
-            animController.Play("working_pre");
+            //animController.Play("working_pre");
             //animController.Queue("working_loop");
-            //animController.Queue("working_pst");
+            animController.Queue("working_pst");
 
             // 动画结束后重置
             Action<object> onAnimComplete = null;
@@ -394,7 +397,6 @@ namespace TeleportSuitMod
                 return NavType.Floor;
             if (Grid.HasTube[cell]) return NavType.Tube;
             if (Grid.HasPole[cell]) return NavType.Pole;
-            //if (Grid.IsSubstantialLiquid(cell)) return NavType.Swim;
 
             return NavType.NumNavTypes;
         }
