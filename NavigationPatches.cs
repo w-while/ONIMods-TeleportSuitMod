@@ -151,7 +151,7 @@ namespace TeleportSuitMod
 
             public static bool Prefix(Navigator __instance, PathFinderQuery query)
             {
-                if (TeleNavigator.isTeleMiniom(__instance)) return true;
+                if (!TeleNavigator.isTeleMiniom(__instance)) return true;
 
                 query.ClearResult();
                 int rootCell = Grid.PosToCell(__instance);
