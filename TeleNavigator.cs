@@ -138,8 +138,13 @@ namespace TeleportSuitMod
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static public bool CanTeloportTo(int targetcell)
         {
+            if (Grid.CellCount <= 0 ||
+                TeleportationOverlay.TeleportRestrict == null )
+            {
+                return false; // Cannot teleport if underlying systems are not initialized
+            }
             // --- 1. 检查: 限制区域 ---
-            if (TeleportationOverlay.TeleportRestrict[targetcell])
+            if (Grid.IsValidCell(targetcell) && TeleportationOverlay.TeleportRestrict[targetcell])
             {
                 return false;
             }
@@ -154,7 +159,7 @@ namespace TeleportSuitMod
             foreach (CellOffset offset in BoundingOffsets)
             {
                 int cell2 = Grid.OffsetCell(targetcell, offset);
-                if (cell2 < 0 || cell2 > Grid.CellCount) continue;
+                if (!Grid.IsValidCell(cell2)) continue;
                 // --- 内联 IsCellPassable(cell2, true) 逻辑 ---
                 // 注意: 这里假设 is_dupe 总是 true
                 {
@@ -197,9 +202,10 @@ namespace TeleportSuitMod
 
             // --- 5. 普通模式: 综合检查 ---
             // a. 检查目标点是否是标准位置 (flag4)
-            bool isStandardLocation = GameNavGrids.FloorValidator.IsWalkableCell(targetcell, Grid.CellBelow(targetcell), true) ||
+            int cellBelow = Grid.CellBelow(targetcell);
+            bool isStandardLocation = Grid.IsValidCell(cellBelow) && (GameNavGrids.FloorValidator.IsWalkableCell(targetcell, Grid.CellBelow(targetcell), true) ||
                                         Grid.HasLadder[targetcell] ||
-                                        Grid.HasPole[targetcell];
+                                        Grid.HasPole[targetcell]);
 
             if (!isStandardLocation)
             {
@@ -419,7 +425,6 @@ namespace TeleportSuitMod
             }
             // --- 执行当前帧的批次更新 ---
             int endIndex = Math.Min(TelePathGridUpdateCurrentIndex + TelePathGridUpdateBatchSize, TelePathGrid.Length);
-
             for (int i = TelePathGridUpdateCurrentIndex; i < endIndex; i++)
             {
                 // 注意：CanTeloportTo 可能访问无效的 i，虽然 Min 应该防止，但保险起见加个检查
