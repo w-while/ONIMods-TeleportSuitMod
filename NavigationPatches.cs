@@ -24,7 +24,7 @@ namespace TeleportSuitMod
             internal static void Prefix()
             {
                 TeleportationOverlay.TeleportRestrict = null;
-                if (TeleportSuitWorldCountManager.Instance != null &&  TeleportSuitWorldCountManager.Instance.WorldCount != null)
+                if (TeleportSuitWorldCountManager.Instance != null && TeleportSuitWorldCountManager.Instance.WorldCount != null)
                 {
                     TeleportSuitWorldCountManager.Instance.WorldCount.Clear();
                 }
@@ -51,7 +51,7 @@ namespace TeleportSuitMod
             public static void Postfix(int cell, ref bool __result)
             {
                 //如果判定为无法常规到达，则开始判定是否能传送到达
-                if (__result == false)__result = CanBeReachByMinionGroup(cell);
+                if (__result == false) __result = CanBeReachByMinionGroup(cell);
             }
         }
         /**
@@ -80,13 +80,13 @@ namespace TeleportSuitMod
             public static bool Prefix(Navigator __instance, int cell, ref int __result)
             {
                 if (__instance == null || !Grid.IsValidCell(cell)) return true;
-                __result =  __instance.PathGrid.GetCost(cell);
+                __result = __instance.PathGrid.GetCost(cell);
 
                 if (__result == -1 && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
-                    
+
                     int targetWorldId = Grid.WorldIdx[cell];
-                    if (TeleNavigator.GetNavigatorWorldId(__instance,out int wid) && wid != -1
+                    if (TeleNavigator.GetNavigatorWorldId(__instance, out int wid) && wid != -1
                         && ClusterManager.Instance.GetWorld(targetWorldId).ParentWorldId == wid
                         && TeleNavigator.IsCellTeleportAccessible(cell))
                     {
@@ -99,7 +99,7 @@ namespace TeleportSuitMod
                         __result = 1;
                         return false;
                     }
-                    __result = -1; 
+                    __result = -1;
                     return false;
                 }
                 return true;
@@ -124,7 +124,7 @@ namespace TeleportSuitMod
                 int currentCell = __instance.cachedCell;
 
                 // 3. 计算初始目标与当前位置的距离
-                int cellPrefernce = tactic.GetCellPreferences(initialTargetCell, offsets,__instance);
+                int cellPrefernce = tactic.GetCellPreferences(initialTargetCell, offsets, __instance);
                 int distance = __instance.PathGrid.GetCost(cellPrefernce);
                 // 4. 判定是否为短距离
                 bool isShortRange = distance != -1 ? distance <= 100 : false;
@@ -212,7 +212,7 @@ namespace TeleportSuitMod
             {
                 try
                 {
-                    if (__instance != null && ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)&& Grid.PosToCell(__instance) != ___reservedCell)
+                    if (__instance != null && ((__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0) && Grid.PosToCell(__instance) != ___reservedCell)
                     {
                         int target_position_cell = Grid.PosToCell(__instance.target);
                         int targetWorldId = Grid.WorldIdx[target_position_cell];
@@ -222,6 +222,13 @@ namespace TeleportSuitMod
                         {
                             __instance.Stop();
                             return true;
+                        }
+                        if (TeleportationOverlay.TeleportRestrict != null)
+                        {
+                            if (TeleportationOverlay.TeleportRestrict[target_position_cell])
+                            {
+                                return true;
+                            }
                         }
                         //===关键逻辑：Blockers
                         if (TeleportBlockerManager.Instance != null && TeleportBlockerManager.Instance.IsTeleportBlocked(__instance, targetWorldId)) return true;
@@ -368,7 +375,18 @@ namespace TeleportSuitMod
         public static bool CanBeReachByMinionGroup(int cell)
         {
             if (!Grid.IsValidCell(cell)) return false;
-            return TeleNavigator.CanTeloportTo(cell);
+
+            if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]) != null
+                && TeleportSuitWorldCountManager.Instance.WorldCount.TryGetValue(
+                ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId, out int value)
+                && value > 0)
+            {
+                return TeleNavigator.CanTeloportTo(cell);
+            }
+            else
+            {
+                return false;
+            }
         }
         #region MovTo功能 手动世界传送的基础
         [HarmonyPatch(typeof(MoveToLocationTool), nameof(MoveToLocationTool.CanMoveTo), new Type[] { typeof(int) })]
@@ -547,6 +565,4 @@ namespace TeleportSuitMod
         }
         #endregion
     }
-
-
 }

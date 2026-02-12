@@ -138,15 +138,12 @@ namespace TeleportSuitMod
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static public bool CanTeloportTo(int targetcell)
         {
-            if (Grid.CellCount <= 0 ||
-                TeleportationOverlay.TeleportRestrict == null )
-            {
-                return false; // Cannot teleport if underlying systems are not initialized
-            }
             // --- 1. 检查: 限制区域 ---
-            if (Grid.IsValidCell(targetcell) && TeleportationOverlay.TeleportRestrict[targetcell])
-            {
-                return false;
+            if(Grid.IsValidCell(targetcell) && TeleportationOverlay.TeleportRestrict != null){
+                if (TeleportationOverlay.TeleportRestrict[targetcell])
+                {
+                    return false;
+                }
             }
 
             // --- 2. 基础有效性检查 ---
