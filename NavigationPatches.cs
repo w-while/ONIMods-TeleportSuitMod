@@ -85,9 +85,9 @@ namespace TeleportSuitMod
                 if (__result == -1 && (__instance.flags & TeleportSuitConfig.TeleportSuitFlags) != 0)//穿着传送服
                 {
 
-                    int targetWorldId = Grid.WorldIdx[cell];
+                    int targetWorldId = Grid.WorldIdx == null? -1 : Grid.WorldIdx[cell];
                     if (TeleNavigator.GetNavigatorWorldId(__instance, out int wid) && wid != -1
-                        && ClusterManager.Instance.GetWorld(targetWorldId).ParentWorldId == wid
+                        && ClusterManager.Instance?.GetWorld(targetWorldId)?.ParentWorldId == wid
                         && TeleNavigator.IsCellTeleportAccessible(cell))
                     {
                         //===== 新增：太空舱拦截逻辑（最优先判断）=====

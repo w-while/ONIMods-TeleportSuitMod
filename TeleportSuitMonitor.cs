@@ -149,6 +149,7 @@ namespace TeleportSuitMod
             }
             public override void StopSM(string reason)
             {
+                UpdateFloat(this,1);
                 base.StopSM(reason);
             }
         }

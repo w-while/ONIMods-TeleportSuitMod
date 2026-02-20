@@ -116,8 +116,6 @@
     <None Include=".editorconfig" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_anim.bytes" />
     <None Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting_build.bytes" />
-    <None Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_anim.bytes" />
-    <None Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_build.bytes" />
     <None Include="anim\assets\teleport_suit\teleport_suit_anim.bytes" />
     <None Include="anim\assets\teleport_suit\teleport_suit_build.bytes" />
     <None Include="anim\assets\teleport_suit_body\teleport_suit_body_anim.bytes" />
@@ -140,7 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="anim\assets\anim_teleport_suit_teleporting\anim_teleport_suit_teleporting.png" />
-    <Content Include="anim\assets\jetsuit_thruster_fx\jetsuit_thruster_fx_0.png" />
     <Content Include="anim\assets\teleport_suit\teleport_suit.png" />
     <Content Include="anim\assets\teleport_suit_body\teleport_suit_body.png" />
     <Content Include="anim\assets\teleport_suit_locker\teleport_suit_locker.png" />

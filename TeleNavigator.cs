@@ -305,7 +305,7 @@ namespace TeleportSuitMod
             var newRestrictions = RocketCabinRestriction.GetRestrictWorld();
 
             // 替换本地缓存
-            _cachedRestrictWorlds = newRestrictions;
+            if(newRestrictions != null ) _cachedRestrictWorlds = newRestrictions;
 
         }
         /**
@@ -314,7 +314,7 @@ namespace TeleportSuitMod
          */
         public static bool IsNavigatorRestricted(Navigator navigator, int targetWorldId)
         {
-            if (navigator != null && _cachedRestrictWorlds.TryGetValue(navigator, out int restrictedToWorldId))
+            if (navigator != null && _cachedRestrictWorlds != null && _cachedRestrictWorlds.TryGetValue(navigator, out int restrictedToWorldId))
             {
                 // 如果缓存中有这个navigator的记录，并且目标世界ID匹配，则返回true（表示阻止）
                 return targetWorldId == restrictedToWorldId;
@@ -474,31 +474,29 @@ namespace TeleportSuitMod
         public static int AddOrUpdateNavigatorWorldId(Navigator navigator)
         {
             if (navigator == null) return -1;
-            int cell = Grid.PosToCell(navigator.gameObject.transform.position);
+            lock (NavigatorWorldIdLocker)
+            {
+                NavigatorWorldId[navigator] = -1;
+            }
+            int cell = Grid.PosToCell(navigator);
             if (Grid.IsValidCell(cell) && Grid.WorldIdx[cell] != byte.MaxValue) {
-                lock (NavigatorWorldIdLocker)
+                var world = ClusterManager.Instance?.GetWorld(Grid.WorldIdx[cell]);
+                if (world != null)
                 {
-                    if (ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]) != null)
+                    lock (NavigatorWorldIdLocker)
                     {
-                        NavigatorWorldId[navigator] = ClusterManager.Instance.GetWorld(Grid.WorldIdx[cell]).ParentWorldId;
+                        NavigatorWorldId[navigator] = world.ParentWorldId;
                     }
-                }
-            } else {
-                lock (NavigatorWorldIdLocker)
-                {
-                    NavigatorWorldId[navigator] = -1;
                 }
             }
             return NavigatorWorldId[navigator];
         }
         public static bool GetNavigatorWorldId(Navigator navigator, out int worldId) {
             worldId = -1;
-            if (!NavigatorWorldId.TryGetValue(navigator, out var wid)) {
+            if (NavigatorWorldId != null && !NavigatorWorldId.TryGetValue(navigator, out worldId)) {
                 worldId = AddOrUpdateNavigatorWorldId(navigator);
             }
-            worldId = wid;
             return true;
         }
-
     }
 }
